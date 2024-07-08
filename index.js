@@ -7130,18 +7130,18 @@
 
   // package.json
   var package_default = {
-    name: "wacky",
+    name: "mephistopheles",
     version: "1.0.2",
     description: "User Friendly Visual Programming Language",
     author: "catpea",
     repository: {
       type: "git",
-      url: "git+https://github.com/catpea/wacky.git"
+      url: "git+https://github.com/catpea/mephistopheles.git"
     },
     bugs: {
-      url: "https://github.com/catpea/wacky/issues"
+      url: "https://github.com/catpea/mephistopheles/issues"
     },
-    homepage: "https://github.com/catpea/wacky#readme",
+    homepage: "https://github.com/catpea/mephistopheles#readme",
     type: "module",
     main: "index.js",
     scripts: {

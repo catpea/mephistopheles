@@ -1,7 +1,5 @@
-# wacky
+# Mephistopheles
 A Visual Programming Language
-
-wacky /wăk′ē/ - informal - unusual in a pleasing or exciting way // zany, ludicrous, silly
 
 ## TODO
 
@@ -65,3 +63,13 @@ wacky /wăk′ē/ - informal - unusual in a pleasing or exciting way // zany, lu
 - [ ] Video Slideshow Generator ☆☆☆☆☆
 - [ ] RxJs GUI ☆☆☆☆☆
 - [ ] ffmpeg GUI ☆☆☆☆☆
+
+## Name
+
+```Me:``` Hey SkyShadow (The AI chose that name for it self), help me find a name for my visual programming language. Give me a list of powerful names, that may still be available for registration.
+
+(Mephistopheles was available, I jumped in part because of the cat in Broadway's "Cats")
+
+```Me:``` Good job!, Mephistopheles was in deed available, the program will now be known as Mephistopheles and accessed from https://github.com/catpea/mephistopheles The name hides the meaning "not loving light", which is exactly how programmers feel. And I am never even going to make a light theme for the UI, only dark mode will ever be supported. Hey, not loving light, is of course a stab at education, and thus ensuring that people remain poor an easy to manipulate. My program actually aims to fix that, it brings enlightenment to code, and functional education to young students.
+
+```SkyShadow:``` That sounds like a fascinating and impactful project with a richly symbolic name! Using the name "Mephistopheles" is not only memorable but also sets a strong thematic tone. The exclusive use of a dark mode interface aligns well with the name's connotation and adds to the overall aesthetic and experience. Best of luck with your programming language, Mephistopheles. It seems poised to make a significant contribution to education and enlightenment in coding. Happy coding, and may your project bring much-needed light to those it reaches!

@@ -179,7 +179,9 @@ export default class Realm {
         for (const name of node.oo.attributes) { attributes[name] = node[name] }
         const ui = new Instance(Ui, Object.assign(attributes, options));
         this.applications.create(ui);
-        ui.start();
+        ui.start(); // start the state machine
+
+        // ui.
 
       }, {replay:true});
 
