@@ -78,8 +78,8 @@ export default class Window {
 
         const resize = new Resize({
           area: window,
-          minimumX:320,
-          minimumY:200,
+          minimumX:128,
+          minimumY:128,
           handle: this.el.ResizeHandle,
           scale: ()=>this.getScale(this),
           box:  this.getApplication(this),

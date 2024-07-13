@@ -67,6 +67,9 @@ export default class Node {
     s:'Integer',
 
     zoom:'Float',
+
+    showCaption: 'Boolean',
+    showStatus: 'Boolean',
   }
 
   methods = {
@@ -136,6 +139,8 @@ function cast(value, type){
     return parseFloat(value);
   }else if(type === 'Integer'){
     return parseInt(value);
+  }else if(type === 'Boolean'){
+    return String(value).toLowerCase() == "true"
   }else{
     throw new TypeError('Unknown type, no cast procedure')
   }

@@ -21,6 +21,9 @@ export default class System {
   methods = {
 
     initialize(){
+
+      this.on('name', name=>document.title=name)
+
     },
 
     mount(){

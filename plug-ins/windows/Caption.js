@@ -46,10 +46,11 @@ export default class Caption {
           p.children.create(c)
           // this.addDisposableFromMethods(c, 'stop destroy')
         }],
-        [Label, {h: 24, W:24, text: '++', parent:this , r:3}, (c,p)=>{
-          p.children.create(c)
-          // this.addDisposableFromMethods(c, 'stop destroy')
-        }],
+
+        // [Label, {h: 24, W:24, text: '++', parent:this , r:3}, (c,p)=>{
+        //   p.children.create(c)
+        // }],
+
       ], (c)=>{
         // this.addDisposableFromMethods(c, 'stop destroy')
       }
@@ -110,7 +111,7 @@ export default class Caption {
         }
       }
 
-      this.addDisposableFromEvent( maximizeButton.handle, 'click', windowToggle); // maximize button
+      // XXXXXXXXXXXXXXXXXX this.addDisposableFromEvent( maximizeButton.handle, 'click', windowToggle); // maximize button
 
 
 

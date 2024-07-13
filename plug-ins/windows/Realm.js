@@ -181,7 +181,7 @@ export default class Realm {
         this.applications.create(application);
         application.start(); // start the state machine
 
- 
+
 
       }, {replay:true});
 
@@ -202,6 +202,7 @@ export default class Realm {
         show: ({x,y,tx,ty})=>{ // NOTE: tx and ty are translated
 
           const availableComponents = Object.keys(this.components)
+          .filter(o=>!['Pipe', 'Workspace'].includes(o))
           .map(className=>({
             x,y,
             root: this.getApplication().node.id,
@@ -214,8 +215,8 @@ export default class Realm {
                 type:className,
                 x:tx,
                 y:ty,
-                w:300,
-                h:300,
+                w:400,
+                h:400,
               });
               const data = {}; //? NOTE: this can use await...
               node.assign({ }, data);

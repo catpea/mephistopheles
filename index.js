@@ -6374,6 +6374,67 @@
     }
   });
 
+  // package.json
+  var package_default = {
+    name: "mephistopheles",
+    version: "1.0.2",
+    description: "User Friendly Visual Programming Language",
+    author: "catpea",
+    repository: {
+      type: "git",
+      url: "git+https://github.com/catpea/mephistopheles.git"
+    },
+    bugs: {
+      url: "https://github.com/catpea/mephistopheles/issues"
+    },
+    homepage: "https://github.com/catpea/mephistopheles#readme",
+    type: "module",
+    main: "index.js",
+    scripts: {
+      start: "./start.js",
+      save: "git add .; git commit -m 'Updated Release'; git push; npm version patch; npm publish; git push;",
+      test: "./try.js"
+    },
+    keywords: [],
+    imports: {
+      "#plug-ins/*": "./plug-ins/*",
+      "#abstract/*": "./abstract/*"
+    },
+    license: "ISC",
+    dependencies: {
+      "@codemirror/commands": "^6.3.3",
+      "@codemirror/lang-javascript": "^6.2.2",
+      "@codemirror/state": "^6.4.1",
+      "@codemirror/theme-one-dark": "^6.1.2",
+      "@codemirror/view": "^6.24.1",
+      "@xterm/addon-fit": "^0.10.0",
+      "@xterm/xterm": "^5.5.0",
+      bootstrap: "^5.3.2",
+      "bootstrap-icons": "^1.11.3",
+      "calculate-percent": "^2.1.0",
+      cheerio: "^1.0.0-rc.12",
+      codemirror: "^6.0.1",
+      "deep-equal": "^2.2.3",
+      "esbuild-svelte": "^0.8.1",
+      esprima: "^4.0.1",
+      events: "^3.3.0",
+      json5: "^2.2.3",
+      lodash: "^4.17.21",
+      oneof: "^2.1.0",
+      panzoom: "^9.4.3",
+      svelte: "^4.2.17",
+      uuid: "^9.0.1"
+    },
+    devDependencies: {
+      chalk: "^5.3.0",
+      esbuild: "0.19.6",
+      "esbuild-sass-plugin": "^2.16.0"
+    },
+    directories: {
+      doc: "doc"
+    }
+  };
+
   // plug-ins/object-oriented-programming/index.js
   var Inheritance = class {
     static {
@@ -6381,8 +6442,8 @@
     }
     instance;
     root;
-    constructor({ Class, instance: instance10, specification }) {
-      this.instance = instance10;
+    constructor({ Class, instance: instance11, specification }) {
+      this.instance = instance11;
       this.instance.oo.extends.push(Class);
       this.collectClasses(Class.extends);
       this.instantiateSuperclasses();
@@ -6400,15 +6461,15 @@
     instantiateSuperclasses() {
       let parent;
       for (const Class of this.instance.oo.extends) {
-        const instance10 = new Class();
-        instance10.name = Class.name;
-        if (!instance10.traits)
-          instance10.traits = [];
-        if (!instance10.methods)
-          instance10.methods = [];
-        this.instance.oo.specifications.push(instance10);
-        instance10.parent = parent;
-        parent = instance10;
+        const instance11 = new Class();
+        instance11.name = Class.name;
+        if (!instance11.traits)
+          instance11.traits = [];
+        if (!instance11.methods)
+          instance11.methods = [];
+        this.instance.oo.specifications.push(instance11);
+        instance11.parent = parent;
+        parent = instance11;
       }
     }
   };
@@ -7070,7 +7131,9 @@
       b: "Integer",
       p: "Integer",
       s: "Integer",
-      zoom: "Float"
+      zoom: "Float",
+      showCaption: "Boolean",
+      showStatus: "Boolean"
     };
     methods = {
       assign(meta, data, content) {
@@ -7122,72 +7185,13 @@
       return parseFloat(value);
     } else if (type === "Integer") {
       return parseInt(value);
+    } else if (type === "Boolean") {
+      return String(value).toLowerCase() == "true";
     } else {
       throw new TypeError("Unknown type, no cast procedure");
     }
   }
   __name(cast, "cast");
-
-  // package.json
-  var package_default = {
-    name: "mephistopheles",
-    version: "1.0.2",
-    description: "User Friendly Visual Programming Language",
-    author: "catpea",
-    repository: {
-      type: "git",
-      url: "git+https://github.com/catpea/mephistopheles.git"
-    },
-    bugs: {
-      url: "https://github.com/catpea/mephistopheles/issues"
-    },
-    homepage: "https://github.com/catpea/mephistopheles#readme",
-    type: "module",
-    main: "index.js",
-    scripts: {
-      start: "./start.js",
-      save: "git add .; git commit -m 'Updated Release'; git push; npm version patch; npm publish; git push;",
-      test: "./try.js"
-    },
-    keywords: [],
-    imports: {
-      "#plug-ins/*": "./plug-ins/*",
-      "#abstract/*": "./abstract/*"
-    },
-    license: "ISC",
-    dependencies: {
-      "@codemirror/commands": "^6.3.3",
-      "@codemirror/lang-javascript": "^6.2.2",
-      "@codemirror/state": "^6.4.1",
-      "@codemirror/theme-one-dark": "^6.1.2",
-      "@codemirror/view": "^6.24.1",
-      "@xterm/addon-fit": "^0.10.0",
-      "@xterm/xterm": "^5.5.0",
-      bootstrap: "^5.3.2",
-      "bootstrap-icons": "^1.11.3",
-      "calculate-percent": "^2.1.0",
-      cheerio: "^1.0.0-rc.12",
-      codemirror: "^6.0.1",
-      "deep-equal": "^2.2.3",
-      "esbuild-svelte": "^0.8.1",
-      esprima: "^4.0.1",
-      events: "^3.3.0",
-      json5: "^2.2.3",
-      lodash: "^4.17.21",
-      oneof: "^2.1.0",
-      panzoom: "^9.4.3",
-      svelte: "^4.2.17",
-      uuid: "^9.0.1"
-    },
-    devDependencies: {
-      chalk: "^5.3.0",
-      esbuild: "0.19.6",
-      "esbuild-sass-plugin": "^2.16.0"
-    },
-    directories: {
-      doc: "doc"
-    }
-  };
 
   // plug-ins/domek/index.js
   var update = /* @__PURE__ */ __name(function(elements, properties) {
@@ -8292,10 +8296,10 @@
     if (!Type)
       return;
     const { Object: attr2, Array: children2, Function: init2 } = byType(input);
-    const instance10 = new Instance(Type, attr2);
+    const instance11 = new Instance(Type, attr2);
     if (init2)
-      init2(instance10, this ? this.parent : null);
-    return [instance10, children2?.map((child) => nest.bind({ parent: instance10 })(...child)).map(([ins, chi]) => chi ? [ins, chi] : ins)];
+      init2(instance11, this ? this.parent : null);
+    return [instance11, children2?.map((child) => nest.bind({ parent: instance11 })(...child)).map(([ins, chi]) => chi ? [ins, chi] : ins)];
   }
   __name(nest, "nest");
 
@@ -8331,10 +8335,10 @@
           [
             [Label, { h: 24, text: this.text, parent: this, r: 3 }, (c, p) => {
               p.children.create(c);
-            }],
-            [Label, { h: 24, W: 24, text: "++", parent: this, r: 3 }, (c, p) => {
-              p.children.create(c);
             }]
+            // [Label, {h: 24, W:24, text: '++', parent:this , r:3}, (c,p)=>{
+            //   p.children.create(c)
+            // }],
           ],
           (c) => {
           }
@@ -8383,7 +8387,6 @@
             maximized = true;
           }
         }, "windowToggle");
-        this.addDisposableFromEvent(maximizeButton.handle, "click", windowToggle);
       },
       clean() {
         this.horizontal.stop();
@@ -8571,8 +8574,8 @@
           this.on("r", (ry) => update(this.el.ResizeHandle, { ry }));
           const resize = new Resize({
             area: window,
-            minimumX: 320,
-            minimumY: 200,
+            minimumX: 128,
+            minimumY: 128,
             handle: this.el.ResizeHandle,
             scale: () => this.getScale(this),
             box: this.getApplication(this),
@@ -9044,7 +9047,7 @@
         this.on("x", (x) => update(this.el.ForeignObject, { x }));
         this.on("y", (y) => update(this.el.ForeignObject, { y }));
         this.on("w", (width) => update(this.body, { style: { width: width + "px" } }));
-        this.on("h", (height) => update(this.body, { style: { height: height + "px" } }));
+        this.on("h", (height) => update(this.body, { style: { height: height - this.parent.p * 2 - this.parent.b * 2 + "px" } }));
         this.appendElements();
       }
     };
@@ -9822,7 +9825,7 @@
     component.$$.dirty[i / 31 | 0] |= 1 << i % 31;
   }
   __name(make_dirty, "make_dirty");
-  function init(component, options, instance10, create_fragment10, not_equal, props, append_styles = null, dirty = [-1]) {
+  function init(component, options, instance11, create_fragment11, not_equal, props, append_styles = null, dirty = [-1]) {
     const parent_component = current_component;
     set_current_component(component);
     const $$ = component.$$ = {
@@ -9848,7 +9851,7 @@
     };
     append_styles && append_styles($$.root);
     let ready = false;
-    $$.ctx = instance10 ? instance10(component, options.props || {}, (i, ret, ...rest) => {
+    $$.ctx = instance11 ? instance11(component, options.props || {}, (i, ret, ...rest) => {
       const value = rest.length ? rest[0] : ret;
       if ($$.ctx && not_equal($$.ctx[i], $$.ctx[i] = value)) {
         if (!$$.skip_bound && $$.bound[i])
@@ -9861,7 +9864,7 @@
     $$.update();
     ready = true;
     run_all($$.before_update);
-    $$.fragment = create_fragment10 ? create_fragment10($$.ctx) : false;
+    $$.fragment = create_fragment11 ? create_fragment11($$.ctx) : false;
     if (options.target) {
       if (options.hydrate) {
         start_hydrating();
@@ -10924,7 +10927,7 @@
           area: realmBody.body,
           transforms: () => this.getTransforms(this),
           show: ({ x, y, tx, ty }) => {
-            const availableComponents = Object.keys(this.components).map((className) => ({
+            const availableComponents = Object.keys(this.components).filter((o) => !["Pipe", "Workspace"].includes(o)).map((className) => ({
               x,
               y,
               root: this.getApplication().node.id,
@@ -10937,8 +10940,8 @@
                   type: className,
                   x: tx,
                   y: ty,
-                  w: 300,
-                  h: 300
+                  w: 400,
+                  h: 400
                 });
                 const data = {};
                 node.assign({}, data);
@@ -14777,16 +14780,178 @@
     };
   };
 
+  // plug-ins/components/alert/Interface.svelte
+  function create_fragment10(ctx) {
+    let div;
+    let h4;
+    let t0;
+    let t1;
+    let p0;
+    let t2;
+    let t3;
+    let hr;
+    let t4;
+    let p1;
+    let t5;
+    let div_class_value;
+    return {
+      c() {
+        div = element("div");
+        h4 = element("h4");
+        t0 = text2(
+          /*title*/
+          ctx[0]
+        );
+        t1 = space();
+        p0 = element("p");
+        t2 = text2(
+          /*text*/
+          ctx[2]
+        );
+        t3 = space();
+        hr = element("hr");
+        t4 = space();
+        p1 = element("p");
+        t5 = text2(
+          /*note*/
+          ctx[3]
+        );
+        attr(h4, "class", "alert-heading");
+        attr(p1, "class", "mb-0");
+        attr(div, "class", div_class_value = "alert alert-" + /*context*/
+        ctx[1] + " h-100 m-0");
+        attr(div, "role", "alert");
+      },
+      m(target, anchor) {
+        insert(target, div, anchor);
+        append(div, h4);
+        append(h4, t0);
+        append(div, t1);
+        append(div, p0);
+        append(p0, t2);
+        append(div, t3);
+        append(div, hr);
+        append(div, t4);
+        append(div, p1);
+        append(p1, t5);
+      },
+      p(ctx2, [dirty]) {
+        if (dirty & /*title*/
+        1)
+          set_data(
+            t0,
+            /*title*/
+            ctx2[0]
+          );
+        if (dirty & /*text*/
+        4)
+          set_data(
+            t2,
+            /*text*/
+            ctx2[2]
+          );
+        if (dirty & /*note*/
+        8)
+          set_data(
+            t5,
+            /*note*/
+            ctx2[3]
+          );
+        if (dirty & /*context*/
+        2 && div_class_value !== (div_class_value = "alert alert-" + /*context*/
+        ctx2[1] + " h-100 m-0")) {
+          attr(div, "class", div_class_value);
+        }
+      },
+      i: noop,
+      o: noop,
+      d(detaching) {
+        if (detaching) {
+          detach(div);
+        }
+      }
+    };
+  }
+  __name(create_fragment10, "create_fragment");
+  function instance10($$self, $$props, $$invalidate) {
+    let { title } = $$props;
+    let { context } = $$props;
+    let { text: text3 } = $$props;
+    let { note } = $$props;
+    $$self.$$set = ($$props2) => {
+      if ("title" in $$props2)
+        $$invalidate(0, title = $$props2.title);
+      if ("context" in $$props2)
+        $$invalidate(1, context = $$props2.context);
+      if ("text" in $$props2)
+        $$invalidate(2, text3 = $$props2.text);
+      if ("note" in $$props2)
+        $$invalidate(3, note = $$props2.note);
+    };
+    return [title, context, text3, note];
+  }
+  __name(instance10, "instance");
+  var Interface3 = class extends SvelteComponent {
+    static {
+      __name(this, "Interface");
+    }
+    constructor(options) {
+      super();
+      init(this, options, instance10, create_fragment10, safe_not_equal, { title: 0, context: 1, text: 2, note: 3 });
+    }
+  };
+  var Interface_default3 = Interface3;
+
+  // plug-ins/components/Alert.js
+  var Alert = class {
+    static {
+      __name(this, "Alert");
+    }
+    static extends = [Application];
+    observables = {
+      context: "primary",
+      text: void 0
+    };
+    methods = {
+      initialize() {
+        this.createSocket("out", 1);
+      },
+      mount() {
+        this.foreign = new Instance(Foreign);
+        this.createWindowComponent(this.foreign);
+        this.component = new Interface_default3({
+          target: this.foreign.body,
+          props: {
+            title: this.title,
+            context: this.context,
+            text: this.text,
+            note: this.note,
+            send: this.send.bind(this)
+          }
+        });
+        this.on("name", (title) => this.component.$set({ title }));
+        this.on("text", (text3) => this.component.$set({ text: text3 }));
+        this.on("note", (note) => this.component.$set({ note }));
+        this.on("context", (context) => this.component.$set({ context }));
+        this.addDisposable(stopWheel(this.foreign.body));
+      },
+      destroy() {
+        this.component.$destroy();
+      }
+    };
+  };
+
   // plug-ins/components/index.js
   var components2 = {
-    Workspace,
     Group,
     Pipe: Pipe2,
     Hello: Hello2,
     Architecture,
     Analysis,
     Terminal,
-    Editor
+    Editor,
+    Alert,
+    Workspace
   };
   var components_default = components2;
 
@@ -14806,6 +14971,7 @@
     constraints = {};
     methods = {
       initialize() {
+        this.on("name", (name) => document.title = name);
       },
       mount() {
         const node = new Instance(Node, { id: "0", name: "Workspace", origin: "0", url: this.url, type: "Workspace", data: {} });
@@ -14835,7 +15001,7 @@
   globalThis.project = system;
   globalThis.scene = document.querySelector("#editor-scene");
   globalThis.svg = document.querySelector("#editor-svg");
-  system.name = "Hello World System";
+  system.name = `${package_default.name} ${package_default.version}`;
   system.svg = document.querySelector("#editor-svg");
   system.scene = document.querySelector("#editor-scene");
   system.background = document.querySelector("#editor-background");

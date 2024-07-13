@@ -1,3 +1,5 @@
+import pkg from '/package.json';
+
 import {Instance} from "/plug-ins/object-oriented-programming/index.js";
 
 import Themes from './Themes.js';
@@ -12,7 +14,8 @@ globalThis.project = system;
 globalThis.scene = document.querySelector('#editor-scene');
 globalThis.svg = document.querySelector('#editor-svg');
 
-system.name = 'Hello World System';
+system.name = `${pkg.name} ${pkg.version}`;
+
 system.svg = document.querySelector('#editor-svg');
 system.scene = document.querySelector('#editor-scene');
 system.background = document.querySelector('#editor-background');

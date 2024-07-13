@@ -8,10 +8,11 @@ import Pipe from './Pipe.js';
 import Architecture from './Architecture.js';
 import Analysis from './Analysis.js';
 
+import Alert from './Alert.js';
+
 // Dependency Injection Pattern
 
 const components = {
-  Workspace,
 
   Group,
   Pipe,
@@ -23,6 +24,11 @@ const components = {
 
   Terminal,
   Editor,
+
+  Alert,
+
+  Workspace,
+  
 }
 
 export default components;

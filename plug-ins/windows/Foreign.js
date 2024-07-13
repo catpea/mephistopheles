@@ -50,12 +50,16 @@ export default class Foreign {
       this.addDisposableFromEvent( this.body, 'keydown', e=>e.stopImmediatePropagation())
 
       this.on('name', name=>update(this.el.ForeignObject,{name}));
+
       this.on('w', width=>update(this.el.ForeignObject,{width}));
       this.on('h', height=>update(this.el.ForeignObject,{height}));
+
       this.on('x', x=>update(this.el.ForeignObject,{x}));
       this.on('y', y=>update(this.el.ForeignObject,{y}));
+      //
       this.on('w', width=>update(this.body, {style:{width: width+'px'}}));
-      this.on('h', height=>update(this.body, {style:{height: height+'px'}}));
+      this.on('h', height=>update(this.body, {style:{height: (height-(this.parent.p*2)-(this.parent.b*2))+'px'}}));
+
 
       this.appendElements();
 
