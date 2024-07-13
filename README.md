@@ -3,7 +3,7 @@ A Visual Programming Language
 
 ## TODO
 
-- [ ] Port Control widget inside evey window that controls window anchors
+- [ ] Port Control widget inside every window that controls window anchors
 - [ ] Junction
 - [ ] Function Node With A Code Editor
 - [ ] Selection Manager

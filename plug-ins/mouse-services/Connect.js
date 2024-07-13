@@ -55,7 +55,7 @@ class Connect extends Drag {
       const control = e.target.dataset.control;
       const port = e.target.dataset.port;
 
-      this.component.getApplication().pane.createNode({
+      this.component.getApplication().realm.createNode({
         id: uuid(),
         type: 'Pipe',
 

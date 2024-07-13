@@ -13,7 +13,7 @@ import Caption from "/plug-ins/windows/Caption.js";
 import Move from "/plug-ins/mouse-services/Move.js";
 import Focus from "/plug-ins/mouse-services/Focus.js";
 import Resize from "/plug-ins/mouse-services/Resize.js";
-import Select from "/plug-ins/select/index.js";
+import Select from "/plug-ins/mouse-services/Select.js";
 
 
 export default class Window {
@@ -142,7 +142,7 @@ export default class Window {
       this.addDisposable(focus);
 
     },
- 
+
 
   };
 

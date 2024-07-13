@@ -141,12 +141,14 @@ export default class Component {
       if(element.parent) return this.getApplication(element.parent);
     },
 
-    getGroup(element) {
+    getGroup(element, rootCall=true) {
       if(!element) element = this;
-      if(element.isGroup===true){
+
+      if((!rootCall)&&(element.isGroup===true)){
         return element;
       }
-      if(element.parent) return this.getGroup(element.parent);
+
+      if(element.parent) return this.getGroup(element.parent, false);
     },
 
 

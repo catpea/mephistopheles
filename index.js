@@ -7473,14 +7473,14 @@
         if (element2.parent)
           return this.getApplication(element2.parent);
       },
-      getGroup(element2) {
+      getGroup(element2, rootCall = true) {
         if (!element2)
           element2 = this;
-        if (element2.isGroup === true) {
+        if (!rootCall && element2.isGroup === true) {
           return element2;
         }
         if (element2.parent)
-          return this.getGroup(element2.parent);
+          return this.getGroup(element2.parent, false);
       },
       getStack(element2, list = []) {
         if (!element2)
@@ -7553,7 +7553,7 @@
     };
   };
 
-  // plug-ins/select/index.js
+  // plug-ins/mouse-services/Select.js
   var Select = class {
     static {
       __name(this, "Select");
@@ -7572,13 +7572,39 @@
       this.handle = handle;
       this.mount();
     }
+    select() {
+      this.component.selected = true;
+    }
+    deselect() {
+      this.component.selected = false;
+    }
+    deselectOthers() {
+      for (const item of this.component.getGroup().realm.applications) {
+        if (this.component.id !== item.id) {
+          item.selected = false;
+        }
+      }
+    }
     mount() {
       this.mouseDownHandler = (e) => {
         const multiSelect = e.ctrlKey;
-        this.component.selected = !this.component.selected;
         if (multiSelect) {
+          if (this.component.selected) {
+            this.deselect();
+          } else {
+            this.select();
+          }
         } else {
           if (this.component.selected) {
+            const multipleSelection = this.component.getGroup().realm.applications.length > 1;
+            if (multipleSelection) {
+              this.deselectOthers();
+            } else {
+              this.deselect();
+            }
+          } else {
+            this.select();
+            this.deselectOthers();
           }
         }
       };
@@ -7716,7 +7742,7 @@
       if (isOverAnotherPort) {
         const control = e.target.dataset.control;
         const port = e.target.dataset.port;
-        this.component.getApplication().pane.createNode({
+        this.component.getApplication().realm.createNode({
           id: uuid2(),
           type: "Pipe",
           from: this.component.control.id,
@@ -10874,8 +10900,8 @@
         this.on("panY", (panY) => realmBody.panY = panY);
         this.on("zoom", (zoom2) => realmBody.zoom = zoom2);
         this.on("elements.created", (node) => {
-          const Ui = this.components[node.type] || this.components["Hello"];
-          if (!Ui)
+          const Application2 = this.components[node.type] || this.components["Hello"];
+          if (!Application2)
             return console.warn(`Skipped Unrecongnized Component Type "${node.type}"`);
           let root = svg.g({ id: node.id, name: "element" });
           realmBody.content.appendChild(root);
@@ -10884,9 +10910,9 @@
           for (const name of node.oo.attributes) {
             attributes[name] = node[name];
           }
-          const ui = new Instance(Ui, Object.assign(attributes, options));
-          this.applications.create(ui);
-          ui.start();
+          const application = new Instance(Application2, Object.assign(attributes, options));
+          this.applications.create(application);
+          application.start();
         }, { replay: true });
         this.on("elements.removed", ({ id }) => {
           this.applications.get(id).stop();

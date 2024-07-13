@@ -19,30 +19,46 @@ export default class Select {
     this.mount();
   }
 
+  select(){
+    this.component.selected = true;
+  }
+  deselect(){
+    this.component.selected = false;
+  }
+  deselectOthers(){
+    for (const item of this.component.getGroup().realm.applications) {
+      if(this.component.id !== item.id){
+        item.selected = false;
+      }
+    }
+  }
+
+
   mount(){
 
 		this.mouseDownHandler = (e) => {
       const multiSelect = e.ctrlKey;
 
-      this.component.selected = !this.component.selected;
-
       if(multiSelect){
-
-      }else{
         if(this.component.selected){
+          this.deselect();
+        }else{
+          this.select()
+        }
+      }else{
 
-          // for (const item of globalThis.project.applications) {
-          //   if(this.component.id !== item.id){
-          //     item.selected = false;
-          //   }
-          // }
-          // for (const item of globalThis.project.anchors) {
-          //   if(this.component.id !== item.id){
-          //     item.selected = false;
-          //   }
-          // }
+        if(this.component.selected){
+          const multipleSelection = this.component.getGroup().realm.applications.length > 1;
 
+          if(multipleSelection){
+            this.deselectOthers();
+          }else{
+            this.deselect();
+          }
 
+        }else{
+          this.select()
+          this.deselectOthers();
         }
       }
 

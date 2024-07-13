@@ -6,7 +6,8 @@ import { svg, update, click } from "/plug-ins/domek/index.js"
 
 import Move from "/plug-ins/move/index.js";
 import Focus from "/plug-ins/focus/index.js";
-import Select from "/plug-ins/select/index.js";
+import Select from "/plug-ins/mouse-services/Select.js";
+
 
 export default class Junction {
 

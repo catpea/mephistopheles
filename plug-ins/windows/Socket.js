@@ -1,7 +1,7 @@
 import { svg, update } from "/plug-ins/domek/index.js"
 
 import Component from "/plug-ins/windows/Component.js";
-import Select from "/plug-ins/select/index.js";
+import Select from "/plug-ins/mouse-services/Select.js";
 
 
 // import Connect from "/plug-ins/connect/index.js";
@@ -89,7 +89,7 @@ export default class Anchor {
 
     },
 
- 
+
 
 
   }

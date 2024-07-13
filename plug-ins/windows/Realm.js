@@ -169,19 +169,19 @@ export default class Realm {
 
       this.on("elements.created", (node) => {
 
-        const Ui = this.components[node.type]||this.components['Hello'];
-        if(!Ui) return console.warn(`Skipped Unrecongnized Component Type "${node.type}"`);
+        const Application = this.components[node.type]||this.components['Hello'];
+        if(!Application) return console.warn(`Skipped Unrecongnized Component Type "${node.type}"`);
 
         let root = svg.g({ id:node.id, name: 'element' });
         realmBody.content.appendChild(root);
         const options = { node, scene: root, parent: this, id:node.id, content:node.content, library:node.library };
         const attributes = {};
         for (const name of node.oo.attributes) { attributes[name] = node[name] }
-        const ui = new Instance(Ui, Object.assign(attributes, options));
-        this.applications.create(ui);
-        ui.start(); // start the state machine
+        const application = new Instance(Application, Object.assign(attributes, options));
+        this.applications.create(application);
+        application.start(); // start the state machine
 
-        // ui.
+ 
 
       }, {replay:true});
 
