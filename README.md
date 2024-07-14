@@ -4,7 +4,7 @@ A Visual Programming Language
 ## TODO
 
 - [ ] fix recursive direction ```const localGroup = this.getGroup(this,false);```
-- [ ] promote ```const serializables =  'id x y w h'.split(' ');``` to OOP
+- [ ] promote ```const serializables =  'id x y w h'.split(' ');``` to object-oriented...
 
 ---
 
