@@ -97,7 +97,9 @@ export default class Realm {
           if(application.realm){
             body = application.realm.getXml();
           }
-          const attributes = (application.serializables||serializables).filter(key=>application[key]).map(key=>`${key}="${application[key]}"`).join(' ')
+          const attributeNames = serializables.concat(application.serializables||[]);
+          console.log({attributeNames});
+          const attributes = attributeNames.filter(key=>application[key]).map(key=>`${key}="${application[key]}"`).join(' ')
           $.root().append(`<${application.oo.name} ${attributes}>${body}</${application.oo.name}>`);
         }
       const xml = $.root().html();

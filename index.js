@@ -6377,7 +6377,7 @@
   // package.json
   var package_default = {
     name: "mephistopheles",
-    version: "1.0.2",
+    version: "1.0.3",
     description: "User Friendly Visual Programming Language",
     author: "catpea",
     repository: {
@@ -6640,6 +6640,10 @@
         }
       };
       const that = this;
+      this.oo.getObservables = function() {
+        const response = that.oo.specifications.map(({ name, observables = {} }) => ({ name, data: Object.entries(observables).map(([name2, code]) => ({ name: name2 })) }));
+        return response;
+      };
       this.oo.getMethods = function() {
         const response = that.oo.specifications.map(({ name, methods: methods2 }) => ({ name, data: Object.entries(methods2).map(([name2, code]) => ({ name: name2, code: "function " + code.toString() })) }));
         return response;
@@ -7583,15 +7587,18 @@
       this.component.selected = false;
     }
     deselectOthers() {
+      console.log(this.component.getGroup().realm.applications.raw);
       for (const item of this.component.getGroup().realm.applications) {
         if (this.component.id !== item.id) {
           item.selected = false;
+          console.log(`Deselected ${item.oo.name}`);
         }
       }
     }
     mount() {
       this.mouseDownHandler = (e) => {
         const multiSelect = e.ctrlKey;
+        console.log("BEFORE", this.component.oo.name, this.component.selected);
         if (multiSelect) {
           if (this.component.selected) {
             this.deselect();
@@ -7611,6 +7618,7 @@
             this.deselectOthers();
           }
         }
+        console.log("AFTER", this.component.oo.name, this.component.selected);
       };
       this.handle.addEventListener("mousedown", this.mouseDownHandler);
     }
@@ -8536,8 +8544,8 @@
       showCaption: true,
       isResizable: true,
       showMenu: false,
-      showStatus: false,
-      selected: false
+      showStatus: false
+      // selected: false,
     };
     properties = {
       contain: true
@@ -8649,7 +8657,7 @@
     };
     traits = {
       removeApplication() {
-        const localGroup = this.getGroup();
+        const localGroup = this.getGroup(this, false);
         const domain = localGroup.realm;
         for (const o of domain.applications.filter((o2) => o2.selected)) {
           if (o.oo.name == "Pipe") {
@@ -10855,7 +10863,9 @@
           if (application.realm) {
             body = application.realm.getXml();
           }
-          const attributes = (application.serializables || serializables).filter((key) => application[key]).map((key) => `${key}="${application[key]}"`).join(" ");
+          const attributeNames = serializables.concat(application.serializables || []);
+          console.log({ attributeNames });
+          const attributes = attributeNames.filter((key) => application[key]).map((key) => `${key}="${application[key]}"`).join(" ");
           $.root().append(`<${application.oo.name} ${attributes}>${body}</${application.oo.name}>`);
         }
         const xml = $.root().html();
@@ -11456,8 +11466,8 @@
       },
       saveXml() {
         const $ = cheerio2.load(`<?xml version="1.0"?><${this.oo.name} name="${package_default.name}" description="${package_default.description}" version="${package_default.version}"></${this.oo.name}>`, { xmlMode: true, decodeEntities: true, withStartIndices: true, withEndIndices: true });
-        if (this.pane) {
-          $(this.oo.name).append(this.pane.getXml());
+        if (this.realm) {
+          $(this.oo.name).append(this.realm.getXml());
         }
         const xml = $.root().html();
         console.info(xml);
@@ -12034,9 +12044,11 @@
       __name(this, "Connector");
     }
     static extends = [Component];
-    properties = {};
+    properties = {
+      handle: void 0
+    };
     observables = {
-      selected: false,
+      // selected: false,
       from: null,
       to: null,
       out: null,
@@ -12057,13 +12069,12 @@
     };
     methods = {
       initialize() {
-      },
-      mount() {
         this.el.PrimaryBg = svg.line({
           name: this.name,
           class: "editor-connector-zone",
           "vector-effect": "non-scaling-stroke"
         });
+        this.handle = this.el.PrimaryBg;
         this.el.Primary = svg.line({
           name: this.name,
           class: "editor-connector",
@@ -12077,13 +12088,10 @@
           style: { "pointer-events": "none" },
           r: 4
         });
+      },
+      mount() {
         this.on("selected", (selected) => selected ? this.el.Primary.classList.add("selected") : this.el.Primary.classList.remove("selected"));
         this.on("selected", (selected) => selected ? this.el.Midpoint.classList.add("selected") : this.el.Midpoint.classList.remove("selected"));
-        const select = new Select({
-          component: this,
-          handle: this.el.PrimaryBg
-        });
-        this.addDisposable(select);
         this.on("name", (name) => update(this.el.Primary, { name }));
         this.on("node", (node) => {
           node.on("from", (v) => this.from = v);
@@ -12140,13 +12148,11 @@
     properties = {
       serializables: "id from to out in".split(" ")
     };
-    observables = {
-      selected: false
-    };
     methods = {
       initialize() {
         this.showCaption = false;
         this.isResizable = false;
+        console.log(this);
       },
       mount() {
         this.connector = new Instance(Connector, {
@@ -12157,7 +12163,12 @@
           out: this.node.out,
           in: this.node.in
         });
-        this.connector.on("selected", (v) => this.selected = v);
+        const select = new Select({
+          component: this,
+          handle: this.connector.handle
+        });
+        this.addDisposable(select);
+        this.on("selected", (v) => this.connector.selected = v);
         this.node.on("from", (v) => this.pipe.from = v);
         this.node.on("to", (v) => this.pipe.to = v);
         this.node.on("out", (v) => this.pipe.out = v);
@@ -13064,74 +13075,95 @@
   // plug-ins/components/analysis/Interface.svelte
   function get_each_context3(ctx, list, i) {
     const child_ctx = ctx.slice();
-    child_ctx[12] = list[i];
-    child_ctx[14] = i;
+    child_ctx[13] = list[i];
+    child_ctx[15] = i;
     return child_ctx;
   }
   __name(get_each_context3, "get_each_context");
   function get_each_context_1(ctx, list, i) {
     const child_ctx = ctx.slice();
-    child_ctx[12] = list[i];
-    child_ctx[14] = i;
+    child_ctx[13] = list[i];
+    child_ctx[15] = i;
     return child_ctx;
   }
   __name(get_each_context_1, "get_each_context_1");
   function get_if_ctx(ctx) {
     const child_ctx = ctx.slice();
-    const constants_0 = "Method";
-    child_ctx[11] = constants_0;
+    const constants_0 = "Observables";
+    child_ctx[12] = constants_0;
     return child_ctx;
   }
   __name(get_if_ctx, "get_if_ctx");
   function get_each_context_2(ctx, list, i) {
     const child_ctx = ctx.slice();
-    child_ctx[12] = list[i];
-    child_ctx[14] = i;
+    child_ctx[13] = list[i];
+    child_ctx[15] = i;
     return child_ctx;
   }
   __name(get_each_context_2, "get_each_context_2");
   function get_each_context_3(ctx, list, i) {
     const child_ctx = ctx.slice();
-    child_ctx[12] = list[i];
-    child_ctx[14] = i;
+    child_ctx[13] = list[i];
+    child_ctx[15] = i;
     return child_ctx;
   }
   __name(get_each_context_3, "get_each_context_3");
   function get_if_ctx_1(ctx) {
     const child_ctx = ctx.slice();
-    const constants_0 = "Trait";
-    child_ctx[11] = constants_0;
+    const constants_0 = "Method";
+    child_ctx[12] = constants_0;
     return child_ctx;
   }
   __name(get_if_ctx_1, "get_if_ctx_1");
   function get_each_context_4(ctx, list, i) {
     const child_ctx = ctx.slice();
-    child_ctx[12] = list[i];
-    child_ctx[14] = i;
+    child_ctx[13] = list[i];
+    child_ctx[15] = i;
     return child_ctx;
   }
   __name(get_each_context_4, "get_each_context_4");
   function get_each_context_5(ctx, list, i) {
     const child_ctx = ctx.slice();
-    child_ctx[12] = list[i];
-    child_ctx[14] = i;
+    child_ctx[13] = list[i];
+    child_ctx[15] = i;
     return child_ctx;
   }
   __name(get_each_context_5, "get_each_context_5");
   function get_if_ctx_2(ctx) {
     const child_ctx = ctx.slice();
-    const constants_0 = "children";
-    child_ctx[11] = constants_0;
+    const constants_0 = "Trait";
+    child_ctx[12] = constants_0;
     return child_ctx;
   }
   __name(get_if_ctx_2, "get_if_ctx_2");
   function get_each_context_6(ctx, list, i) {
     const child_ctx = ctx.slice();
-    child_ctx[12] = list[i];
-    child_ctx[14] = i;
+    child_ctx[13] = list[i];
+    child_ctx[15] = i;
     return child_ctx;
   }
   __name(get_each_context_6, "get_each_context_6");
+  function get_each_context_7(ctx, list, i) {
+    const child_ctx = ctx.slice();
+    child_ctx[13] = list[i];
+    child_ctx[15] = i;
+    return child_ctx;
+  }
+  __name(get_each_context_7, "get_each_context_7");
+  function get_if_ctx_3(ctx) {
+    const child_ctx = ctx.slice();
+    const constants_0 = "children";
+    child_ctx[12] = constants_0;
+    return child_ctx;
+  }
+  __name(get_if_ctx_3, "get_if_ctx_3");
+  function get_each_context_8(ctx, list, i) {
+    const child_ctx = ctx.slice();
+    child_ctx[13] = list[i];
+    child_ctx[15] = i;
+    return child_ctx;
+  }
+  __name(get_each_context_8, "get_each_context_8");
   function create_if_block3(ctx) {
     let div4;
     let div1;
@@ -13166,25 +13198,30 @@
     let t11;
     let t12;
     let t13;
-    let each_value_6 = ensure_array_like(
+    let t14;
+    let each_value_8 = ensure_array_like(
       /*object*/
       ctx[0].oo.extends
     );
     let each_blocks = [];
-    for (let i = 0; i < each_value_6.length; i += 1) {
-      each_blocks[i] = create_each_block_6(get_each_context_6(ctx, each_value_6, i));
+    for (let i = 0; i < each_value_8.length; i += 1) {
+      each_blocks[i] = create_each_block_8(get_each_context_8(ctx, each_value_8, i));
     }
     let if_block0 = (
       /*object*/
-      ctx[0].children && create_if_block_9(get_if_ctx_2(ctx))
+      ctx[0].children && create_if_block_13(get_if_ctx_3(ctx))
     );
     let if_block1 = (
       /*object*/
-      ctx[0] && create_if_block_5(get_if_ctx_1(ctx))
+      ctx[0] && create_if_block_9(get_if_ctx_2(ctx))
     );
     let if_block2 = (
       /*object*/
-      ctx[0] && create_if_block_13(get_if_ctx(ctx))
+      ctx[0] && create_if_block_5(get_if_ctx_1(ctx))
+    );
+    let if_block3 = (
+      /*object*/
+      ctx[0] && create_if_block_17(get_if_ctx(ctx))
     );
     return {
       c() {
@@ -13228,6 +13265,9 @@
         t13 = space();
         if (if_block2)
           if_block2.c();
+        t14 = space();
+        if (if_block3)
+          if_block3.c();
         set_style(span1, "font-size", ".92rem");
         attr(small, "class", "text-body-secondary");
         attr(div0, "class", "col");
@@ -13275,6 +13315,9 @@
         append(div2, t13);
         if (if_block2)
           if_block2.m(div2, null);
+        append(div2, t14);
+        if (if_block3)
+          if_block3.m(div2, null);
       },
       p(ctx2, dirty) {
         if (dirty & /*object*/
@@ -13301,17 +13344,17 @@
           );
         if (dirty & /*object*/
         1) {
-          each_value_6 = ensure_array_like(
+          each_value_8 = ensure_array_like(
             /*object*/
             ctx2[0].oo.extends
           );
           let i;
-          for (i = 0; i < each_value_6.length; i += 1) {
-            const child_ctx = get_each_context_6(ctx2, each_value_6, i);
+          for (i = 0; i < each_value_8.length; i += 1) {
+            const child_ctx = get_each_context_8(ctx2, each_value_8, i);
             if (each_blocks[i]) {
               each_blocks[i].p(child_ctx, dirty);
             } else {
-              each_blocks[i] = create_each_block_6(child_ctx);
+              each_blocks[i] = create_each_block_8(child_ctx);
               each_blocks[i].c();
               each_blocks[i].m(ol, null);
             }
@@ -13319,16 +13362,16 @@
           for (; i < each_blocks.length; i += 1) {
             each_blocks[i].d(1);
           }
-          each_blocks.length = each_value_6.length;
+          each_blocks.length = each_value_8.length;
         }
         if (
           /*object*/
           ctx2[0].children
         ) {
           if (if_block0) {
-            if_block0.p(get_if_ctx_2(ctx2), dirty);
+            if_block0.p(get_if_ctx_3(ctx2), dirty);
           } else {
-            if_block0 = create_if_block_9(get_if_ctx_2(ctx2));
+            if_block0 = create_if_block_13(get_if_ctx_3(ctx2));
             if_block0.c();
             if_block0.m(div2, t12);
           }
@@ -13341,9 +13384,9 @@
           ctx2[0]
         ) {
           if (if_block1) {
-            if_block1.p(get_if_ctx_1(ctx2), dirty);
+            if_block1.p(get_if_ctx_2(ctx2), dirty);
           } else {
-            if_block1 = create_if_block_5(get_if_ctx_1(ctx2));
+            if_block1 = create_if_block_9(get_if_ctx_2(ctx2));
             if_block1.c();
             if_block1.m(div2, t13);
           }
@@ -13356,15 +13399,30 @@
           ctx2[0]
         ) {
           if (if_block2) {
-            if_block2.p(get_if_ctx(ctx2), dirty);
+            if_block2.p(get_if_ctx_1(ctx2), dirty);
           } else {
-            if_block2 = create_if_block_13(get_if_ctx(ctx2));
+            if_block2 = create_if_block_5(get_if_ctx_1(ctx2));
             if_block2.c();
-            if_block2.m(div2, null);
+            if_block2.m(div2, t14);
           }
         } else if (if_block2) {
           if_block2.d(1);
           if_block2 = null;
+        }
+        if (
+          /*object*/
+          ctx2[0]
+        ) {
+          if (if_block3) {
+            if_block3.p(get_if_ctx(ctx2), dirty);
+          } else {
+            if_block3 = create_if_block_17(get_if_ctx(ctx2));
+            if_block3.c();
+            if_block3.m(div2, null);
+          }
+        } else if (if_block3) {
+          if_block3.d(1);
+          if_block3 = null;
         }
       },
       d(detaching) {
@@ -13378,18 +13436,20 @@
           if_block1.d();
         if (if_block2)
           if_block2.d();
+        if (if_block3)
+          if_block3.d();
       }
     };
   }
   __name(create_if_block3, "create_if_block");
-  function create_each_block_6(ctx) {
+  function create_each_block_8(ctx) {
     let li;
     let i_1;
     let i_1_class_value;
     let t0;
     let t1_value = (
       /*item*/
-      ctx[12].name + ""
+      ctx[13].name + ""
     );
     let t1;
     return {
@@ -13400,7 +13460,7 @@
         t1 = text2(t1_value);
         attr(i_1, "class", i_1_class_value = "bi bi-" + class_icons_default(
           /*item*/
-          ctx[12].name
+          ctx[13].name
         ) + " text-light pe-2");
         attr(li, "class", "breadcrumb-item");
       },
@@ -13414,13 +13474,13 @@
         if (dirty & /*object*/
         1 && i_1_class_value !== (i_1_class_value = "bi bi-" + class_icons_default(
           /*item*/
-          ctx2[12].name
+          ctx2[13].name
         ) + " text-light pe-2")) {
           attr(i_1, "class", i_1_class_value);
         }
         if (dirty & /*object*/
         1 && t1_value !== (t1_value = /*item*/
-        ctx2[12].name + ""))
+        ctx2[13].name + ""))
           set_data(t1, t1_value);
       },
       d(detaching) {
@@ -13430,8 +13490,8 @@
       }
     };
   }
-  __name(create_each_block_6, "create_each_block_6");
-  function create_if_block_9(ctx) {
+  __name(create_each_block_8, "create_each_block_8");
+  function create_if_block_13(ctx) {
     let div1;
     let div0;
     let t0;
@@ -13443,11 +13503,11 @@
         /*opened*/
         ctx2[3][
           /*feature*/
-          ctx2[11]
+          ctx2[12]
         ]
       )
-        return create_if_block_12;
-      return create_else_block_2;
+        return create_if_block_16;
+      return create_else_block_3;
     }
     __name(select_block_type, "select_block_type");
     let current_block_type = select_block_type(ctx, -1);
@@ -13457,7 +13517,7 @@
         /*click_handler*/
         ctx[8](
           /*feature*/
-          ctx[11]
+          ctx[12]
         )
       );
     }
@@ -13466,9 +13526,9 @@
       /*opened*/
       ctx[3][
         /*feature*/
-        ctx[11]
+        ctx[12]
       ] && /*object*/
-      ctx[0].children && create_if_block_10(ctx)
+      ctx[0].children && create_if_block_14(ctx)
     );
     return {
       c() {
@@ -13509,9 +13569,395 @@
           /*opened*/
           ctx[3][
             /*feature*/
-            ctx[11]
+            ctx[12]
           ] && /*object*/
           ctx[0].children
+        ) {
+          if (if_block1) {
+            if_block1.p(ctx, dirty);
+          } else {
+            if_block1 = create_if_block_14(ctx);
+            if_block1.c();
+            if_block1.m(div1, null);
+          }
+        } else if (if_block1) {
+          if_block1.d(1);
+          if_block1 = null;
+        }
+      },
+      d(detaching) {
+        if (detaching) {
+          detach(div1);
+        }
+        if_block0.d();
+        if (if_block1)
+          if_block1.d();
+        mounted = false;
+        dispose();
+      }
+    };
+  }
+  __name(create_if_block_13, "create_if_block_13");
+  function create_else_block_3(ctx) {
+    let i;
+    return {
+      c() {
+        i = element("i");
+        attr(i, "class", "bi bi-caret-right");
+      },
+      m(target, anchor) {
+        insert(target, i, anchor);
+      },
+      d(detaching) {
+        if (detaching) {
+          detach(i);
+        }
+      }
+    };
+  }
+  __name(create_else_block_3, "create_else_block_3");
+  function create_if_block_16(ctx) {
+    let i;
+    return {
+      c() {
+        i = element("i");
+        attr(i, "class", "bi bi-caret-down-fill");
+      },
+      m(target, anchor) {
+        insert(target, i, anchor);
+      },
+      d(detaching) {
+        if (detaching) {
+          detach(i);
+        }
+      }
+    };
+  }
+  __name(create_if_block_16, "create_if_block_16");
+  function create_if_block_14(ctx) {
+    let ul;
+    let each_value_6 = ensure_array_like(
+      /*object*/
+      ctx[0].children.raw
+    );
+    let each_blocks = [];
+    for (let i = 0; i < each_value_6.length; i += 1) {
+      each_blocks[i] = create_each_block_6(get_each_context_6(ctx, each_value_6, i));
+    }
+    return {
+      c() {
+        ul = element("ul");
+        for (let i = 0; i < each_blocks.length; i += 1) {
+          each_blocks[i].c();
+        }
+        attr(ul, "class", "list-group list-group-flush");
+      },
+      m(target, anchor) {
+        insert(target, ul, anchor);
+        for (let i = 0; i < each_blocks.length; i += 1) {
+          if (each_blocks[i]) {
+            each_blocks[i].m(ul, null);
+          }
+        }
+      },
+      p(ctx2, dirty) {
+        if (dirty & /*object*/
+        1) {
+          each_value_6 = ensure_array_like(
+            /*object*/
+            ctx2[0].children.raw
+          );
+          let i;
+          for (i = 0; i < each_value_6.length; i += 1) {
+            const child_ctx = get_each_context_6(ctx2, each_value_6, i);
+            if (each_blocks[i]) {
+              each_blocks[i].p(child_ctx, dirty);
+            } else {
+              each_blocks[i] = create_each_block_6(child_ctx);
+              each_blocks[i].c();
+              each_blocks[i].m(ul, null);
+            }
+          }
+          for (; i < each_blocks.length; i += 1) {
+            each_blocks[i].d(1);
+          }
+          each_blocks.length = each_value_6.length;
+        }
+      },
+      d(detaching) {
+        if (detaching) {
+          detach(ul);
+        }
+        destroy_each(each_blocks, detaching);
+      }
+    };
+  }
+  __name(create_if_block_14, "create_if_block_14");
+  function create_if_block_15(ctx) {
+    let each_1_anchor;
+    let each_value_7 = ensure_array_like(
+      /*object*/
+      ctx[0].pane.applications.raw
+    );
+    let each_blocks = [];
+    for (let i = 0; i < each_value_7.length; i += 1) {
+      each_blocks[i] = create_each_block_7(get_each_context_7(ctx, each_value_7, i));
+    }
+    return {
+      c() {
+        for (let i = 0; i < each_blocks.length; i += 1) {
+          each_blocks[i].c();
+        }
+        each_1_anchor = empty();
+      },
+      m(target, anchor) {
+        for (let i = 0; i < each_blocks.length; i += 1) {
+          if (each_blocks[i]) {
+            each_blocks[i].m(target, anchor);
+          }
+        }
+        insert(target, each_1_anchor, anchor);
+      },
+      p(ctx2, dirty) {
+        if (dirty & /*object*/
+        1) {
+          each_value_7 = ensure_array_like(
+            /*object*/
+            ctx2[0].pane.applications.raw
+          );
+          let i;
+          for (i = 0; i < each_value_7.length; i += 1) {
+            const child_ctx = get_each_context_7(ctx2, each_value_7, i);
+            if (each_blocks[i]) {
+              each_blocks[i].p(child_ctx, dirty);
+            } else {
+              each_blocks[i] = create_each_block_7(child_ctx);
+              each_blocks[i].c();
+              each_blocks[i].m(each_1_anchor.parentNode, each_1_anchor);
+            }
+          }
+          for (; i < each_blocks.length; i += 1) {
+            each_blocks[i].d(1);
+          }
+          each_blocks.length = each_value_7.length;
+        }
+      },
+      d(detaching) {
+        if (detaching) {
+          detach(each_1_anchor);
+        }
+        destroy_each(each_blocks, detaching);
+      }
+    };
+  }
+  __name(create_if_block_15, "create_if_block_15");
+  function create_each_block_7(ctx) {
+    let li;
+    let small;
+    let i_1;
+    let i_1_class_value;
+    let t_value = (
+      /*item*/
+      ctx[13].oo.name + ""
+    );
+    let t;
+    return {
+      c() {
+        li = element("li");
+        small = element("small");
+        i_1 = element("i");
+        t = text2(t_value);
+        attr(i_1, "class", i_1_class_value = "bi bi-" + class_icons_default(
+          /*item*/
+          ctx[13].oo.name
+        ) + " text-light pe-2");
+        attr(li, "class", "list-group-item ps-5");
+      },
+      m(target, anchor) {
+        insert(target, li, anchor);
+        append(li, small);
+        append(small, i_1);
+        append(small, t);
+      },
+      p(ctx2, dirty) {
+        if (dirty & /*object*/
+        1 && i_1_class_value !== (i_1_class_value = "bi bi-" + class_icons_default(
+          /*item*/
+          ctx2[13].oo.name
+        ) + " text-light pe-2")) {
+          attr(i_1, "class", i_1_class_value);
+        }
+        if (dirty & /*object*/
+        1 && t_value !== (t_value = /*item*/
+        ctx2[13].oo.name + ""))
+          set_data(t, t_value);
+      },
+      d(detaching) {
+        if (detaching) {
+          detach(li);
+        }
+      }
+    };
+  }
+  __name(create_each_block_7, "create_each_block_7");
+  function create_each_block_6(ctx) {
+    let li;
+    let i_1;
+    let i_1_class_value;
+    let t0_value = (
+      /*item*/
+      ctx[13].oo.name + ""
+    );
+    let t0;
+    let t1;
+    let if_block_anchor;
+    let if_block = (
+      /*item*/
+      ctx[13].oo.name == "Pane" && create_if_block_15(ctx)
+    );
+    return {
+      c() {
+        li = element("li");
+        i_1 = element("i");
+        t0 = text2(t0_value);
+        t1 = space();
+        if (if_block)
+          if_block.c();
+        if_block_anchor = empty();
+        attr(i_1, "class", i_1_class_value = "bi bi-" + class_icons_default(
+          /*item*/
+          ctx[13].oo.name
+        ) + " text-light pe-2");
+        attr(li, "class", "list-group-item");
+      },
+      m(target, anchor) {
+        insert(target, li, anchor);
+        append(li, i_1);
+        append(li, t0);
+        insert(target, t1, anchor);
+        if (if_block)
+          if_block.m(target, anchor);
+        insert(target, if_block_anchor, anchor);
+      },
+      p(ctx2, dirty) {
+        if (dirty & /*object*/
+        1 && i_1_class_value !== (i_1_class_value = "bi bi-" + class_icons_default(
+          /*item*/
+          ctx2[13].oo.name
+        ) + " text-light pe-2")) {
+          attr(i_1, "class", i_1_class_value);
+        }
+        if (dirty & /*object*/
+        1 && t0_value !== (t0_value = /*item*/
+        ctx2[13].oo.name + ""))
+          set_data(t0, t0_value);
+        if (
+          /*item*/
+          ctx2[13].oo.name == "Pane"
+        ) {
+          if (if_block) {
+            if_block.p(ctx2, dirty);
+          } else {
+            if_block = create_if_block_15(ctx2);
+            if_block.c();
+            if_block.m(if_block_anchor.parentNode, if_block_anchor);
+          }
+        } else if (if_block) {
+          if_block.d(1);
+          if_block = null;
+        }
+      },
+      d(detaching) {
+        if (detaching) {
+          detach(li);
+          detach(t1);
+          detach(if_block_anchor);
+        }
+        if (if_block)
+          if_block.d(detaching);
+      }
+    };
+  }
+  __name(create_each_block_6, "create_each_block_6");
+  function create_if_block_9(ctx) {
+    let div1;
+    let div0;
+    let t0;
+    let t1;
+    let mounted;
+    let dispose;
+    function select_block_type_1(ctx2, dirty) {
+      if (
+        /*opened*/
+        ctx2[3][
+          /*feature*/
+          ctx2[12]
+        ]
+      )
+        return create_if_block_12;
+      return create_else_block_2;
+    }
+    __name(select_block_type_1, "select_block_type_1");
+    let current_block_type = select_block_type_1(ctx, -1);
+    let if_block0 = current_block_type(ctx);
+    function click_handler_1() {
+      return (
+        /*click_handler_1*/
+        ctx[9](
+          /*feature*/
+          ctx[12]
+        )
+      );
+    }
+    __name(click_handler_1, "click_handler_1");
+    let if_block1 = (
+      /*opened*/
+      ctx[3][
+        /*feature*/
+        ctx[12]
+      ] && create_if_block_10(ctx)
+    );
+    return {
+      c() {
+        div1 = element("div");
+        div0 = element("div");
+        if_block0.c();
+        t0 = text2("\n              Traits");
+        t1 = space();
+        if (if_block1)
+          if_block1.c();
+        attr(div0, "class", "card-header");
+        attr(div1, "class", "card mb-3");
+      },
+      m(target, anchor) {
+        insert(target, div1, anchor);
+        append(div1, div0);
+        if_block0.m(div0, null);
+        append(div0, t0);
+        append(div1, t1);
+        if (if_block1)
+          if_block1.m(div1, null);
+        if (!mounted) {
+          dispose = listen(div0, "click", click_handler_1);
+          mounted = true;
+        }
+      },
+      p(new_ctx, dirty) {
+        ctx = new_ctx;
+        if (current_block_type !== (current_block_type = select_block_type_1(ctx, dirty))) {
+          if_block0.d(1);
+          if_block0 = current_block_type(ctx);
+          if (if_block0) {
+            if_block0.c();
+            if_block0.m(div0, t0);
+          }
+        }
+        if (
+          /*opened*/
+          ctx[3][
+            /*feature*/
+            ctx[12]
+          ]
         ) {
           if (if_block1) {
             if_block1.p(ctx, dirty);
@@ -13578,7 +14024,7 @@
     let ul;
     let each_value_4 = ensure_array_like(
       /*object*/
-      ctx[0].children.raw
+      ctx[0].oo.getTraits()
     );
     let each_blocks = [];
     for (let i = 0; i < each_value_4.length; i += 1) {
@@ -13605,7 +14051,7 @@
         1) {
           each_value_4 = ensure_array_like(
             /*object*/
-            ctx2[0].children.raw
+            ctx2[0].oo.getTraits()
           );
           let i;
           for (i = 0; i < each_value_4.length; i += 1) {
@@ -13636,8 +14082,8 @@
   function create_if_block_11(ctx) {
     let each_1_anchor;
     let each_value_5 = ensure_array_like(
-      /*object*/
-      ctx[0].pane.applications.raw
+      /*item*/
+      ctx[13].data
     );
     let each_blocks = [];
     for (let i = 0; i < each_value_5.length; i += 1) {
@@ -13662,8 +14108,8 @@
         if (dirty & /*object*/
         1) {
           each_value_5 = ensure_array_like(
-            /*object*/
-            ctx2[0].pane.applications.raw
+            /*item*/
+            ctx2[13].data
           );
           let i;
           for (i = 0; i < each_value_5.length; i += 1) {
@@ -13696,20 +14142,30 @@
     let small;
     let i_1;
     let i_1_class_value;
-    let t_value = (
+    let t0_value = (
       /*item*/
-      ctx[12].oo.name + ""
+      ctx[13].name + ""
     );
-    let t;
+    let t0;
+    let t1;
+    let t2_value = getFunctionSignature(
+      /*item*/
+      ctx[13].code
+    ).join(", ") + "";
+    let t2;
+    let t3;
     return {
       c() {
         li = element("li");
         small = element("small");
         i_1 = element("i");
-        t = text2(t_value);
+        t0 = text2(t0_value);
+        t1 = text2("(");
+        t2 = text2(t2_value);
+        t3 = text2(")");
         attr(i_1, "class", i_1_class_value = "bi bi-" + class_icons_default(
-          /*item*/
-          ctx[12].oo.name
+          /*feature*/
+          ctx[12]
         ) + " text-light pe-2");
         attr(li, "class", "list-group-item ps-5");
       },
@@ -13717,20 +14173,22 @@
         insert(target, li, anchor);
         append(li, small);
         append(small, i_1);
-        append(small, t);
+        append(small, t0);
+        append(small, t1);
+        append(small, t2);
+        append(small, t3);
       },
       p(ctx2, dirty) {
         if (dirty & /*object*/
-        1 && i_1_class_value !== (i_1_class_value = "bi bi-" + class_icons_default(
-          /*item*/
-          ctx2[12].oo.name
-        ) + " text-light pe-2")) {
-          attr(i_1, "class", i_1_class_value);
-        }
+        1 && t0_value !== (t0_value = /*item*/
+        ctx2[13].name + ""))
+          set_data(t0, t0_value);
         if (dirty & /*object*/
-        1 && t_value !== (t_value = /*item*/
-        ctx2[12].oo.name + ""))
-          set_data(t, t_value);
+        1 && t2_value !== (t2_value = getFunctionSignature(
+          /*item*/
+          ctx2[13].code
+        ).join(", ") + ""))
+          set_data(t2, t2_value);
       },
       d(detaching) {
         if (detaching) {
@@ -13746,14 +14204,14 @@
     let i_1_class_value;
     let t0_value = (
       /*item*/
-      ctx[12].oo.name + ""
+      ctx[13].name + ""
     );
     let t0;
     let t1;
     let if_block_anchor;
     let if_block = (
       /*item*/
-      ctx[12].oo.name == "Pane" && create_if_block_11(ctx)
+      ctx[13].data && create_if_block_11(ctx)
     );
     return {
       c() {
@@ -13766,9 +14224,15 @@
         if_block_anchor = empty();
         attr(i_1, "class", i_1_class_value = "bi bi-" + class_icons_default(
           /*item*/
-          ctx[12].oo.name
+          ctx[13].name
         ) + " text-light pe-2");
         attr(li, "class", "list-group-item");
+        toggle_class(
+          li,
+          "opacity-50",
+          /*item*/
+          ctx[13].data.length == 0
+        );
       },
       m(target, anchor) {
         insert(target, li, anchor);
@@ -13783,17 +14247,26 @@
         if (dirty & /*object*/
         1 && i_1_class_value !== (i_1_class_value = "bi bi-" + class_icons_default(
           /*item*/
-          ctx2[12].oo.name
+          ctx2[13].name
         ) + " text-light pe-2")) {
           attr(i_1, "class", i_1_class_value);
         }
         if (dirty & /*object*/
         1 && t0_value !== (t0_value = /*item*/
-        ctx2[12].oo.name + ""))
+        ctx2[13].name + ""))
           set_data(t0, t0_value);
+        if (dirty & /*object*/
+        1) {
+          toggle_class(
+            li,
+            "opacity-50",
+            /*item*/
+            ctx2[13].data.length == 0
+          );
+        }
         if (
           /*item*/
-          ctx2[12].oo.name == "Pane"
+          ctx2[13].data
         ) {
           if (if_block) {
             if_block.p(ctx2, dirty);
@@ -13826,35 +14299,35 @@
     let t1;
     let mounted;
     let dispose;
-    function select_block_type_1(ctx2, dirty) {
+    function select_block_type_2(ctx2, dirty) {
       if (
         /*opened*/
         ctx2[3][
           /*feature*/
-          ctx2[11]
+          ctx2[12]
         ]
       )
         return create_if_block_8;
       return create_else_block_1;
     }
-    __name(select_block_type_1, "select_block_type_1");
-    let current_block_type = select_block_type_1(ctx, -1);
+    __name(select_block_type_2, "select_block_type_2");
+    let current_block_type = select_block_type_2(ctx, -1);
     let if_block0 = current_block_type(ctx);
-    function click_handler_1() {
+    function click_handler_2() {
       return (
-        /*click_handler_1*/
-        ctx[9](
+        /*click_handler_2*/
+        ctx[10](
           /*feature*/
-          ctx[11]
+          ctx[12]
         )
       );
     }
-    __name(click_handler_1, "click_handler_1");
+    __name(click_handler_2, "click_handler_2");
     let if_block1 = (
       /*opened*/
       ctx[3][
         /*feature*/
-        ctx[11]
+        ctx[12]
       ] && create_if_block_6(ctx)
     );
     return {
@@ -13862,7 +14335,7 @@
         div1 = element("div");
         div0 = element("div");
         if_block0.c();
-        t0 = text2("\n              Traits");
+        t0 = text2("\n              Methods");
         t1 = space();
         if (if_block1)
           if_block1.c();
@@ -13878,13 +14351,13 @@
         if (if_block1)
           if_block1.m(div1, null);
         if (!mounted) {
-          dispose = listen(div0, "click", click_handler_1);
+          dispose = listen(div0, "click", click_handler_2);
           mounted = true;
         }
       },
       p(new_ctx, dirty) {
         ctx = new_ctx;
-        if (current_block_type !== (current_block_type = select_block_type_1(ctx, dirty))) {
+        if (current_block_type !== (current_block_type = select_block_type_2(ctx, dirty))) {
           if_block0.d(1);
           if_block0 = current_block_type(ctx);
           if (if_block0) {
@@ -13896,7 +14369,7 @@
           /*opened*/
           ctx[3][
             /*feature*/
-            ctx[11]
+            ctx[12]
           ]
         ) {
           if (if_block1) {
@@ -13964,7 +14437,7 @@
     let ul;
     let each_value_2 = ensure_array_like(
       /*object*/
-      ctx[0].oo.getTraits()
+      ctx[0].oo.getMethods()
     );
     let each_blocks = [];
     for (let i = 0; i < each_value_2.length; i += 1) {
@@ -13991,7 +14464,7 @@
         1) {
           each_value_2 = ensure_array_like(
             /*object*/
-            ctx2[0].oo.getTraits()
+            ctx2[0].oo.getMethods()
           );
           let i;
           for (i = 0; i < each_value_2.length; i += 1) {
@@ -14023,7 +14496,7 @@
     let each_1_anchor;
     let each_value_3 = ensure_array_like(
       /*item*/
-      ctx[12].data
+      ctx[13].data
     );
     let each_blocks = [];
     for (let i = 0; i < each_value_3.length; i += 1) {
@@ -14049,7 +14522,7 @@
         1) {
           each_value_3 = ensure_array_like(
             /*item*/
-            ctx2[12].data
+            ctx2[13].data
           );
           let i;
           for (i = 0; i < each_value_3.length; i += 1) {
@@ -14082,30 +14555,20 @@
     let small;
     let i_1;
     let i_1_class_value;
-    let t0_value = (
+    let t_value = (
       /*item*/
-      ctx[12].name + ""
+      ctx[13].name + ""
     );
-    let t0;
-    let t1;
-    let t2_value = getFunctionSignature(
-      /*item*/
-      ctx[12].code
-    ).join(", ") + "";
-    let t2;
-    let t3;
+    let t;
     return {
       c() {
         li = element("li");
         small = element("small");
         i_1 = element("i");
-        t0 = text2(t0_value);
-        t1 = text2("(");
-        t2 = text2(t2_value);
-        t3 = text2(")");
+        t = text2(t_value);
         attr(i_1, "class", i_1_class_value = "bi bi-" + class_icons_default(
           /*feature*/
-          ctx[11]
+          ctx[12]
         ) + " text-light pe-2");
         attr(li, "class", "list-group-item ps-5");
       },
@@ -14113,22 +14576,13 @@
         insert(target, li, anchor);
         append(li, small);
         append(small, i_1);
-        append(small, t0);
-        append(small, t1);
-        append(small, t2);
-        append(small, t3);
+        append(small, t);
       },
       p(ctx2, dirty) {
         if (dirty & /*object*/
-        1 && t0_value !== (t0_value = /*item*/
-        ctx2[12].name + ""))
-          set_data(t0, t0_value);
-        if (dirty & /*object*/
-        1 && t2_value !== (t2_value = getFunctionSignature(
-          /*item*/
-          ctx2[12].code
-        ).join(", ") + ""))
-          set_data(t2, t2_value);
+        1 && t_value !== (t_value = /*item*/
+        ctx2[13].name + ""))
+          set_data(t, t_value);
       },
       d(detaching) {
         if (detaching) {
@@ -14144,14 +14598,14 @@
     let i_1_class_value;
     let t0_value = (
       /*item*/
-      ctx[12].name + ""
+      ctx[13].name + ""
     );
     let t0;
     let t1;
     let if_block_anchor;
     let if_block = (
       /*item*/
-      ctx[12].data && create_if_block_7(ctx)
+      ctx[13].data && create_if_block_7(ctx)
     );
     return {
       c() {
@@ -14164,15 +14618,9 @@
         if_block_anchor = empty();
         attr(i_1, "class", i_1_class_value = "bi bi-" + class_icons_default(
           /*item*/
-          ctx[12].name
+          ctx[13].name
         ) + " text-light pe-2");
         attr(li, "class", "list-group-item");
-        toggle_class(
-          li,
-          "opacity-50",
-          /*item*/
-          ctx[12].data.length == 0
-        );
       },
       m(target, anchor) {
         insert(target, li, anchor);
@@ -14187,26 +14635,17 @@
         if (dirty & /*object*/
         1 && i_1_class_value !== (i_1_class_value = "bi bi-" + class_icons_default(
           /*item*/
-          ctx2[12].name
+          ctx2[13].name
         ) + " text-light pe-2")) {
           attr(i_1, "class", i_1_class_value);
         }
         if (dirty & /*object*/
         1 && t0_value !== (t0_value = /*item*/
-        ctx2[12].name + ""))
+        ctx2[13].name + ""))
           set_data(t0, t0_value);
-        if (dirty & /*object*/
-        1) {
-          toggle_class(
-            li,
-            "opacity-50",
-            /*item*/
-            ctx2[12].data.length == 0
-          );
-        }
         if (
           /*item*/
-          ctx2[12].data
+          ctx2[13].data
         ) {
           if (if_block) {
             if_block.p(ctx2, dirty);
@@ -14232,42 +14671,42 @@
     };
   }
   __name(create_each_block_2, "create_each_block_2");
-  function create_if_block_13(ctx) {
+  function create_if_block_17(ctx) {
     let div1;
     let div0;
     let t0;
     let t1;
     let mounted;
     let dispose;
-    function select_block_type_2(ctx2, dirty) {
+    function select_block_type_3(ctx2, dirty) {
       if (
         /*opened*/
         ctx2[3][
           /*feature*/
-          ctx2[11]
+          ctx2[12]
         ]
       )
         return create_if_block_4;
       return create_else_block2;
     }
-    __name(select_block_type_2, "select_block_type_2");
-    let current_block_type = select_block_type_2(ctx, -1);
+    __name(select_block_type_3, "select_block_type_3");
+    let current_block_type = select_block_type_3(ctx, -1);
     let if_block0 = current_block_type(ctx);
-    function click_handler_2() {
+    function click_handler_3() {
       return (
-        /*click_handler_2*/
-        ctx[10](
+        /*click_handler_3*/
+        ctx[11](
           /*feature*/
-          ctx[11]
+          ctx[12]
         )
       );
     }
-    __name(click_handler_2, "click_handler_2");
+    __name(click_handler_3, "click_handler_3");
     let if_block1 = (
       /*opened*/
       ctx[3][
         /*feature*/
-        ctx[11]
+        ctx[12]
       ] && create_if_block_22(ctx)
     );
     return {
@@ -14275,7 +14714,7 @@
         div1 = element("div");
         div0 = element("div");
         if_block0.c();
-        t0 = text2("\n              Methods");
+        t0 = text2("\n              Observables");
         t1 = space();
         if (if_block1)
           if_block1.c();
@@ -14291,13 +14730,13 @@
         if (if_block1)
           if_block1.m(div1, null);
         if (!mounted) {
-          dispose = listen(div0, "click", click_handler_2);
+          dispose = listen(div0, "click", click_handler_3);
           mounted = true;
         }
       },
       p(new_ctx, dirty) {
         ctx = new_ctx;
-        if (current_block_type !== (current_block_type = select_block_type_2(ctx, dirty))) {
+        if (current_block_type !== (current_block_type = select_block_type_3(ctx, dirty))) {
           if_block0.d(1);
           if_block0 = current_block_type(ctx);
           if (if_block0) {
@@ -14309,7 +14748,7 @@
           /*opened*/
           ctx[3][
             /*feature*/
-            ctx[11]
+            ctx[12]
           ]
         ) {
           if (if_block1) {
@@ -14336,7 +14775,7 @@
       }
     };
   }
-  __name(create_if_block_13, "create_if_block_1");
+  __name(create_if_block_17, "create_if_block_1");
   function create_else_block2(ctx) {
     let i;
     return {
@@ -14377,7 +14816,7 @@
     let ul;
     let each_value = ensure_array_like(
       /*object*/
-      ctx[0].oo.getMethods()
+      ctx[0].oo.getObservables()
     );
     let each_blocks = [];
     for (let i = 0; i < each_value.length; i += 1) {
@@ -14404,7 +14843,7 @@
         1) {
           each_value = ensure_array_like(
             /*object*/
-            ctx2[0].oo.getMethods()
+            ctx2[0].oo.getObservables()
           );
           let i;
           for (i = 0; i < each_value.length; i += 1) {
@@ -14436,7 +14875,7 @@
     let each_1_anchor;
     let each_value_1 = ensure_array_like(
       /*item*/
-      ctx[12].data
+      ctx[13].data
     );
     let each_blocks = [];
     for (let i = 0; i < each_value_1.length; i += 1) {
@@ -14462,7 +14901,7 @@
         1) {
           each_value_1 = ensure_array_like(
             /*item*/
-            ctx2[12].data
+            ctx2[13].data
           );
           let i;
           for (i = 0; i < each_value_1.length; i += 1) {
@@ -14497,7 +14936,7 @@
     let i_1_class_value;
     let t_value = (
       /*item*/
-      ctx[12].name + ""
+      ctx[13].name + ""
     );
     let t;
     return {
@@ -14508,7 +14947,7 @@
         t = text2(t_value);
         attr(i_1, "class", i_1_class_value = "bi bi-" + class_icons_default(
           /*feature*/
-          ctx[11]
+          ctx[12]
         ) + " text-light pe-2");
         attr(li, "class", "list-group-item ps-5");
       },
@@ -14521,7 +14960,7 @@
       p(ctx2, dirty) {
         if (dirty & /*object*/
         1 && t_value !== (t_value = /*item*/
-        ctx2[12].name + ""))
+        ctx2[13].name + ""))
           set_data(t, t_value);
       },
       d(detaching) {
@@ -14538,14 +14977,14 @@
     let i_1_class_value;
     let t0_value = (
       /*item*/
-      ctx[12].name + ""
+      ctx[13].name + ""
     );
     let t0;
     let t1;
     let if_block_anchor;
     let if_block = (
       /*item*/
-      ctx[12].data && create_if_block_3(ctx)
+      ctx[13].data && create_if_block_3(ctx)
     );
     return {
       c() {
@@ -14558,7 +14997,7 @@
         if_block_anchor = empty();
         attr(i_1, "class", i_1_class_value = "bi bi-" + class_icons_default(
           /*item*/
-          ctx[12].name
+          ctx[13].name
         ) + " text-light pe-2");
         attr(li, "class", "list-group-item");
       },
@@ -14575,17 +15014,17 @@
         if (dirty & /*object*/
         1 && i_1_class_value !== (i_1_class_value = "bi bi-" + class_icons_default(
           /*item*/
-          ctx2[12].name
+          ctx2[13].name
         ) + " text-light pe-2")) {
           attr(i_1, "class", i_1_class_value);
         }
         if (dirty & /*object*/
         1 && t0_value !== (t0_value = /*item*/
-        ctx2[12].name + ""))
+        ctx2[13].name + ""))
           set_data(t0, t0_value);
         if (
           /*item*/
-          ctx2[12].data
+          ctx2[13].data
         ) {
           if (if_block) {
             if_block.p(ctx2, dirty);
@@ -14672,11 +15111,13 @@
     let opened = {
       children: true,
       Trait: true,
-      Method: true
+      Method: true,
+      Observables: true
     };
     const click_handler = /* @__PURE__ */ __name((feature) => $$invalidate(3, opened[feature] = !opened[feature], opened), "click_handler");
     const click_handler_1 = /* @__PURE__ */ __name((feature) => $$invalidate(3, opened[feature] = !opened[feature], opened), "click_handler_1");
     const click_handler_2 = /* @__PURE__ */ __name((feature) => $$invalidate(3, opened[feature] = !opened[feature], opened), "click_handler_2");
+    const click_handler_3 = /* @__PURE__ */ __name((feature) => $$invalidate(3, opened[feature] = !opened[feature], opened), "click_handler_3");
     $$self.$$set = ($$props2) => {
       if ("stores" in $$props2)
         $$invalidate(6, stores = $$props2.stores);
@@ -14700,7 +15141,8 @@
       paneItems,
       click_handler,
       click_handler_1,
-      click_handler_2
+      click_handler_2,
+      click_handler_3
     ];
   }
   __name(instance9, "instance");
@@ -14914,6 +15356,7 @@
     };
     methods = {
       initialize() {
+        this.serializables = "title context text note".split(" ");
         this.createSocket("out", 1);
       },
       mount() {

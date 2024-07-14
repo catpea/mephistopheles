@@ -15,6 +15,7 @@
     children:true,
     Trait: true,
     Method: true,
+    Observables: true,
   };
 
 </script>
@@ -115,6 +116,34 @@
             {#if opened[feature]}
               <ul class="list-group list-group-flush">
                 {#each object.oo.getMethods() as item, i}
+                  <li class="list-group-item"><i class="bi bi-{classIcons(item.name)} text-light pe-2"></i>{item.name}</li>
+                  {#if item.data}
+                    {#each item.data as item, i}
+                      <li class="list-group-item ps-5"><small><i class="bi bi-{classIcons(feature)} text-light pe-2"></i>{item.name}</small></li>
+
+                    {/each}
+                  {/if}
+                {/each}
+              </ul>
+            {/if}
+          </div>
+      {/if}
+
+
+      {#if object}
+        {@const feature = 'Observables'}
+          <div class="card mb-3">
+            <div class="card-header" on:click={()=>opened[feature]=!opened[feature]}>
+            {#if opened[feature]}
+            <i class="bi bi-caret-down-fill"></i>
+            {:else}
+            <i class="bi bi-caret-right"></i>
+            {/if}
+              Observables
+            </div>
+            {#if opened[feature]}
+              <ul class="list-group list-group-flush">
+                {#each object.oo.getObservables() as item, i}
                   <li class="list-group-item"><i class="bi bi-{classIcons(item.name)} text-light pe-2"></i>{item.name}</li>
                   {#if item.data}
                     {#each item.data as item, i}

@@ -71,8 +71,8 @@ export default class Workspace {
 
     saveXml(){
       const $ = cheerio.load(`<?xml version="1.0"?><${this.oo.name} name="${pkg.name}" description="${pkg.description}" version="${pkg.version}"></${this.oo.name}>`, { xmlMode: true, decodeEntities: true, withStartIndices: true, withEndIndices: true });
-      if (this.pane) {
-        $(this.oo.name).append(this.pane.getXml());
+      if (this.realm) {
+        $(this.oo.name).append(this.realm.getXml());
       }
       const xml = $.root().html();
       console.info(xml);

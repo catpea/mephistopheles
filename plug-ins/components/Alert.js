@@ -14,8 +14,10 @@ export default class Alert {
     text: undefined,
   };
 
+
   methods = {
     initialize(){
+      this.serializables = 'title context text note'   .split(' ');
       this.createSocket('out', 1);
     },
     mount(){

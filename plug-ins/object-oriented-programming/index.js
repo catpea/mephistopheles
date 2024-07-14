@@ -116,6 +116,8 @@ export class Instance {
       } // if
     }
 
+ 
+
     // Install Traits (a trait is bound to the nice object)
     for (const inherited of this.oo.specifications) {
       // begin at top, avoid properties that already exist.
@@ -279,6 +281,10 @@ export class Instance {
     // NOTE: these are API/protocol functions - stable way to reliably get what you need
 
     const that = this;
+    this.oo.getObservables = function(){
+      const response = that.oo.specifications.map( ({name, observables={}})=>({name,data: Object.entries(observables)          .map( ([name,code]) => ({name}) )                }) );
+      return response
+    }
     this.oo.getMethods = function(){
       const response = that.oo.specifications.map( ({name, methods})=>({name,data: Object.entries(methods)          .map( ([name,code]) => ({name,code: 'function ' + code.toString()}) )                }) );
       return response
@@ -531,7 +537,7 @@ export class Primitive {
       this.#observers[eventName].forEach((observerCallback) => observerCallback(eventData, ...extra));
     }
   }
-  
+
   status(){
 
     return {

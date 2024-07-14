@@ -28,7 +28,7 @@ export default class Window {
     showMenu: false,
     showStatus: false,
 
-    selected: false,
+    // selected: false,
   };
 
   properties = {

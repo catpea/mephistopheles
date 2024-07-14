@@ -19,7 +19,7 @@ export default class Application {
 
 
       removeApplication(){
-        const localGroup = this.getGroup();
+        const localGroup = this.getGroup(this,false);
         const domain = localGroup.realm;
 
         for (const o of domain.applications.filter(o=>o.selected)) {

@@ -1,5 +1,4 @@
 import Component from "/plug-ins/windows/Component.js";
-import Select from "/plug-ins/mouse-services/Select.js";
 import { svg, update } from "/plug-ins/domek/index.js"
 import { midpoint } from "/plug-ins/geometrique/index.js";
 import { edgepoint } from "/plug-ins/geometrique/index.js";
@@ -9,11 +8,12 @@ export default class Connector {
   static extends = [Component];
 
   properties = {
+    handle: undefined,
   };
 
   observables = {
 
-    selected: false,
+    // selected: false,
 
     from: null,
     to: null,
@@ -36,15 +36,13 @@ export default class Connector {
   methods = {
 
     initialize(){
-    },
-
-    mount(){
 
       this.el.PrimaryBg = svg.line({
         name: this.name,
         class: 'editor-connector-zone',
         'vector-effect': 'non-scaling-stroke',
       });
+      this.handle = this.el.PrimaryBg;
 
       this.el.Primary = svg.line({
         name: this.name,
@@ -61,15 +59,14 @@ export default class Connector {
         r:4,
       });
 
+    },
+
+    mount(){
+
+
+
       this.on("selected", selected => selected?this.el.Primary.classList.add('selected'):this.el.Primary.classList.remove('selected'));
       this.on("selected", selected => selected?this.el.Midpoint.classList.add('selected'):this.el.Midpoint.classList.remove('selected'));
-
-
-      const select = new Select({
-        component: this,
-        handle: this.el.PrimaryBg,
-      });
-      this.addDisposable(select);
 
       this.on('name',  name=>update(this.el.Primary,{name}), );
 
