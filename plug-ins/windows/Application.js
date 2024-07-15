@@ -1,5 +1,6 @@
 import {Instance} from "/plug-ins/object-oriented-programming/index.js";
 import Window from "/plug-ins/windows/Window.js";
+import prioritySort from "/plug-ins/priority-sort/index.js";
 import EventEmitter from "/plug-ins/event-emitter/EventEmitter.js";
 
 export default class Application {
@@ -18,19 +19,21 @@ export default class Application {
   traits = {
 
 
-      removeApplication(){
-        const localGroup = this.getGroup(this,false);
-        const domain = localGroup.realm;
+      removeApplication(realm){
+        const selected = [...realm.applications.filter(o=>o.selected)];
+        const ordered = prioritySort( selected, ['Pipe', 'Something', '*'], application=>application.oo.name );
 
-        for (const o of domain.applications.filter(o=>o.selected)) {
-          if(o.oo.name == 'Pipe'){
-            domain.elements.remove(o.id);
+        for (const item of ordered ) {
+
+          if(item.oo.name == 'Pipe'){
+            realm.elements.remove(item.id);
           }else{ //
-            for (const relatedPipe of domain.applications.filter(x=>x.oo.name == 'Pipe').filter(x=>(x.to==o.id||x.from==o.id))) {
-              domain.elements.remove(relatedPipe.id);
+            for (const relatedPipe of realm.applications.filter(x=>x.oo.name == 'Pipe').filter(x=>(x.to==item.id||x.from==item.id))) {
+              realm.elements.remove(relatedPipe.id);
             }
-            domain.elements.remove(o.id);
+            realm.elements.remove(item.id);
           }
+
         }
 
       },
@@ -75,7 +78,7 @@ export default class Application {
       this.getRoot().applications.create(this);
     },
     mount(){
-      this.addDisposableFromSmartEmitter( this.getRoot().keyboard, 'Remove', ()=>this.removeApplication() );
+      this.addDisposableFromSmartEmitter( this.getRoot().keyboard, 'Remove', ()=>this.removeApplication(this.getGroup(this, true).realm) );
     }
 
 

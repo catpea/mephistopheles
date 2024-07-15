@@ -26,7 +26,6 @@ export default class Select {
     this.component.selected = false;
   }
   deselectOthers(){
-    console.log(this.component.getGroup().realm.applications.raw);
     for (const item of this.component.getGroup().realm.applications) {
       if(this.component.id !== item.id){
         item.selected = false;

@@ -3,8 +3,8 @@ A Visual Programming Language
 
 ## TODO
 
-- [ ] fix recursive direction ```const localGroup = this.getGroup(this,false);```
 - [ ] promote ```const serializables =  'id x y w h'.split(' ');``` to object-oriented...
+- [ ] serializables should indicate type! {id:'string', showCaption:'Boolean'}
 
 ---
 
@@ -41,6 +41,9 @@ A Visual Programming Language
 - [x] Nested Transforms
 - [x] Add component loading to Root Window
 - [x] Switch from JSON to XML
+- [x] fix recursive direction ```const localGroup = this.getGroup(this,false);```
+- [x] in multi remove, remove connectors before removing applications
+
 
 ## Laws
 - Parent Components Sets The Scene: the child must ass it's .g to the scene (add its svg group to scene set by parent)

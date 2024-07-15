@@ -141,14 +141,20 @@ export default class Component {
       if(element.parent) return this.getApplication(element.parent);
     },
 
-    getGroup(element, rootCall=true) {
+    /*
+      When called for the first time, the function will not check if it is a group,
+      this is to avoid nested group problems, where a group window will report it self as the containing group.
+    */
+    getGroup(element, withInner=false) {
       if(!element) element = this;
 
-      if((!rootCall)&&(element.isGroup===true)){
-        return element;
+      if(withInner){
+        if(element.isGroup===true){
+          return element;
+        }
       }
 
-      if(element.parent) return this.getGroup(element.parent, false);
+      if(element.parent) return this.getGroup(element.parent, true);
     },
 
 

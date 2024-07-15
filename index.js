@@ -7481,14 +7481,20 @@
         if (element2.parent)
           return this.getApplication(element2.parent);
       },
-      getGroup(element2, rootCall = true) {
+      /*
+        When called for the first time, the function will not check if it is a group,
+        this is to avoid nested group problems, where a group window will report it self as the containing group.
+      */
+      getGroup(element2, withInner = false) {
         if (!element2)
           element2 = this;
-        if (!rootCall && element2.isGroup === true) {
-          return element2;
+        if (withInner) {
+          if (element2.isGroup === true) {
+            return element2;
+          }
         }
         if (element2.parent)
-          return this.getGroup(element2.parent, false);
+          return this.getGroup(element2.parent, true);
       },
       getStack(element2, list = []) {
         if (!element2)
@@ -7587,7 +7593,6 @@
       this.component.selected = false;
     }
     deselectOthers() {
-      console.log(this.component.getGroup().realm.applications.raw);
       for (const item of this.component.getGroup().realm.applications) {
         if (this.component.id !== item.id) {
           item.selected = false;
@@ -8641,6 +8646,20 @@
     };
   };
 
+  // plug-ins/priority-sort/index.js
+  function prioritySort(list, priority, field) {
+    const WILDCARD = priority.indexOf("*") == -1 ? priority.length - 1 : priority.indexOf("*");
+    const indexer = /* @__PURE__ */ __name(function(a) {
+      const value = priority.indexOf(field(a));
+      return value === -1 ? WILDCARD : value;
+    }, "indexer");
+    const sorter = /* @__PURE__ */ __name(function(a, b) {
+      return indexer(a) - indexer(b);
+    }, "sorter");
+    return [...list].sort(sorter);
+  }
+  __name(prioritySort, "prioritySort");
+
   // plug-ins/windows/Application.js
   var Application = class {
     static {
@@ -8656,17 +8675,17 @@
       url: null
     };
     traits = {
-      removeApplication() {
-        const localGroup = this.getGroup(this, false);
-        const domain = localGroup.realm;
-        for (const o of domain.applications.filter((o2) => o2.selected)) {
-          if (o.oo.name == "Pipe") {
-            domain.elements.remove(o.id);
+      removeApplication(realm) {
+        const selected = [...realm.applications.filter((o) => o.selected)];
+        const ordered = prioritySort(selected, ["Pipe", "Something", "*"], (application) => application.oo.name);
+        for (const item of ordered) {
+          if (item.oo.name == "Pipe") {
+            realm.elements.remove(item.id);
           } else {
-            for (const relatedPipe of domain.applications.filter((x) => x.oo.name == "Pipe").filter((x) => x.to == o.id || x.from == o.id)) {
-              domain.elements.remove(relatedPipe.id);
+            for (const relatedPipe of realm.applications.filter((x) => x.oo.name == "Pipe").filter((x) => x.to == item.id || x.from == item.id)) {
+              realm.elements.remove(relatedPipe.id);
             }
-            domain.elements.remove(o.id);
+            realm.elements.remove(item.id);
           }
         }
       },
@@ -8710,7 +8729,7 @@
         this.getRoot().applications.create(this);
       },
       mount() {
-        this.addDisposableFromSmartEmitter(this.getRoot().keyboard, "Remove", () => this.removeApplication());
+        this.addDisposableFromSmartEmitter(this.getRoot().keyboard, "Remove", () => this.removeApplication(this.getGroup(this, true).realm));
       }
     };
   };
