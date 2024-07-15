@@ -8563,7 +8563,7 @@
     };
     methods = {
       initialize() {
-        this.caption = `${this.name || this.oo.name} (${this.id})`;
+        this.caption = `${this.name || this.oo.name}`;
         if (this.isRootWindow)
           return;
         if (this.oo.name == "Pipe")
@@ -8675,7 +8675,19 @@
       url: null
     };
     traits = {
-      removeApplication(realm) {
+      removeApplication() {
+        const item = this;
+        const realm = item.getGroup().realm;
+        if (item.oo.name == "Pipe") {
+          realm.elements.remove(item.id);
+        } else {
+          for (const relatedPipe of realm.applications.filter((x) => x.oo.name == "Pipe").filter((x) => x.to == item.id || x.from == item.id)) {
+            realm.elements.remove(relatedPipe.id);
+          }
+          realm.elements.remove(item.id);
+        }
+      },
+      removeApplications(realm) {
         const selected = [...realm.applications.filter((o) => o.selected)];
         const ordered = prioritySort(selected, ["Pipe", "Something", "*"], (application) => application.oo.name);
         for (const item of ordered) {
@@ -8729,7 +8741,7 @@
         this.getRoot().applications.create(this);
       },
       mount() {
-        this.addDisposableFromSmartEmitter(this.getRoot().keyboard, "Remove", () => this.removeApplication(this.getGroup(this, true).realm));
+        this.addDisposableFromSmartEmitter(this.getRoot().keyboard, "Remove", () => this.removeApplications(this.getGroup(this, true).realm));
       }
     };
   };
@@ -15244,83 +15256,103 @@
   // plug-ins/components/alert/Interface.svelte
   function create_fragment10(ctx) {
     let div;
-    let h4;
+    let button;
     let t0;
+    let h4;
     let t1;
-    let p0;
     let t2;
+    let p0;
     let t3;
-    let hr;
     let t4;
-    let p1;
+    let hr;
     let t5;
+    let p1;
+    let t6;
     let div_class_value;
+    let mounted;
+    let dispose;
     return {
       c() {
         div = element("div");
+        button = element("button");
+        t0 = space();
         h4 = element("h4");
-        t0 = text2(
+        t1 = text2(
           /*title*/
-          ctx[0]
+          ctx[1]
         );
-        t1 = space();
+        t2 = space();
         p0 = element("p");
-        t2 = text2(
+        t3 = text2(
           /*text*/
-          ctx[2]
-        );
-        t3 = space();
-        hr = element("hr");
-        t4 = space();
-        p1 = element("p");
-        t5 = text2(
-          /*note*/
           ctx[3]
         );
+        t4 = space();
+        hr = element("hr");
+        t5 = space();
+        p1 = element("p");
+        t6 = text2(
+          /*note*/
+          ctx[4]
+        );
+        attr(button, "type", "button");
+        attr(button, "class", "btn-close");
+        attr(button, "aria-label", "Close");
         attr(h4, "class", "alert-heading");
         attr(p1, "class", "mb-0");
         attr(div, "class", div_class_value = "alert alert-" + /*context*/
-        ctx[1] + " h-100 m-0");
+        ctx[2] + " alert-dismissible h-100 m-0");
         attr(div, "role", "alert");
       },
       m(target, anchor) {
         insert(target, div, anchor);
+        append(div, button);
+        append(div, t0);
         append(div, h4);
-        append(h4, t0);
-        append(div, t1);
+        append(h4, t1);
+        append(div, t2);
         append(div, p0);
-        append(p0, t2);
-        append(div, t3);
-        append(div, hr);
+        append(p0, t3);
         append(div, t4);
+        append(div, hr);
+        append(div, t5);
         append(div, p1);
-        append(p1, t5);
+        append(p1, t6);
+        if (!mounted) {
+          dispose = listen(
+            button,
+            "click",
+            /*click_handler*/
+            ctx[5]
+          );
+          mounted = true;
+        }
       },
       p(ctx2, [dirty]) {
         if (dirty & /*title*/
-        1)
+        2)
           set_data(
-            t0,
+            t1,
             /*title*/
-            ctx2[0]
+            ctx2[1]
           );
         if (dirty & /*text*/
-        4)
-          set_data(
-            t2,
-            /*text*/
-            ctx2[2]
-          );
-        if (dirty & /*note*/
         8)
           set_data(
-            t5,
-            /*note*/
+            t3,
+            /*text*/
             ctx2[3]
           );
+        if (dirty & /*note*/
+        16)
+          set_data(
+            t6,
+            /*note*/
+            ctx2[4]
+          );
         if (dirty & /*context*/
-        2 && div_class_value !== (div_class_value = "alert alert-" + /*context*/
-        ctx2[1] + " h-100 m-0")) {
+        4 && div_class_value !== (div_class_value = "alert alert-" + /*context*/
+        ctx2[2] + " alert-dismissible h-100 m-0")) {
           attr(div, "class", div_class_value);
         }
       },
@@ -15330,26 +15362,32 @@
         if (detaching) {
           detach(div);
         }
+        mounted = false;
+        dispose();
       }
     };
   }
   __name(create_fragment10, "create_fragment");
   function instance10($$self, $$props, $$invalidate) {
+    let { api } = $$props;
     let { title } = $$props;
     let { context } = $$props;
     let { text: text3 } = $$props;
     let { note } = $$props;
+    const click_handler = /* @__PURE__ */ __name(() => api.removeApplication(), "click_handler");
     $$self.$$set = ($$props2) => {
+      if ("api" in $$props2)
+        $$invalidate(0, api = $$props2.api);
       if ("title" in $$props2)
-        $$invalidate(0, title = $$props2.title);
+        $$invalidate(1, title = $$props2.title);
       if ("context" in $$props2)
-        $$invalidate(1, context = $$props2.context);
+        $$invalidate(2, context = $$props2.context);
       if ("text" in $$props2)
-        $$invalidate(2, text3 = $$props2.text);
+        $$invalidate(3, text3 = $$props2.text);
       if ("note" in $$props2)
-        $$invalidate(3, note = $$props2.note);
+        $$invalidate(4, note = $$props2.note);
     };
-    return [title, context, text3, note];
+    return [api, title, context, text3, note, click_handler];
   }
   __name(instance10, "instance");
   var Interface3 = class extends SvelteComponent {
@@ -15358,7 +15396,13 @@
     }
     constructor(options) {
       super();
-      init(this, options, instance10, create_fragment10, safe_not_equal, { title: 0, context: 1, text: 2, note: 3 });
+      init(this, options, instance10, create_fragment10, safe_not_equal, {
+        api: 0,
+        title: 1,
+        context: 2,
+        text: 3,
+        note: 4
+      });
     }
   };
   var Interface_default3 = Interface3;
@@ -15373,10 +15417,10 @@
       context: "primary",
       text: void 0
     };
+    traits;
     methods = {
       initialize() {
         this.serializables = "title context text note".split(" ");
-        this.createSocket("out", 1);
       },
       mount() {
         this.foreign = new Instance(Foreign);
@@ -15384,6 +15428,7 @@
         this.component = new Interface_default3({
           target: this.foreign.body,
           props: {
+            api: this,
             title: this.title,
             context: this.context,
             text: this.text,

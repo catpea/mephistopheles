@@ -14,11 +14,12 @@ export default class Alert {
     text: undefined,
   };
 
+  traits
 
   methods = {
     initialize(){
       this.serializables = 'title context text note'   .split(' ');
-      this.createSocket('out', 1);
+      // this.createSocket('out', 1);
     },
     mount(){
 
@@ -28,6 +29,7 @@ export default class Alert {
       this.component = new Interface({
           target: this.foreign.body,
           props: {
+            api: this,
             title: this.title,
             context: this.context,
             text: this.text,

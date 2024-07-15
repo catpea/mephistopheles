@@ -19,12 +19,26 @@ export default class Application {
   traits = {
 
 
-      removeApplication(realm){
+      removeApplication(){
+
+        const item = this;
+        const realm = item.getGroup().realm;
+
+        if(item.oo.name == 'Pipe'){
+          realm.elements.remove(item.id);
+        }else{ //
+          for (const relatedPipe of realm.applications.filter(x=>x.oo.name == 'Pipe').filter(x=>(x.to==item.id||x.from==item.id))) {
+            realm.elements.remove(relatedPipe.id);
+          }
+          realm.elements.remove(item.id);
+        }
+
+      },
+
+      removeApplications(realm){
         const selected = [...realm.applications.filter(o=>o.selected)];
         const ordered = prioritySort( selected, ['Pipe', 'Something', '*'], application=>application.oo.name );
-
         for (const item of ordered ) {
-
           if(item.oo.name == 'Pipe'){
             realm.elements.remove(item.id);
           }else{ //
@@ -33,9 +47,7 @@ export default class Application {
             }
             realm.elements.remove(item.id);
           }
-
         }
-
       },
 
     /**
@@ -78,7 +90,7 @@ export default class Application {
       this.getRoot().applications.create(this);
     },
     mount(){
-      this.addDisposableFromSmartEmitter( this.getRoot().keyboard, 'Remove', ()=>this.removeApplication(this.getGroup(this, true).realm) );
+      this.addDisposableFromSmartEmitter( this.getRoot().keyboard, 'Remove', ()=>this.removeApplications(this.getGroup(this, true).realm) );
     }
 
 

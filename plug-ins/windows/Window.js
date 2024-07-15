@@ -50,7 +50,7 @@ export default class Window {
 
     initialize(){
 
-      this.caption = `${this.name||this.oo.name} (${this.id})`;
+      this.caption = `${this.name||this.oo.name}`;
 
       if(this.isRootWindow) return;
       if(this.oo.name == 'Pipe') return;
