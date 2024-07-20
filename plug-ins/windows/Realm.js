@@ -119,6 +119,8 @@ export default class Realm {
 
     initialize(){
 
+
+
       this.name = 'realm';
 
       if(this.library){
@@ -287,6 +289,11 @@ export default class Realm {
       // TODO: Kludge the flow must be fixed
       if(this.getApplication().content) this.loadElements(this.getApplication().content /* this passes on the cheerio tuple */ )
 
+
+      this.addDisposableFromSmartEmitter( this.getRoot().keyboard, 'Unzoom', ()=>{
+        this.zoom = 1;
+      });
+      
     },
 
     clean(){

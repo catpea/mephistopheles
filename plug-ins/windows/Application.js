@@ -138,6 +138,7 @@ export default class Application {
     },
     mount(){
       this.addDisposableFromSmartEmitter( this.getRoot().keyboard, 'Remove', ()=>this.removeApplications(this.getGroup(this, true).realm) );
+
     }
 
 

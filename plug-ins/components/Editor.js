@@ -10,6 +10,7 @@ const { EditorState } = bundle["@codemirror/state"];
 const { oneDark } = bundle['@codemirror/theme-one-dark']; // NOTE: "Dark Backgroung And Light Text" Firefox Extension Mangles The Theme
 
 import {  svg, html, update, click } from "/plug-ins/domek/index.js"
+import stopWheel from '/plug-ins/stop-wheel/index.js';
 
 
 export default class Editor {
@@ -32,6 +33,7 @@ export default class Editor {
 
       this.foreign = new Instance(Foreign);
       this.createWindowComponent( this.foreign );
+      this.addDisposable( stopWheel(this.foreign.body) );
 
       const extensions = [
         basicSetup,
@@ -46,7 +48,8 @@ export default class Editor {
         oneDark,
         EditorView.theme({
 
-          '&': { maxHeight: this.h + 'px' },
+          // '&': { height: this.h + 'px' },
+
           '.cm-gutter,.cm-content': { minHeight: '100px' },
           ".cm-scroller": {
             overflow: "auto",

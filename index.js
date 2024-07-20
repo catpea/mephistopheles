@@ -11098,6 +11098,9 @@
             this.getApplication().content
             /* this passes on the cheerio tuple */
           );
+        this.addDisposableFromSmartEmitter(this.getRoot().keyboard, "Unzoom", () => {
+          this.zoom = 1;
+        });
       },
       clean() {
         this.elements.map(({ id }) => this.elements.remove(id));
@@ -11171,6 +11174,7 @@
   var keyboard_default = {
     Backspace: "Remove",
     Delete: "Remove",
+    "1": "Unzoom",
     Bork: "Bork"
   };
 
@@ -11192,6 +11196,7 @@
     mount() {
       const self = this;
       this.keyDownListener = function(e) {
+        console.log(`Keyboard ${e.key} -> ${keyboard_default[e.key]}`);
         self.emit(keyboard_default[e.key], e);
       };
       this.source.addEventListener("keydown", this.keyDownListener);
@@ -12408,6 +12413,7 @@
       mount() {
         this.foreign = new Instance(Foreign);
         this.createWindowComponent(this.foreign);
+        this.addDisposable(stopWheel(this.foreign.body));
         const extensions = [
           basicSetup,
           javascript(),
@@ -12420,7 +12426,7 @@
           }),
           oneDark,
           EditorView.theme({
-            "&": { maxHeight: this.h + "px" },
+            // '&': { height: this.h + 'px' },
             ".cm-gutter,.cm-content": { minHeight: "100px" },
             ".cm-scroller": {
               overflow: "auto",
