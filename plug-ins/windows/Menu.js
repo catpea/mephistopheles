@@ -5,9 +5,12 @@ import { svg, update } from "/plug-ins/domek/index.js"
 import UI from "./ui/Menu.svelte";
 import stopWheel from '/plug-ins/stop-wheel/index.js';
 
+import Bootstrap from "/plug-ins/windows/framework/Bootstrap.js";
+import Svelte from "/plug-ins/windows/framework/Svelte.js";
+
 
 export default class Menu {
-  static extends = [Vertical];
+  static extends = [Svelte, Bootstrap, Vertical];
 
   properties = {
   };
@@ -21,9 +24,13 @@ export default class Menu {
 
     initialize(){
       this.r = 5;
-      this.b = 5;
+      // this.b = 5;
       this.s = 3;
-      this.p = 3;
+      // this.p = 3;
+
+      this.w = 200;
+      this.h = 400;
+
     },
 
     mount(){
@@ -51,10 +58,13 @@ export default class Menu {
 
       this.ui = new UI({
         target: this.foreign.body,
-        control: this.control,
+        props: {
+          control: this.control,
+          api: this,
+        }
       });
 
-      this.addDisposable( stopWheel(this.foreign.body) );
+      // this.addDisposable( stopWheel(this.foreign.body) );
 
       this.on('options', options=> this.ui.$set({options}));
 

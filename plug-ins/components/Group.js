@@ -18,6 +18,10 @@ export default class Group {
   methods = {
 
     initialize(){
+      this.p =3;
+      this.showCaption = true;
+      this.isResizable = true;
+
       this.createSocket('in', 0);
       this.createSocket('out', 1);
     },

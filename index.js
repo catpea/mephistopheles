@@ -404,20 +404,20 @@
             function(module2, exports2, __webpack_require__) {
               "use strict";
               var __extends = this && this.__extends || function() {
-                var extendStatics = Object.setPrototypeOf || { __proto__: [] } instanceof Array && function(d, b) {
-                  d.__proto__ = b;
-                } || function(d, b) {
-                  for (var p in b)
-                    if (b.hasOwnProperty(p))
-                      d[p] = b[p];
+                var extendStatics = Object.setPrototypeOf || { __proto__: [] } instanceof Array && function(d, b2) {
+                  d.__proto__ = b2;
+                } || function(d, b2) {
+                  for (var p in b2)
+                    if (b2.hasOwnProperty(p))
+                      d[p] = b2[p];
                 };
-                return function(d, b) {
-                  extendStatics(d, b);
+                return function(d, b2) {
+                  extendStatics(d, b2);
                   function __() {
                     this.constructor = d;
                   }
                   __name(__, "__");
-                  d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+                  d.prototype = b2 === null ? Object.create(b2) : (__.prototype = b2.prototype, new __());
                 };
               }();
               Object.defineProperty(exports2, "__esModule", { value: true });
@@ -7071,19 +7071,19 @@
   __name(debounce_default, "default");
 
   // plug-ins/boolean/index.js
-  function intersection(a, b) {
+  function intersection(a2, b2) {
     const response = /* @__PURE__ */ new Set();
-    for (const item of a) {
-      if (b.has(item))
+    for (const item of a2) {
+      if (b2.has(item))
         response.add(item);
     }
     return response;
   }
   __name(intersection, "intersection");
-  function difference(a, b) {
+  function difference(a2, b2) {
     const response = /* @__PURE__ */ new Set();
-    for (const item of a) {
-      if (!b.has(item))
+    for (const item of a2) {
+      if (!b2.has(item))
         response.add(item);
     }
     return response;
@@ -7519,12 +7519,12 @@
       },
       getParentScale(component) {
         const list = this.getTransforms(component).slice(0, -1);
-        const scale = list.map((o) => o.zoom).reduce((a, c) => a * c, 1);
+        const scale = list.map((o) => o.zoom).reduce((a2, c) => a2 * c, 1);
         return scale;
       },
       getScale(component) {
         const list = this.getTransforms(component);
-        const scale = list.map((o) => o.zoom).reduce((a, c) => a * c, 1);
+        const scale = list.map((o) => o.zoom).reduce((a2, c) => a2 * c, 1);
         return scale;
       },
       getTransforms(element2, list = [], root = true) {
@@ -7559,7 +7559,7 @@
           node.on("h", (h) => this.h = h);
           node.on("H", (H) => this.H = H);
           node.on("r", (r) => this.r = r);
-          node.on("b", (b) => this.b = b);
+          node.on("b", (b2) => this.b = b2);
           node.on("p", (p) => this.p = p);
           node.on("s", (s) => this.s = s);
           node.on("data", (data) => this.data = data);
@@ -8659,15 +8659,101 @@
     };
   };
 
+  // plug-ins/windows/framework/Bootstrap.js
+  var Bootstrap = class {
+    static {
+      __name(this, "Bootstrap");
+    }
+    static extends = [];
+    observables = {
+      context: "dark",
+      text: "Hello World",
+      status: "This is a kitchen sink hello world note"
+    };
+    traits = {};
+    methods = {
+      initialize() {
+      },
+      clean() {
+      }
+    };
+  };
+
+  // plug-ins/constants/index.js
+  function constants_default(CONSTANTS) {
+    const constants = Object.fromEntries(CONSTANTS.split(" ").map((o) => o.trim()).filter((o) => o).map((o) => [o, o]));
+    return new Proxy(constants, {
+      get(target, prop) {
+        if (prop in target) {
+          return target[prop];
+        } else {
+          throw new Error(`Attempt to access undefined constant '${prop}'. Check for typos!`);
+        }
+      }
+    });
+  }
+  __name(constants_default, "default");
+
+  // plug-ins/stop-wheel/index.js
+  var Action = constants_default(" SCROLL ZOOM ");
+  function stopWheel(el) {
+    function wheelHandler(e) {
+      const hasVerticalScrollbar = el.clientHeight < el.scrollHeight;
+      const hasHorizontalScrollbar = el.clientWidth < el.scrollWidth;
+      const isHoldingShiftKey = e.shiftKey;
+      let action = Action.ZOOM;
+      if (hasVerticalScrollbar)
+        action = Action.SCROLL;
+      if (isHoldingShiftKey)
+        action = Action.ZOOM;
+      if (action == Action.ZOOM) {
+        e.preventDefault();
+        return false;
+      }
+      ;
+      if (action == Action.SCROLL) {
+        e.stopPropagation();
+      }
+    }
+    __name(wheelHandler, "wheelHandler");
+    el.addEventListener("wheel", wheelHandler);
+    return {
+      destroy() {
+        el.removeEventListener("wheel", wheelHandler);
+      }
+    };
+  }
+  __name(stopWheel, "stopWheel");
+
+  // plug-ins/windows/framework/Svelte.js
+  var Svelte = class {
+    static {
+      __name(this, "Svelte");
+    }
+    static extends = [];
+    observables = {};
+    traits = {
+      stopWheel(el) {
+        this.addDisposable(stopWheel(el));
+      }
+    };
+    methods = {
+      initialize() {
+      },
+      clean() {
+      }
+    };
+  };
+
   // plug-ins/priority-sort/index.js
   function prioritySort(list, priority, field) {
     const WILDCARD = priority.indexOf("*") == -1 ? priority.length - 1 : priority.indexOf("*");
-    const indexer = /* @__PURE__ */ __name(function(a) {
-      const value = priority.indexOf(field(a));
+    const indexer = /* @__PURE__ */ __name(function(a2) {
+      const value = priority.indexOf(field(a2));
       return value === -1 ? WILDCARD : value;
     }, "indexer");
-    const sorter = /* @__PURE__ */ __name(function(a, b) {
-      return indexer(a) - indexer(b);
+    const sorter = /* @__PURE__ */ __name(function(a2, b2) {
+      return indexer(a2) - indexer(b2);
     }, "sorter");
     return [...list].sort(sorter);
   }
@@ -8678,7 +8764,7 @@
     static {
       __name(this, "Application");
     }
-    static extends = [Window];
+    static extends = [Svelte, Bootstrap, Window];
     properties = {
       isApplication: true
     };
@@ -8833,7 +8919,7 @@
     x1 = x1 - locationX;
     y1 = y1 - locationY;
     const self = localList[localList.length - 1];
-    const finalZoom = localList.map((o) => o.zoom).reduce((a, c) => a * c, 1) / self.zoom;
+    const finalZoom = localList.map((o) => o.zoom).reduce((a2, c) => a2 * c, 1) / self.zoom;
     x1 = x1 / finalZoom;
     y1 = y1 / finalZoom;
     x1 = x1 / self.zoom;
@@ -9133,7 +9219,8 @@
         });
         this.body = html.div({
           style: {
-            "overflow-y": "scroll"
+            width: this.w,
+            height: this.h
           }
         });
         this.el.ForeignObject.appendChild(this.body);
@@ -9174,8 +9261,8 @@
     return typeof thing === "function";
   }
   __name(is_function, "is_function");
-  function safe_not_equal(a, b) {
-    return a != a ? b == b : a !== b || a && typeof a === "object" || typeof a === "function";
+  function safe_not_equal(a2, b2) {
+    return a2 != a2 ? b2 == b2 : a2 !== b2 || a2 && typeof a2 === "object" || typeof a2 === "function";
   }
   __name(safe_not_equal, "safe_not_equal");
   function is_empty(obj2) {
@@ -9444,15 +9531,15 @@
     return info;
   }
   __name(create_style_information, "create_style_information");
-  function create_rule(node, a, b, duration, delay, ease, fn, uid = 0) {
+  function create_rule(node, a2, b2, duration, delay, ease, fn, uid = 0) {
     const step = 16.666 / duration;
     let keyframes = "{\n";
     for (let p = 0; p <= 1; p += step) {
-      const t = a + (b - a) * ease(p);
+      const t = a2 + (b2 - a2) * ease(p);
       keyframes += p * 100 + `%{${fn(t, 1 - t)}}
 `;
     }
-    const rule = keyframes + `100% {${fn(b, 1 - b)}}
+    const rule = keyframes + `100% {${fn(b2, 1 - b2)}}
 }`;
     const name = `__svelte_${hash(rule)}_${uid}`;
     const doc = get_root_for_style(node);
@@ -9674,7 +9761,7 @@
       };
     }
     __name(init2, "init");
-    function go(b) {
+    function go(b2) {
       const {
         delay = 0,
         duration = 300,
@@ -9684,14 +9771,14 @@
       } = config || null_transition;
       const program = {
         start: now() + delay,
-        b
+        b: b2
       };
-      if (!b) {
+      if (!b2) {
         program.group = outros;
         outros.r += 1;
       }
       if ("inert" in node) {
-        if (b) {
+        if (b2) {
           if (original_inert_value !== void 0) {
             node.inert = original_inert_value;
           }
@@ -9706,12 +9793,12 @@
       } else {
         if (css) {
           clear_animation();
-          animation_name = create_rule(node, t, b, duration, delay, easing, css);
+          animation_name = create_rule(node, t, b2, duration, delay, easing, css);
         }
-        if (b)
+        if (b2)
           tick(0, 1);
         running_program = init2(program, duration);
-        add_render_callback(() => dispatch(node, b, "start"));
+        add_render_callback(() => dispatch(node, b2, "start"));
         loop((now2) => {
           if (pending_program && now2 > pending_program.start) {
             running_program = init2(pending_program, duration);
@@ -9755,15 +9842,15 @@
     }
     __name(go, "go");
     return {
-      run(b) {
+      run(b2) {
         if (is_function(config)) {
           wait().then(() => {
-            const opts = { direction: b ? "in" : "out" };
+            const opts = { direction: b2 ? "in" : "out" };
             config = config(opts);
-            go(b);
+            go(b2);
           });
         } else {
-          go(b);
+          go(b2);
         }
       },
       end() {
@@ -11039,6 +11126,7 @@
               y,
               root: this.getApplication().node.id,
               text: `New ${className}`,
+              icon: className,
               value: className,
               action: () => {
                 const node = new Instance(Node, {
@@ -11099,7 +11187,28 @@
             /* this passes on the cheerio tuple */
           );
         this.addDisposableFromSmartEmitter(this.getRoot().keyboard, "Unzoom", () => {
-          this.zoom = 1;
+          const newZoom = 1;
+          const newPanX = this.panX * (newZoom / this.zoom) - this.w * (newZoom / this.zoom - 1) / 2;
+          const newPanY = this.panY * (newZoom / this.zoom) - this.h * (newZoom / this.zoom - 1) / 2;
+          this.panX = newPanX;
+          this.panY = newPanY;
+          this.zoom = newZoom;
+        });
+        this.addDisposableFromSmartEmitter(this.getRoot().keyboard, "Halfzoom", () => {
+          const newZoom = 0.5;
+          const newPanX = this.panX * (newZoom / this.zoom) - this.w * (newZoom / this.zoom - 1) / 2;
+          const newPanY = this.panY * (newZoom / this.zoom) - this.h * (newZoom / this.zoom - 1) / 2;
+          this.panX = newPanX;
+          this.panY = newPanY;
+          this.zoom = newZoom;
+        });
+        this.addDisposableFromSmartEmitter(this.getRoot().keyboard, "Minimap", () => {
+          const newZoom = 0.1;
+          const newPanX = this.panX * (newZoom / this.zoom) - this.w * (newZoom / this.zoom - 1) / 2;
+          const newPanY = this.panY * (newZoom / this.zoom) - this.h * (newZoom / this.zoom - 1) / 2;
+          this.panX = newPanX;
+          this.panY = newPanY;
+          this.zoom = newZoom;
         });
       },
       clean() {
@@ -11123,6 +11232,9 @@
     traits = {};
     methods = {
       initialize() {
+        this.p = 3;
+        this.showCaption = true;
+        this.isResizable = true;
         this.createSocket("in", 0);
         this.createSocket("out", 1);
       },
@@ -11175,6 +11287,8 @@
     Backspace: "Remove",
     Delete: "Remove",
     "1": "Unzoom",
+    "2": "Halfzoom",
+    "3": "Minimap",
     Bork: "Bork"
   };
 
@@ -11196,7 +11310,7 @@
     mount() {
       const self = this;
       this.keyDownListener = function(e) {
-        console.log(`Keyboard ${e.key} -> ${keyboard_default[e.key]}`);
+        console.log(`Keyboard key "${e.key}" interpreted as: ${keyboard_default[e.key]}`);
         self.emit(keyboard_default[e.key], e);
       };
       this.source.addEventListener("keydown", this.keyDownListener);
@@ -11206,21 +11320,98 @@
     }
   };
 
+  // plug-ins/class-icons/index.js
+  function class_icons_default(className) {
+    let response;
+    switch (className) {
+      case "Workspace":
+        response = "box";
+        break;
+      case "Window":
+        response = "window-fullscreen";
+        break;
+      case "Terminal":
+        response = "terminal";
+        break;
+      case "Editor":
+        response = "window-sidebar";
+        break;
+      case "Architecture":
+        response = "gem";
+        break;
+      case "Analysis":
+        response = "diagram-3";
+        break;
+      case "Pipe":
+        response = "share-fill";
+        break;
+      case "Realm":
+        response = "globe";
+        break;
+      case "Caption":
+        response = "usb";
+        break;
+      case "Label":
+        response = "alphabet";
+        break;
+      case "Foreign":
+        response = "wrench-adjustable";
+        break;
+      case "Sockets":
+        response = "node-plus";
+        break;
+      case "Vertical":
+        response = "arrows-vertical";
+        break;
+      case "Hortizontal":
+        response = "arrows";
+        break;
+      case "Container":
+        response = "box2-heart";
+        break;
+      case "Component":
+        response = "heart-pulse";
+        break;
+      case "Application":
+        response = "brightness-high";
+        break;
+      case "Trait":
+        response = "gear-wide";
+        break;
+      case "Method":
+        response = "gear-wide-connected";
+        break;
+      case "Group":
+        response = "box";
+        break;
+      case "Viewport":
+        response = "binoculars";
+        break;
+      default:
+        response = "list";
+    }
+    return response;
+  }
+  __name(class_icons_default, "default");
+
   // plug-ins/windows/ui/Menu.svelte
   function get_each_context(ctx, list, i) {
     const child_ctx = ctx.slice();
-    child_ctx[2] = list[i].text;
-    child_ctx[3] = list[i].value;
-    child_ctx[4] = list[i].action;
-    child_ctx[6] = i;
+    child_ctx[3] = list[i].text;
+    child_ctx[4] = list[i].value;
+    child_ctx[5] = list[i].action;
+    child_ctx[6] = list[i].icon;
+    child_ctx[8] = i;
     return child_ctx;
   }
   __name(get_each_context, "get_each_context");
   function create_each_block(ctx) {
     let li;
+    let i_1;
+    let i_1_class_value;
     let t_value = (
       /*text*/
-      ctx[2] + ""
+      ctx[3] + ""
     );
     let t;
     let mounted;
@@ -11228,19 +11419,26 @@
     return {
       c() {
         li = element("li");
+        i_1 = element("i");
         t = text2(t_value);
+        attr(i_1, "class", i_1_class_value = "bi bi-" + class_icons_default(
+          /*icon*/
+          ctx[6]
+        ) + " text-light pe-2");
         attr(li, "class", "list-group-item");
+        set_style(li, "cursor", "pointer");
       },
       m(target, anchor) {
         insert(target, li, anchor);
+        append(li, i_1);
         append(li, t);
         if (!mounted) {
           dispose = listen(li, "click", function() {
             if (is_function(
               /*action*/
-              ctx[4]
+              ctx[5]
             ))
-              ctx[4].apply(this, arguments);
+              ctx[5].apply(this, arguments);
           });
           mounted = true;
         }
@@ -11248,8 +11446,15 @@
       p(new_ctx, dirty) {
         ctx = new_ctx;
         if (dirty & /*options*/
-        1 && t_value !== (t_value = /*text*/
-        ctx[2] + ""))
+        2 && i_1_class_value !== (i_1_class_value = "bi bi-" + class_icons_default(
+          /*icon*/
+          ctx[6]
+        ) + " text-light pe-2")) {
+          attr(i_1, "class", i_1_class_value);
+        }
+        if (dirty & /*options*/
+        2 && t_value !== (t_value = /*text*/
+        ctx[3] + ""))
           set_data(t, t_value);
       },
       d(detaching) {
@@ -11263,13 +11468,18 @@
   }
   __name(create_each_block, "create_each_block");
   function create_fragment5(ctx) {
-    let div1;
+    let div3;
     let div0;
     let t1;
-    let ul;
+    let div1;
+    let api_stopWheel_action;
+    let t2;
+    let div2;
+    let mounted;
+    let dispose;
     let each_value = ensure_array_like(
       /*options*/
-      ctx[0].data
+      ctx[1].data
     );
     let each_blocks = [];
     for (let i = 0; i < each_value.length; i += 1) {
@@ -11277,35 +11487,46 @@
     }
     return {
       c() {
-        div1 = element("div");
+        div3 = element("div");
         div0 = element("div");
         div0.textContent = "Operations";
         t1 = space();
-        ul = element("ul");
+        div1 = element("div");
         for (let i = 0; i < each_blocks.length; i += 1) {
           each_blocks[i].c();
         }
+        t2 = space();
+        div2 = element("div");
+        div2.textContent = "Create new application.";
         attr(div0, "class", "card-header");
-        attr(ul, "class", "list-group list-group-flush");
-        attr(div1, "class", "card");
+        attr(div1, "class", "list-group list-group-flush overflow-auto h-100");
+        attr(div2, "class", "card-footer text-body-secondary");
+        attr(div3, "class", "card h-100 m-0");
       },
       m(target, anchor) {
-        insert(target, div1, anchor);
-        append(div1, div0);
-        append(div1, t1);
-        append(div1, ul);
+        insert(target, div3, anchor);
+        append(div3, div0);
+        append(div3, t1);
+        append(div3, div1);
         for (let i = 0; i < each_blocks.length; i += 1) {
           if (each_blocks[i]) {
-            each_blocks[i].m(ul, null);
+            each_blocks[i].m(div1, null);
           }
+        }
+        append(div3, t2);
+        append(div3, div2);
+        if (!mounted) {
+          dispose = action_destroyer(api_stopWheel_action = /*api*/
+          ctx[0].stopWheel(div1));
+          mounted = true;
         }
       },
       p(ctx2, [dirty]) {
         if (dirty & /*options*/
-        1) {
+        2) {
           each_value = ensure_array_like(
             /*options*/
-            ctx2[0].data
+            ctx2[1].data
           );
           let i;
           for (i = 0; i < each_value.length; i += 1) {
@@ -11315,7 +11536,7 @@
             } else {
               each_blocks[i] = create_each_block(child_ctx);
               each_blocks[i].c();
-              each_blocks[i].m(ul, null);
+              each_blocks[i].m(div1, null);
             }
           }
           for (; i < each_blocks.length; i += 1) {
@@ -11328,23 +11549,28 @@
       o: noop,
       d(detaching) {
         if (detaching) {
-          detach(div1);
+          detach(div3);
         }
         destroy_each(each_blocks, detaching);
+        mounted = false;
+        dispose();
       }
     };
   }
   __name(create_fragment5, "create_fragment");
   function instance5($$self, $$props, $$invalidate) {
+    let { api } = $$props;
     let { control } = $$props;
     let { options = { data: [] } } = $$props;
     $$self.$$set = ($$props2) => {
+      if ("api" in $$props2)
+        $$invalidate(0, api = $$props2.api);
       if ("control" in $$props2)
-        $$invalidate(1, control = $$props2.control);
+        $$invalidate(2, control = $$props2.control);
       if ("options" in $$props2)
-        $$invalidate(0, options = $$props2.options);
+        $$invalidate(1, options = $$props2.options);
     };
-    return [options, control];
+    return [api, options, control];
   }
   __name(instance5, "instance");
   var Menu2 = class extends SvelteComponent {
@@ -11353,63 +11579,17 @@
     }
     constructor(options) {
       super();
-      init(this, options, instance5, create_fragment5, safe_not_equal, { control: 1, options: 0 });
+      init(this, options, instance5, create_fragment5, safe_not_equal, { api: 0, control: 2, options: 1 });
     }
   };
   var Menu_default = Menu2;
-
-  // plug-ins/constants/index.js
-  function constants_default(CONSTANTS) {
-    const constants = Object.fromEntries(CONSTANTS.split(" ").map((o) => o.trim()).filter((o) => o).map((o) => [o, o]));
-    return new Proxy(constants, {
-      get(target, prop) {
-        if (prop in target) {
-          return target[prop];
-        } else {
-          throw new Error(`Attempt to access undefined constant '${prop}'. Check for typos!`);
-        }
-      }
-    });
-  }
-  __name(constants_default, "default");
-
-  // plug-ins/stop-wheel/index.js
-  var Action = constants_default(" SCROLL ZOOM ");
-  function stopWheel(el) {
-    function wheelHandler(e) {
-      const hasVerticalScrollbar = el.clientHeight < el.scrollHeight;
-      const hasHorizontalScrollbar = el.clientWidth < el.scrollWidth;
-      const isHoldingShiftKey = e.shiftKey;
-      let action = Action.ZOOM;
-      if (hasVerticalScrollbar)
-        action = Action.SCROLL;
-      if (isHoldingShiftKey)
-        action = Action.ZOOM;
-      if (action == Action.ZOOM) {
-        e.preventDefault();
-        return false;
-      }
-      ;
-      if (action == Action.SCROLL) {
-        e.stopPropagation();
-      }
-    }
-    __name(wheelHandler, "wheelHandler");
-    el.addEventListener("wheel", wheelHandler);
-    return {
-      destroy() {
-        el.removeEventListener("wheel", wheelHandler);
-      }
-    };
-  }
-  __name(stopWheel, "stopWheel");
 
   // plug-ins/windows/Menu.js
   var Menu3 = class {
     static {
       __name(this, "Menu");
     }
-    static extends = [Vertical];
+    static extends = [Svelte, Bootstrap, Vertical];
     properties = {};
     observables = {
       show: false,
@@ -11418,9 +11598,9 @@
     methods = {
       initialize() {
         this.r = 5;
-        this.b = 5;
         this.s = 3;
-        this.p = 3;
+        this.w = 200;
+        this.h = 400;
       },
       mount() {
         this.el.Background = svg.rect({
@@ -11442,9 +11622,11 @@
         this.children.create(this.foreign);
         this.ui = new Menu_default({
           target: this.foreign.body,
-          control: this.control
+          props: {
+            control: this.control,
+            api: this
+          }
         });
-        this.addDisposable(stopWheel(this.foreign.body));
         this.on("options", (options) => this.ui.$set({ options }));
         this.foreign.body.addEventListener("click", (e) => {
           this.parent.closeMenu();
@@ -11578,80 +11760,6 @@
     };
   };
 
-  // plug-ins/class-icons/index.js
-  function class_icons_default(className) {
-    let response;
-    switch (className) {
-      case "Workspace":
-        response = "box";
-        break;
-      case "Window":
-        response = "window-fullscreen";
-        break;
-      case "Terminal":
-        response = "terminal";
-        break;
-      case "Editor":
-        response = "window-sidebar";
-        break;
-      case "Architecture":
-        response = "gem";
-        break;
-      case "Analysis":
-        response = "diagram-3";
-        break;
-      case "Pipe":
-        response = "share-fill";
-        break;
-      case "Realm":
-        response = "globe";
-        break;
-      case "Caption":
-        response = "usb";
-        break;
-      case "Label":
-        response = "alphabet";
-        break;
-      case "Foreign":
-        response = "wrench-adjustable";
-        break;
-      case "Sockets":
-        response = "node-plus";
-        break;
-      case "Vertical":
-        response = "arrows-vertical";
-        break;
-      case "Hortizontal":
-        response = "arrows";
-        break;
-      case "Container":
-        response = "box2-heart";
-        break;
-      case "Component":
-        response = "heart-pulse";
-        break;
-      case "Application":
-        response = "brightness-high";
-        break;
-      case "Trait":
-        response = "gear-wide";
-        break;
-      case "Method":
-        response = "gear-wide-connected";
-        break;
-      case "Group":
-        response = "box";
-        break;
-      case "Viewport":
-        response = "binoculars";
-        break;
-      default:
-        response = "list";
-    }
-    return response;
-  }
-  __name(class_icons_default, "default");
-
   // plug-ins/components/hello/Interface.svelte
   function create_fragment6(ctx) {
     let div10;
@@ -11716,6 +11824,7 @@
     let hr3;
     let t29;
     let form;
+    let api_stopWheel_action;
     let t42;
     let div9;
     let t43;
@@ -11805,7 +11914,7 @@
         t42 = space();
         div9 = element("div");
         t43 = text2(
-          /*$note*/
+          /*$status*/
           ctx[10]
         );
         t44 = space();
@@ -11859,7 +11968,7 @@
         attr(input4, "id", "customRange2");
         attr(input5, "type", "number");
         attr(input6, "type", "number");
-        attr(div8, "class", "card-body");
+        attr(div8, "class", "card-body overflow-auto");
         attr(button2, "type", "button");
         attr(button2, "class", "btn opacity-50");
         set_style(button2, "position", "absolute");
@@ -11870,7 +11979,6 @@
         attr(div9, "class", "card-footer text-body-secondary");
         attr(div10, "class", div10_class_value = "card alert-" + /*$context*/
         ctx[4] + " h-100 m-0");
-        set_style(div10, "overflow-y", "scroll");
         toggle_class(
           div10,
           "active",
@@ -11986,6 +12094,8 @@
               /*input6_input_handler*/
               ctx[21]
             ),
+            action_destroyer(api_stopWheel_action = /*api*/
+            ctx[0].stopWheel(div8)),
             action_destroyer(api_makeResizable_action = /*api*/
             ctx[0].makeResizable(button2))
           ];
@@ -12068,11 +12178,11 @@
             /*c*/
             ctx2[3]
           );
-        if (dirty & /*$note*/
+        if (dirty & /*$status*/
         1024)
           set_data(
             t43,
-            /*$note*/
+            /*$status*/
             ctx2[10]
           );
         if (dirty & /*$context*/
@@ -12110,7 +12220,7 @@
     let $w;
     let $h;
     let $text;
-    let $note;
+    let $status;
     let { api } = $$props;
     const context = api.signal("context");
     component_subscribe($$self, context, (value) => $$invalidate(4, $context = value));
@@ -12118,31 +12228,31 @@
     component_subscribe($$self, caption, (value) => $$invalidate(6, $caption = value));
     const text3 = api.signal("text");
     component_subscribe($$self, text3, (value) => $$invalidate(9, $text = value));
-    const note = api.signal("note");
-    component_subscribe($$self, note, (value) => $$invalidate(10, $note = value));
+    const status = api.signal("status");
+    component_subscribe($$self, status, (value) => $$invalidate(10, $status = value));
     const w = api.signal("w");
     component_subscribe($$self, w, (value) => $$invalidate(7, $w = value));
     const h = api.signal("h");
     component_subscribe($$self, h, (value) => $$invalidate(8, $h = value));
-    let a = 1;
-    let b = 2;
+    let a2 = 1;
+    let b2 = 2;
     const x = api.signal("h");
     const selected = api.signal("selected");
     component_subscribe($$self, selected, (value) => $$invalidate(5, $selected = value));
     const click_handler = /* @__PURE__ */ __name(() => api.removeApplication(), "click_handler");
     function input4_change_input_handler() {
       c = to_number(this.value);
-      $$invalidate(3, c), $$invalidate(1, a), $$invalidate(2, b);
+      $$invalidate(3, c), $$invalidate(1, a2), $$invalidate(2, b2);
     }
     __name(input4_change_input_handler, "input4_change_input_handler");
     function input5_input_handler() {
-      a = to_number(this.value);
-      $$invalidate(1, a);
+      a2 = to_number(this.value);
+      $$invalidate(1, a2);
     }
     __name(input5_input_handler, "input5_input_handler");
     function input6_input_handler() {
-      b = to_number(this.value);
-      $$invalidate(2, b);
+      b2 = to_number(this.value);
+      $$invalidate(2, b2);
     }
     __name(input6_input_handler, "input6_input_handler");
     $$self.$$set = ($$props2) => {
@@ -12153,22 +12263,22 @@
       if ($$self.$$.dirty & /*a, b*/
       6) {
         $:
-          $$invalidate(3, c = a + b);
+          $$invalidate(3, c = a2 + b2);
       }
       if ($$self.$$.dirty & /*api, a, b, c*/
       15) {
         $:
-          api.send("out", { a, b, c });
+          api.send("out", { a: a2, b: b2, c });
       }
       if ($$self.$$.dirty & /*api, a*/
       3) {
         $:
-          api.send("a", a);
+          api.send("a", a2);
       }
       if ($$self.$$.dirty & /*api, b*/
       5) {
         $:
-          api.send("b", b);
+          api.send("b", b2);
       }
       if ($$self.$$.dirty & /*api, c*/
       9) {
@@ -12178,8 +12288,8 @@
     };
     return [
       api,
-      a,
-      b,
+      a2,
+      b2,
       c,
       $context,
       $selected,
@@ -12187,11 +12297,11 @@
       $w,
       $h,
       $text,
-      $note,
+      $status,
       context,
       caption,
       text3,
-      note,
+      status,
       w,
       h,
       selected,
@@ -12219,11 +12329,7 @@
       __name(this, "Hello");
     }
     static extends = [Application];
-    observables = {
-      context: "primary",
-      text: "Hello World",
-      note: "This is a note"
-    };
+    observables = {};
     methods = {
       initialize() {
         this.serializables = "title context text note".split(" ");
@@ -12807,7 +12913,7 @@
         current = true;
       },
       p(ctx2, dirty) {
-        if (dirty & /*controller, send, item*/
+        if (dirty & /*controller, api, item*/
         7) {
           each_value = ensure_array_like(
             /*item*/
@@ -12889,8 +12995,8 @@
           /*controller*/
           ctx[1]
         ),
-        send: (
-          /*send*/
+        api: (
+          /*api*/
           ctx[0]
         ),
         item: (
@@ -12919,9 +13025,9 @@
         2)
           entry_changes.controller = /*controller*/
           ctx[1];
-        if (dirty & /*send*/
+        if (dirty & /*api*/
         1)
-          entry_changes.send = /*send*/
+          entry_changes.api = /*api*/
           ctx[0];
         if (dirty & /*item*/
         4)
@@ -13122,21 +13228,21 @@
   __name(create_fragment7, "create_fragment");
   function instance7($$self, $$props, $$invalidate) {
     let { item } = $$props;
-    let { send } = $$props;
+    let { api } = $$props;
     let { controller } = $$props;
     let open = item.open;
     const click_handler = /* @__PURE__ */ __name(() => $$invalidate(3, open = !open), "click_handler");
     const click_handler_1 = /* @__PURE__ */ __name(() => $$invalidate(3, open = !open), "click_handler_1");
-    const click_handler_2 = /* @__PURE__ */ __name(() => send("out", { object: item.object }), "click_handler_2");
+    const click_handler_2 = /* @__PURE__ */ __name(() => api.send("out", { object: item.object }), "click_handler_2");
     $$self.$$set = ($$props2) => {
       if ("item" in $$props2)
         $$invalidate(2, item = $$props2.item);
-      if ("send" in $$props2)
-        $$invalidate(0, send = $$props2.send);
+      if ("api" in $$props2)
+        $$invalidate(0, api = $$props2.api);
       if ("controller" in $$props2)
         $$invalidate(1, controller = $$props2.controller);
     };
-    return [send, controller, item, open, click_handler, click_handler_1, click_handler_2];
+    return [api, controller, item, open, click_handler, click_handler_1, click_handler_2];
   }
   __name(instance7, "instance");
   var Entry = class extends SvelteComponent {
@@ -13145,103 +13251,266 @@
     }
     constructor(options) {
       super();
-      init(this, options, instance7, create_fragment7, safe_not_equal, { item: 2, send: 0, controller: 1 });
+      init(this, options, instance7, create_fragment7, safe_not_equal, { item: 2, api: 0, controller: 1 });
     }
   };
   var Entry_default = Entry;
 
   // plug-ins/components/architecture/Interface.svelte
   function create_fragment8(ctx) {
-    let div5;
+    let div9;
+    let div0;
+    let t0;
+    let t1;
+    let t2_value = parseInt(
+      /*$w*/
+      ctx[5]
+    ) + "";
+    let t2;
+    let t3;
+    let t4_value = parseInt(
+      /*$h*/
+      ctx[6]
+    ) + "";
+    let t4;
+    let t5;
+    let button0;
+    let api_makeMovable_action;
+    let t6;
+    let div7;
+    let div6;
+    let div3;
     let div2;
     let div1;
-    let div0;
-    let button0;
-    let t1;
     let button1;
-    let t3;
+    let t8;
+    let button2;
+    let t10;
+    let div5;
     let div4;
-    let div3;
     let ul;
     let entry;
+    let api_stopWheel_action;
+    let t11;
+    let div8;
+    let t12;
+    let t13;
+    let button3;
+    let api_makeResizable_action;
+    let div9_class_value;
     let current;
     let mounted;
     let dispose;
     entry = new Entry_default({
       props: {
-        send: (
-          /*send*/
-          ctx[0]
+        api: (
+          /*api*/
+          ctx[1]
         ),
         item: (
           /*$tree*/
-          ctx[2]
+          ctx[7]
         )
       }
     });
     return {
       c() {
-        div5 = element("div");
+        div9 = element("div");
+        div0 = element("div");
+        t0 = text2(
+          /*$caption*/
+          ctx[4]
+        );
+        t1 = text2(" (");
+        t2 = text2(t2_value);
+        t3 = text2("x");
+        t4 = text2(t4_value);
+        t5 = text2(")\n    ");
+        button0 = element("button");
+        button0.innerHTML = `<i class="bi bi-x"></i>`;
+        t6 = space();
+        div7 = element("div");
+        div6 = element("div");
+        div3 = element("div");
         div2 = element("div");
         div1 = element("div");
-        div0 = element("div");
-        button0 = element("button");
-        button0.innerHTML = `<i class="bi bi-vignette me-2"></i> Squelch`;
-        t1 = space();
         button1 = element("button");
-        button1.innerHTML = `<i class="bi bi-camera me-2"></i> Refresh Snapshot`;
-        t3 = space();
+        button1.innerHTML = `<i class="bi bi-vignette me-2"></i> Squelch`;
+        t8 = space();
+        button2 = element("button");
+        button2.innerHTML = `<i class="bi bi-camera me-2"></i> Refresh Snapshot`;
+        t10 = space();
+        div5 = element("div");
         div4 = element("div");
-        div3 = element("div");
         ul = element("ul");
         create_component(entry.$$.fragment);
+        t11 = space();
+        div8 = element("div");
+        t12 = text2(
+          /*$status*/
+          ctx[8]
+        );
+        t13 = space();
+        button3 = element("button");
+        button3.innerHTML = `<i class="bi bi-grip-horizontal"></i>`;
         attr(button0, "type", "button");
-        attr(button0, "class", "btn btn-outline-secondary");
+        attr(button0, "class", "btn opacity-50");
+        set_style(button0, "position", "absolute");
+        set_style(button0, "right", "0");
+        set_style(button0, "top", "0");
+        set_style(button0, "padding", ".5rem");
+        attr(button0, "aria-label", "Close");
+        attr(div0, "class", "card-header user-select-none");
+        toggle_class(
+          div0,
+          "text-warning",
+          /*$selected*/
+          ctx[3]
+        );
         attr(button1, "type", "button");
         attr(button1, "class", "btn btn-outline-secondary");
-        attr(div0, "class", "btn-group btn-group-sm float-end");
-        attr(div1, "class", "col");
-        attr(div2, "class", "row");
+        attr(button2, "type", "button");
+        attr(button2, "class", "btn btn-outline-secondary");
+        attr(div1, "class", "btn-group btn-group-sm float-end");
+        attr(div2, "class", "col");
+        attr(div3, "class", "row");
         attr(ul, "class", "list-unstyled my-3");
-        attr(div3, "class", "col");
-        attr(div4, "class", "row");
-        attr(div5, "class", "container-fluid pt-3");
+        attr(div4, "class", "col");
+        attr(div5, "class", "row");
+        attr(div6, "class", "container");
+        attr(div7, "class", "card-body overflow-auto");
+        attr(button3, "type", "button");
+        attr(button3, "class", "btn opacity-50");
+        set_style(button3, "position", "absolute");
+        set_style(button3, "right", "0");
+        set_style(button3, "bottom", "0");
+        set_style(button3, "padding", ".5rem");
+        attr(button3, "aria-label", "Resize");
+        attr(div8, "class", "card-footer text-body-secondary");
+        attr(div9, "class", div9_class_value = "card alert-" + /*$context*/
+        ctx[2] + " h-100 m-0");
+        set_style(div9, "overflow-y", "scroll");
+        toggle_class(
+          div9,
+          "active",
+          /*$selected*/
+          ctx[3]
+        );
       },
       m(target, anchor) {
-        insert(target, div5, anchor);
-        append(div5, div2);
-        append(div2, div1);
-        append(div1, div0);
-        append(div0, button0);
+        insert(target, div9, anchor);
+        append(div9, div0);
+        append(div0, t0);
         append(div0, t1);
-        append(div0, button1);
-        append(div5, t3);
+        append(div0, t2);
+        append(div0, t3);
+        append(div0, t4);
+        append(div0, t5);
+        append(div0, button0);
+        append(div9, t6);
+        append(div9, div7);
+        append(div7, div6);
+        append(div6, div3);
+        append(div3, div2);
+        append(div2, div1);
+        append(div1, button1);
+        append(div1, t8);
+        append(div1, button2);
+        append(div6, t10);
+        append(div6, div5);
         append(div5, div4);
-        append(div4, div3);
-        append(div3, ul);
+        append(div4, ul);
         mount_component(entry, ul, null);
+        append(div9, t11);
+        append(div9, div8);
+        append(div8, t12);
+        append(div8, t13);
+        append(div8, button3);
         current = true;
         if (!mounted) {
-          dispose = listen(
-            button1,
-            "click",
-            /*click_handler*/
-            ctx[3]
-          );
+          dispose = [
+            listen(
+              button0,
+              "click",
+              /*click_handler*/
+              ctx[16]
+            ),
+            action_destroyer(api_makeMovable_action = /*api*/
+            ctx[1].makeMovable(div0)),
+            listen(
+              button2,
+              "click",
+              /*click_handler_1*/
+              ctx[17]
+            ),
+            action_destroyer(api_stopWheel_action = /*api*/
+            ctx[1].stopWheel(div7)),
+            action_destroyer(api_makeResizable_action = /*api*/
+            ctx[1].makeResizable(button3))
+          ];
           mounted = true;
         }
       },
       p(ctx2, [dirty]) {
+        if (!current || dirty & /*$caption*/
+        16)
+          set_data(
+            t0,
+            /*$caption*/
+            ctx2[4]
+          );
+        if ((!current || dirty & /*$w*/
+        32) && t2_value !== (t2_value = parseInt(
+          /*$w*/
+          ctx2[5]
+        ) + ""))
+          set_data(t2, t2_value);
+        if ((!current || dirty & /*$h*/
+        64) && t4_value !== (t4_value = parseInt(
+          /*$h*/
+          ctx2[6]
+        ) + ""))
+          set_data(t4, t4_value);
+        if (!current || dirty & /*$selected*/
+        8) {
+          toggle_class(
+            div0,
+            "text-warning",
+            /*$selected*/
+            ctx2[3]
+          );
+        }
         const entry_changes = {};
-        if (dirty & /*send*/
-        1)
-          entry_changes.send = /*send*/
-          ctx2[0];
+        if (dirty & /*api*/
+        2)
+          entry_changes.api = /*api*/
+          ctx2[1];
         if (dirty & /*$tree*/
-        4)
+        128)
           entry_changes.item = /*$tree*/
-          ctx2[2];
+          ctx2[7];
         entry.$set(entry_changes);
+        if (!current || dirty & /*$status*/
+        256)
+          set_data(
+            t12,
+            /*$status*/
+            ctx2[8]
+          );
+        if (!current || dirty & /*$context*/
+        4 && div9_class_value !== (div9_class_value = "card alert-" + /*$context*/
+        ctx2[2] + " h-100 m-0")) {
+          attr(div9, "class", div9_class_value);
+        }
+        if (!current || dirty & /*$context, $selected*/
+        12) {
+          toggle_class(
+            div9,
+            "active",
+            /*$selected*/
+            ctx2[3]
+          );
+        }
       },
       i(local) {
         if (current)
@@ -13255,29 +13524,96 @@
       },
       d(detaching) {
         if (detaching) {
-          detach(div5);
+          detach(div9);
         }
         destroy_component(entry);
         mounted = false;
-        dispose();
+        run_all(dispose);
       }
     };
   }
   __name(create_fragment8, "create_fragment");
+  var a = 1;
+  var b = 2;
   function instance8($$self, $$props, $$invalidate) {
-    let $tree, $$unsubscribe_tree = noop, $$subscribe_tree = /* @__PURE__ */ __name(() => ($$unsubscribe_tree(), $$unsubscribe_tree = subscribe(tree, ($$value) => $$invalidate(2, $tree = $$value)), tree), "$$subscribe_tree");
+    let c;
+    let $context;
+    let $selected;
+    let $caption;
+    let $w;
+    let $h;
+    let $tree, $$unsubscribe_tree = noop, $$subscribe_tree = /* @__PURE__ */ __name(() => ($$unsubscribe_tree(), $$unsubscribe_tree = subscribe(tree, ($$value) => $$invalidate(7, $tree = $$value)), tree), "$$subscribe_tree");
+    let $status;
     $$self.$$.on_destroy.push(() => $$unsubscribe_tree());
-    let { send } = $$props;
     let { tree } = $$props;
     $$subscribe_tree();
-    const click_handler = /* @__PURE__ */ __name(() => tree.snapshot(), "click_handler");
+    let { api } = $$props;
+    const context = api.signal("context");
+    component_subscribe($$self, context, (value) => $$invalidate(2, $context = value));
+    const caption = api.signal("caption");
+    component_subscribe($$self, caption, (value) => $$invalidate(4, $caption = value));
+    const text3 = api.signal("text");
+    const status = api.signal("status");
+    component_subscribe($$self, status, (value) => $$invalidate(8, $status = value));
+    const w = api.signal("w");
+    component_subscribe($$self, w, (value) => $$invalidate(5, $w = value));
+    const h = api.signal("h");
+    component_subscribe($$self, h, (value) => $$invalidate(6, $h = value));
+    const x = api.signal("h");
+    const selected = api.signal("selected");
+    component_subscribe($$self, selected, (value) => $$invalidate(3, $selected = value));
+    const click_handler = /* @__PURE__ */ __name(() => api.removeApplication(), "click_handler");
+    const click_handler_1 = /* @__PURE__ */ __name(() => tree.snapshot(), "click_handler_1");
     $$self.$$set = ($$props2) => {
-      if ("send" in $$props2)
-        $$invalidate(0, send = $$props2.send);
       if ("tree" in $$props2)
-        $$subscribe_tree($$invalidate(1, tree = $$props2.tree));
+        $$subscribe_tree($$invalidate(0, tree = $$props2.tree));
+      if ("api" in $$props2)
+        $$invalidate(1, api = $$props2.api);
     };
-    return [send, tree, $tree, click_handler];
+    $$self.$$.update = () => {
+      if ($$self.$$.dirty & /*api, c*/
+      32770) {
+        $:
+          api.send("out", { a, b, c });
+      }
+      if ($$self.$$.dirty & /*api*/
+      2) {
+        $:
+          api.send("a", a);
+      }
+      if ($$self.$$.dirty & /*api*/
+      2) {
+        $:
+          api.send("b", b);
+      }
+      if ($$self.$$.dirty & /*api, c*/
+      32770) {
+        $:
+          api.send("c", c);
+      }
+    };
+    $:
+      $$invalidate(15, c = a + b);
+    return [
+      tree,
+      api,
+      $context,
+      $selected,
+      $caption,
+      $w,
+      $h,
+      $tree,
+      $status,
+      context,
+      caption,
+      status,
+      w,
+      h,
+      selected,
+      c,
+      click_handler,
+      click_handler_1
+    ];
   }
   __name(instance8, "instance");
   var Interface2 = class extends SvelteComponent {
@@ -13286,7 +13622,7 @@
     }
     constructor(options) {
       super();
-      init(this, options, instance8, create_fragment8, safe_not_equal, { send: 0, tree: 1 });
+      init(this, options, instance8, create_fragment8, safe_not_equal, { tree: 0, api: 1 });
     }
   };
   var Interface_default2 = Interface2;
@@ -13394,7 +13730,7 @@
         this.component = new Interface_default2({
           target: this.foreign.body,
           props: {
-            send: this.send.bind(this),
+            api: this,
             tree: stores_default.getApplicationTree(this)
           }
         });
@@ -13409,124 +13745,132 @@
   // plug-ins/code-tools/index.js
   var import_esprima = __toESM(require_esprima());
   function getFunctionSignature(src) {
-    const response = [];
-    src = src.replace(/\?\./g, ".");
-    const ast = (0, import_esprima.parseScript)(src, { tolerant: true });
-    for (const param of ast.body[0].params) {
-      switch (param.type) {
-        case "Identifier":
-          response.push(param.name);
-          break;
-        case "AssignmentPattern":
-          response.push(param.left.name);
-          break;
-        case "ObjectPattern":
-          response.push("{...}");
-          break;
-        default:
-          response.push(JSON.stringify(param));
+    try {
+      const response = [];
+      src = src.replace(/\?\./g, ".");
+      src = src.replace(/\.{3}/g, "spreadOperator:");
+      src = src.replace(/ async /g, " ");
+      const ast = (0, import_esprima.parseScript)(src, { tolerant: true });
+      for (const param of ast.body[0].params) {
+        switch (param.type) {
+          case "Identifier":
+            response.push(param.name);
+            break;
+          case "AssignmentPattern":
+            response.push(param.left.name);
+            break;
+          case "ArrayPattern":
+            response.push(...param.elements.map((o) => o.name));
+            break;
+          case "ObjectPattern":
+            response.push("{...}");
+            break;
+          default:
+            response.push(JSON.stringify(param));
+        }
       }
+      return response;
+    } catch (e) {
+      console.error(src);
+      console.error(e);
+      return ["?"];
     }
-    return response;
   }
   __name(getFunctionSignature, "getFunctionSignature");
 
   // plug-ins/components/analysis/Interface.svelte
   function get_each_context3(ctx, list, i) {
     const child_ctx = ctx.slice();
-    child_ctx[13] = list[i];
-    child_ctx[15] = i;
+    child_ctx[24] = list[i];
+    child_ctx[26] = i;
     return child_ctx;
   }
   __name(get_each_context3, "get_each_context");
   function get_each_context_1(ctx, list, i) {
     const child_ctx = ctx.slice();
-    child_ctx[13] = list[i];
-    child_ctx[15] = i;
+    child_ctx[24] = list[i];
+    child_ctx[26] = i;
     return child_ctx;
   }
   __name(get_each_context_1, "get_each_context_1");
   function get_if_ctx(ctx) {
     const child_ctx = ctx.slice();
     const constants_0 = "Observables";
-    child_ctx[12] = constants_0;
+    child_ctx[23] = constants_0;
     return child_ctx;
   }
   __name(get_if_ctx, "get_if_ctx");
   function get_each_context_2(ctx, list, i) {
     const child_ctx = ctx.slice();
-    child_ctx[13] = list[i];
-    child_ctx[15] = i;
+    child_ctx[24] = list[i];
+    child_ctx[26] = i;
     return child_ctx;
   }
   __name(get_each_context_2, "get_each_context_2");
   function get_each_context_3(ctx, list, i) {
     const child_ctx = ctx.slice();
-    child_ctx[13] = list[i];
-    child_ctx[15] = i;
+    child_ctx[24] = list[i];
+    child_ctx[26] = i;
     return child_ctx;
   }
   __name(get_each_context_3, "get_each_context_3");
   function get_if_ctx_1(ctx) {
     const child_ctx = ctx.slice();
     const constants_0 = "Method";
-    child_ctx[12] = constants_0;
+    child_ctx[23] = constants_0;
     return child_ctx;
   }
   __name(get_if_ctx_1, "get_if_ctx_1");
   function get_each_context_4(ctx, list, i) {
     const child_ctx = ctx.slice();
-    child_ctx[13] = list[i];
-    child_ctx[15] = i;
+    child_ctx[24] = list[i];
+    child_ctx[26] = i;
     return child_ctx;
   }
   __name(get_each_context_4, "get_each_context_4");
   function get_each_context_5(ctx, list, i) {
     const child_ctx = ctx.slice();
-    child_ctx[13] = list[i];
-    child_ctx[15] = i;
+    child_ctx[24] = list[i];
+    child_ctx[26] = i;
     return child_ctx;
   }
   __name(get_each_context_5, "get_each_context_5");
   function get_if_ctx_2(ctx) {
     const child_ctx = ctx.slice();
     const constants_0 = "Trait";
-    child_ctx[12] = constants_0;
+    child_ctx[23] = constants_0;
     return child_ctx;
   }
   __name(get_if_ctx_2, "get_if_ctx_2");
   function get_each_context_6(ctx, list, i) {
     const child_ctx = ctx.slice();
-    child_ctx[13] = list[i];
-    child_ctx[15] = i;
+    child_ctx[24] = list[i];
+    child_ctx[26] = i;
     return child_ctx;
   }
   __name(get_each_context_6, "get_each_context_6");
   function get_each_context_7(ctx, list, i) {
     const child_ctx = ctx.slice();
-    child_ctx[13] = list[i];
-    child_ctx[15] = i;
+    child_ctx[24] = list[i];
+    child_ctx[26] = i;
     return child_ctx;
   }
   __name(get_each_context_7, "get_each_context_7");
   function get_if_ctx_3(ctx) {
     const child_ctx = ctx.slice();
     const constants_0 = "children";
-    child_ctx[12] = constants_0;
+    child_ctx[23] = constants_0;
     return child_ctx;
   }
   __name(get_if_ctx_3, "get_if_ctx_3");
   function get_each_context_8(ctx, list, i) {
     const child_ctx = ctx.slice();
-    child_ctx[13] = list[i];
-    child_ctx[15] = i;
+    child_ctx[24] = list[i];
+    child_ctx[26] = i;
     return child_ctx;
   }
   __name(get_each_context_8, "get_each_context_8");
   function create_if_block3(ctx) {
-    let div4;
-    let div1;
-    let div0;
     let h3;
     let t0_value = (
       /*object*/
@@ -13544,20 +13888,13 @@
     let t4;
     let span1;
     let t5;
+    let div;
+    let nav;
+    let ol;
     let t6;
     let t7;
     let t8;
     let t9;
-    let span0;
-    let t10;
-    let div3;
-    let div2;
-    let nav;
-    let ol;
-    let t11;
-    let t12;
-    let t13;
-    let t14;
     let each_value_8 = ensure_array_like(
       /*object*/
       ctx[0].oo.extends
@@ -13584,64 +13921,42 @@
     );
     return {
       c() {
-        div4 = element("div");
-        div1 = element("div");
-        div0 = element("div");
         h3 = element("h3");
         t0 = text2(t0_value);
-        t1 = text2(" Class;\n          ");
+        t1 = text2(" Class;\n      ");
         small = element("small");
         t2 = text2("id:");
         t3 = text2(t3_value);
         t4 = space();
         span1 = element("span");
-        t5 = text2("(");
-        t6 = text2(
-          /*$x*/
-          ctx[4]
-        );
-        t7 = text2("x");
-        t8 = text2(
-          /*$y*/
-          ctx[5]
-        );
-        t9 = text2(")");
-        span0 = element("span");
-        t10 = space();
-        div3 = element("div");
-        div2 = element("div");
+        span1.innerHTML = `<span></span>`;
+        t5 = space();
+        div = element("div");
         nav = element("nav");
         ol = element("ol");
         for (let i = 0; i < each_blocks.length; i += 1) {
           each_blocks[i].c();
         }
-        t11 = space();
+        t6 = space();
         if (if_block0)
           if_block0.c();
-        t12 = space();
+        t7 = space();
         if (if_block1)
           if_block1.c();
-        t13 = space();
+        t8 = space();
         if (if_block2)
           if_block2.c();
-        t14 = space();
+        t9 = space();
         if (if_block3)
           if_block3.c();
         set_style(span1, "font-size", ".92rem");
         attr(small, "class", "text-body-secondary");
-        attr(div0, "class", "col");
-        attr(div1, "class", "row");
         attr(ol, "class", "breadcrumb");
         attr(nav, "aria-label", "breadcrumb");
-        attr(div2, "class", "col");
-        attr(div3, "class", "row");
-        attr(div4, "class", "container-fluid pt-3");
+        attr(div, "class", "");
       },
       m(target, anchor) {
-        insert(target, div4, anchor);
-        append(div4, div1);
-        append(div1, div0);
-        append(div0, h3);
+        insert(target, h3, anchor);
         append(h3, t0);
         append(h3, t1);
         append(h3, small);
@@ -13649,59 +13964,38 @@
         append(small, t3);
         append(small, t4);
         append(small, span1);
-        append(span1, t5);
-        append(span1, t6);
-        append(span1, t7);
-        append(span1, t8);
-        append(span1, t9);
-        append(span1, span0);
-        append(div4, t10);
-        append(div4, div3);
-        append(div3, div2);
-        append(div2, nav);
+        insert(target, t5, anchor);
+        insert(target, div, anchor);
+        append(div, nav);
         append(nav, ol);
         for (let i = 0; i < each_blocks.length; i += 1) {
           if (each_blocks[i]) {
             each_blocks[i].m(ol, null);
           }
         }
-        append(div2, t11);
+        append(div, t6);
         if (if_block0)
-          if_block0.m(div2, null);
-        append(div2, t12);
+          if_block0.m(div, null);
+        append(div, t7);
         if (if_block1)
-          if_block1.m(div2, null);
-        append(div2, t13);
+          if_block1.m(div, null);
+        append(div, t8);
         if (if_block2)
-          if_block2.m(div2, null);
-        append(div2, t14);
+          if_block2.m(div, null);
+        append(div, t9);
         if (if_block3)
-          if_block3.m(div2, null);
+          if_block3.m(div, null);
       },
       p(ctx2, dirty) {
-        if (dirty & /*object*/
+        if (dirty[0] & /*object*/
         1 && t0_value !== (t0_value = /*object*/
         ctx2[0].oo.name + ""))
           set_data(t0, t0_value);
-        if (dirty & /*object*/
+        if (dirty[0] & /*object*/
         1 && t3_value !== (t3_value = /*object*/
         ctx2[0].id + ""))
           set_data(t3, t3_value);
-        if (dirty & /*$x*/
-        16)
-          set_data(
-            t6,
-            /*$x*/
-            ctx2[4]
-          );
-        if (dirty & /*$y*/
-        32)
-          set_data(
-            t8,
-            /*$y*/
-            ctx2[5]
-          );
-        if (dirty & /*object*/
+        if (dirty[0] & /*object*/
         1) {
           each_value_8 = ensure_array_like(
             /*object*/
@@ -13732,7 +14026,7 @@
           } else {
             if_block0 = create_if_block_13(get_if_ctx_3(ctx2));
             if_block0.c();
-            if_block0.m(div2, t12);
+            if_block0.m(div, t7);
           }
         } else if (if_block0) {
           if_block0.d(1);
@@ -13747,7 +14041,7 @@
           } else {
             if_block1 = create_if_block_9(get_if_ctx_2(ctx2));
             if_block1.c();
-            if_block1.m(div2, t13);
+            if_block1.m(div, t8);
           }
         } else if (if_block1) {
           if_block1.d(1);
@@ -13762,7 +14056,7 @@
           } else {
             if_block2 = create_if_block_5(get_if_ctx_1(ctx2));
             if_block2.c();
-            if_block2.m(div2, t14);
+            if_block2.m(div, t9);
           }
         } else if (if_block2) {
           if_block2.d(1);
@@ -13777,7 +14071,7 @@
           } else {
             if_block3 = create_if_block_17(get_if_ctx(ctx2));
             if_block3.c();
-            if_block3.m(div2, null);
+            if_block3.m(div, null);
           }
         } else if (if_block3) {
           if_block3.d(1);
@@ -13786,7 +14080,9 @@
       },
       d(detaching) {
         if (detaching) {
-          detach(div4);
+          detach(h3);
+          detach(t5);
+          detach(div);
         }
         destroy_each(each_blocks, detaching);
         if (if_block0)
@@ -13808,7 +14104,7 @@
     let t0;
     let t1_value = (
       /*item*/
-      ctx[13].name + ""
+      ctx[24].name + ""
     );
     let t1;
     return {
@@ -13819,7 +14115,7 @@
         t1 = text2(t1_value);
         attr(i_1, "class", i_1_class_value = "bi bi-" + class_icons_default(
           /*item*/
-          ctx[13].name
+          ctx[24].name
         ) + " text-light pe-2");
         attr(li, "class", "breadcrumb-item");
       },
@@ -13830,16 +14126,16 @@
         append(li, t1);
       },
       p(ctx2, dirty) {
-        if (dirty & /*object*/
+        if (dirty[0] & /*object*/
         1 && i_1_class_value !== (i_1_class_value = "bi bi-" + class_icons_default(
           /*item*/
-          ctx2[13].name
+          ctx2[24].name
         ) + " text-light pe-2")) {
           attr(i_1, "class", i_1_class_value);
         }
-        if (dirty & /*object*/
+        if (dirty[0] & /*object*/
         1 && t1_value !== (t1_value = /*item*/
-        ctx2[13].name + ""))
+        ctx2[24].name + ""))
           set_data(t1, t1_value);
       },
       d(detaching) {
@@ -13860,32 +14156,32 @@
     function select_block_type(ctx2, dirty) {
       if (
         /*opened*/
-        ctx2[3][
+        ctx2[2][
           /*feature*/
-          ctx2[12]
+          ctx2[23]
         ]
       )
         return create_if_block_16;
       return create_else_block_3;
     }
     __name(select_block_type, "select_block_type");
-    let current_block_type = select_block_type(ctx, -1);
+    let current_block_type = select_block_type(ctx, [-1, -1]);
     let if_block0 = current_block_type(ctx);
-    function click_handler() {
+    function click_handler_1() {
       return (
-        /*click_handler*/
-        ctx[8](
+        /*click_handler_1*/
+        ctx[18](
           /*feature*/
-          ctx[12]
+          ctx[23]
         )
       );
     }
-    __name(click_handler, "click_handler");
+    __name(click_handler_1, "click_handler_1");
     let if_block1 = (
       /*opened*/
-      ctx[3][
+      ctx[2][
         /*feature*/
-        ctx[12]
+        ctx[23]
       ] && /*object*/
       ctx[0].children && create_if_block_14(ctx)
     );
@@ -13910,7 +14206,7 @@
         if (if_block1)
           if_block1.m(div1, null);
         if (!mounted) {
-          dispose = listen(div0, "click", click_handler);
+          dispose = listen(div0, "click", click_handler_1);
           mounted = true;
         }
       },
@@ -13926,9 +14222,9 @@
         }
         if (
           /*opened*/
-          ctx[3][
+          ctx[2][
             /*feature*/
-            ctx[12]
+            ctx[23]
           ] && /*object*/
           ctx[0].children
         ) {
@@ -14020,7 +14316,7 @@
         }
       },
       p(ctx2, dirty) {
-        if (dirty & /*object*/
+        if (dirty[0] & /*object*/
         1) {
           each_value_6 = ensure_array_like(
             /*object*/
@@ -14078,7 +14374,7 @@
         insert(target, each_1_anchor, anchor);
       },
       p(ctx2, dirty) {
-        if (dirty & /*object*/
+        if (dirty[0] & /*object*/
         1) {
           each_value_7 = ensure_array_like(
             /*object*/
@@ -14117,7 +14413,7 @@
     let i_1_class_value;
     let t_value = (
       /*item*/
-      ctx[13].oo.name + ""
+      ctx[24].oo.name + ""
     );
     let t;
     return {
@@ -14128,7 +14424,7 @@
         t = text2(t_value);
         attr(i_1, "class", i_1_class_value = "bi bi-" + class_icons_default(
           /*item*/
-          ctx[13].oo.name
+          ctx[24].oo.name
         ) + " text-light pe-2");
         attr(li, "class", "list-group-item ps-5");
       },
@@ -14139,16 +14435,16 @@
         append(small, t);
       },
       p(ctx2, dirty) {
-        if (dirty & /*object*/
+        if (dirty[0] & /*object*/
         1 && i_1_class_value !== (i_1_class_value = "bi bi-" + class_icons_default(
           /*item*/
-          ctx2[13].oo.name
+          ctx2[24].oo.name
         ) + " text-light pe-2")) {
           attr(i_1, "class", i_1_class_value);
         }
-        if (dirty & /*object*/
+        if (dirty[0] & /*object*/
         1 && t_value !== (t_value = /*item*/
-        ctx2[13].oo.name + ""))
+        ctx2[24].oo.name + ""))
           set_data(t, t_value);
       },
       d(detaching) {
@@ -14165,14 +14461,14 @@
     let i_1_class_value;
     let t0_value = (
       /*item*/
-      ctx[13].oo.name + ""
+      ctx[24].oo.name + ""
     );
     let t0;
     let t1;
     let if_block_anchor;
     let if_block = (
       /*item*/
-      ctx[13].oo.name == "Pane" && create_if_block_15(ctx)
+      ctx[24].oo.name == "Pane" && create_if_block_15(ctx)
     );
     return {
       c() {
@@ -14185,7 +14481,7 @@
         if_block_anchor = empty();
         attr(i_1, "class", i_1_class_value = "bi bi-" + class_icons_default(
           /*item*/
-          ctx[13].oo.name
+          ctx[24].oo.name
         ) + " text-light pe-2");
         attr(li, "class", "list-group-item");
       },
@@ -14199,20 +14495,20 @@
         insert(target, if_block_anchor, anchor);
       },
       p(ctx2, dirty) {
-        if (dirty & /*object*/
+        if (dirty[0] & /*object*/
         1 && i_1_class_value !== (i_1_class_value = "bi bi-" + class_icons_default(
           /*item*/
-          ctx2[13].oo.name
+          ctx2[24].oo.name
         ) + " text-light pe-2")) {
           attr(i_1, "class", i_1_class_value);
         }
-        if (dirty & /*object*/
+        if (dirty[0] & /*object*/
         1 && t0_value !== (t0_value = /*item*/
-        ctx2[13].oo.name + ""))
+        ctx2[24].oo.name + ""))
           set_data(t0, t0_value);
         if (
           /*item*/
-          ctx2[13].oo.name == "Pane"
+          ctx2[24].oo.name == "Pane"
         ) {
           if (if_block) {
             if_block.p(ctx2, dirty);
@@ -14248,32 +14544,32 @@
     function select_block_type_1(ctx2, dirty) {
       if (
         /*opened*/
-        ctx2[3][
+        ctx2[2][
           /*feature*/
-          ctx2[12]
+          ctx2[23]
         ]
       )
         return create_if_block_12;
       return create_else_block_2;
     }
     __name(select_block_type_1, "select_block_type_1");
-    let current_block_type = select_block_type_1(ctx, -1);
+    let current_block_type = select_block_type_1(ctx, [-1, -1]);
     let if_block0 = current_block_type(ctx);
-    function click_handler_1() {
+    function click_handler_2() {
       return (
-        /*click_handler_1*/
-        ctx[9](
+        /*click_handler_2*/
+        ctx[19](
           /*feature*/
-          ctx[12]
+          ctx[23]
         )
       );
     }
-    __name(click_handler_1, "click_handler_1");
+    __name(click_handler_2, "click_handler_2");
     let if_block1 = (
       /*opened*/
-      ctx[3][
+      ctx[2][
         /*feature*/
-        ctx[12]
+        ctx[23]
       ] && create_if_block_10(ctx)
     );
     return {
@@ -14297,7 +14593,7 @@
         if (if_block1)
           if_block1.m(div1, null);
         if (!mounted) {
-          dispose = listen(div0, "click", click_handler_1);
+          dispose = listen(div0, "click", click_handler_2);
           mounted = true;
         }
       },
@@ -14313,9 +14609,9 @@
         }
         if (
           /*opened*/
-          ctx[3][
+          ctx[2][
             /*feature*/
-            ctx[12]
+            ctx[23]
           ]
         ) {
           if (if_block1) {
@@ -14406,7 +14702,7 @@
         }
       },
       p(ctx2, dirty) {
-        if (dirty & /*object*/
+        if (dirty[0] & /*object*/
         1) {
           each_value_4 = ensure_array_like(
             /*object*/
@@ -14442,7 +14738,7 @@
     let each_1_anchor;
     let each_value_5 = ensure_array_like(
       /*item*/
-      ctx[13].data
+      ctx[24].data
     );
     let each_blocks = [];
     for (let i = 0; i < each_value_5.length; i += 1) {
@@ -14464,11 +14760,11 @@
         insert(target, each_1_anchor, anchor);
       },
       p(ctx2, dirty) {
-        if (dirty & /*object*/
+        if (dirty[0] & /*object*/
         1) {
           each_value_5 = ensure_array_like(
             /*item*/
-            ctx2[13].data
+            ctx2[24].data
           );
           let i;
           for (i = 0; i < each_value_5.length; i += 1) {
@@ -14503,13 +14799,13 @@
     let i_1_class_value;
     let t0_value = (
       /*item*/
-      ctx[13].name + ""
+      ctx[24].name + ""
     );
     let t0;
     let t1;
     let t2_value = getFunctionSignature(
       /*item*/
-      ctx[13].code
+      ctx[24].code
     ).join(", ") + "";
     let t2;
     let t3;
@@ -14524,7 +14820,7 @@
         t3 = text2(")");
         attr(i_1, "class", i_1_class_value = "bi bi-" + class_icons_default(
           /*feature*/
-          ctx[12]
+          ctx[23]
         ) + " text-light pe-2");
         attr(li, "class", "list-group-item ps-5");
       },
@@ -14538,14 +14834,14 @@
         append(small, t3);
       },
       p(ctx2, dirty) {
-        if (dirty & /*object*/
+        if (dirty[0] & /*object*/
         1 && t0_value !== (t0_value = /*item*/
-        ctx2[13].name + ""))
+        ctx2[24].name + ""))
           set_data(t0, t0_value);
-        if (dirty & /*object*/
+        if (dirty[0] & /*object*/
         1 && t2_value !== (t2_value = getFunctionSignature(
           /*item*/
-          ctx2[13].code
+          ctx2[24].code
         ).join(", ") + ""))
           set_data(t2, t2_value);
       },
@@ -14563,14 +14859,14 @@
     let i_1_class_value;
     let t0_value = (
       /*item*/
-      ctx[13].name + ""
+      ctx[24].name + ""
     );
     let t0;
     let t1;
     let if_block_anchor;
     let if_block = (
       /*item*/
-      ctx[13].data && create_if_block_11(ctx)
+      ctx[24].data && create_if_block_11(ctx)
     );
     return {
       c() {
@@ -14583,14 +14879,14 @@
         if_block_anchor = empty();
         attr(i_1, "class", i_1_class_value = "bi bi-" + class_icons_default(
           /*item*/
-          ctx[13].name
+          ctx[24].name
         ) + " text-light pe-2");
         attr(li, "class", "list-group-item");
         toggle_class(
           li,
           "opacity-50",
           /*item*/
-          ctx[13].data.length == 0
+          ctx[24].data.length == 0
         );
       },
       m(target, anchor) {
@@ -14603,29 +14899,29 @@
         insert(target, if_block_anchor, anchor);
       },
       p(ctx2, dirty) {
-        if (dirty & /*object*/
+        if (dirty[0] & /*object*/
         1 && i_1_class_value !== (i_1_class_value = "bi bi-" + class_icons_default(
           /*item*/
-          ctx2[13].name
+          ctx2[24].name
         ) + " text-light pe-2")) {
           attr(i_1, "class", i_1_class_value);
         }
-        if (dirty & /*object*/
+        if (dirty[0] & /*object*/
         1 && t0_value !== (t0_value = /*item*/
-        ctx2[13].name + ""))
+        ctx2[24].name + ""))
           set_data(t0, t0_value);
-        if (dirty & /*object*/
+        if (dirty[0] & /*object*/
         1) {
           toggle_class(
             li,
             "opacity-50",
             /*item*/
-            ctx2[13].data.length == 0
+            ctx2[24].data.length == 0
           );
         }
         if (
           /*item*/
-          ctx2[13].data
+          ctx2[24].data
         ) {
           if (if_block) {
             if_block.p(ctx2, dirty);
@@ -14661,32 +14957,32 @@
     function select_block_type_2(ctx2, dirty) {
       if (
         /*opened*/
-        ctx2[3][
+        ctx2[2][
           /*feature*/
-          ctx2[12]
+          ctx2[23]
         ]
       )
         return create_if_block_8;
       return create_else_block_1;
     }
     __name(select_block_type_2, "select_block_type_2");
-    let current_block_type = select_block_type_2(ctx, -1);
+    let current_block_type = select_block_type_2(ctx, [-1, -1]);
     let if_block0 = current_block_type(ctx);
-    function click_handler_2() {
+    function click_handler_3() {
       return (
-        /*click_handler_2*/
-        ctx[10](
+        /*click_handler_3*/
+        ctx[20](
           /*feature*/
-          ctx[12]
+          ctx[23]
         )
       );
     }
-    __name(click_handler_2, "click_handler_2");
+    __name(click_handler_3, "click_handler_3");
     let if_block1 = (
       /*opened*/
-      ctx[3][
+      ctx[2][
         /*feature*/
-        ctx[12]
+        ctx[23]
       ] && create_if_block_6(ctx)
     );
     return {
@@ -14710,7 +15006,7 @@
         if (if_block1)
           if_block1.m(div1, null);
         if (!mounted) {
-          dispose = listen(div0, "click", click_handler_2);
+          dispose = listen(div0, "click", click_handler_3);
           mounted = true;
         }
       },
@@ -14726,9 +15022,9 @@
         }
         if (
           /*opened*/
-          ctx[3][
+          ctx[2][
             /*feature*/
-            ctx[12]
+            ctx[23]
           ]
         ) {
           if (if_block1) {
@@ -14819,7 +15115,7 @@
         }
       },
       p(ctx2, dirty) {
-        if (dirty & /*object*/
+        if (dirty[0] & /*object*/
         1) {
           each_value_2 = ensure_array_like(
             /*object*/
@@ -14855,7 +15151,7 @@
     let each_1_anchor;
     let each_value_3 = ensure_array_like(
       /*item*/
-      ctx[13].data
+      ctx[24].data
     );
     let each_blocks = [];
     for (let i = 0; i < each_value_3.length; i += 1) {
@@ -14877,11 +15173,11 @@
         insert(target, each_1_anchor, anchor);
       },
       p(ctx2, dirty) {
-        if (dirty & /*object*/
+        if (dirty[0] & /*object*/
         1) {
           each_value_3 = ensure_array_like(
             /*item*/
-            ctx2[13].data
+            ctx2[24].data
           );
           let i;
           for (i = 0; i < each_value_3.length; i += 1) {
@@ -14916,7 +15212,7 @@
     let i_1_class_value;
     let t_value = (
       /*item*/
-      ctx[13].name + ""
+      ctx[24].name + ""
     );
     let t;
     return {
@@ -14927,7 +15223,7 @@
         t = text2(t_value);
         attr(i_1, "class", i_1_class_value = "bi bi-" + class_icons_default(
           /*feature*/
-          ctx[12]
+          ctx[23]
         ) + " text-light pe-2");
         attr(li, "class", "list-group-item ps-5");
       },
@@ -14938,9 +15234,9 @@
         append(small, t);
       },
       p(ctx2, dirty) {
-        if (dirty & /*object*/
+        if (dirty[0] & /*object*/
         1 && t_value !== (t_value = /*item*/
-        ctx2[13].name + ""))
+        ctx2[24].name + ""))
           set_data(t, t_value);
       },
       d(detaching) {
@@ -14957,14 +15253,14 @@
     let i_1_class_value;
     let t0_value = (
       /*item*/
-      ctx[13].name + ""
+      ctx[24].name + ""
     );
     let t0;
     let t1;
     let if_block_anchor;
     let if_block = (
       /*item*/
-      ctx[13].data && create_if_block_7(ctx)
+      ctx[24].data && create_if_block_7(ctx)
     );
     return {
       c() {
@@ -14977,7 +15273,7 @@
         if_block_anchor = empty();
         attr(i_1, "class", i_1_class_value = "bi bi-" + class_icons_default(
           /*item*/
-          ctx[13].name
+          ctx[24].name
         ) + " text-light pe-2");
         attr(li, "class", "list-group-item");
       },
@@ -14991,20 +15287,20 @@
         insert(target, if_block_anchor, anchor);
       },
       p(ctx2, dirty) {
-        if (dirty & /*object*/
+        if (dirty[0] & /*object*/
         1 && i_1_class_value !== (i_1_class_value = "bi bi-" + class_icons_default(
           /*item*/
-          ctx2[13].name
+          ctx2[24].name
         ) + " text-light pe-2")) {
           attr(i_1, "class", i_1_class_value);
         }
-        if (dirty & /*object*/
+        if (dirty[0] & /*object*/
         1 && t0_value !== (t0_value = /*item*/
-        ctx2[13].name + ""))
+        ctx2[24].name + ""))
           set_data(t0, t0_value);
         if (
           /*item*/
-          ctx2[13].data
+          ctx2[24].data
         ) {
           if (if_block) {
             if_block.p(ctx2, dirty);
@@ -15040,32 +15336,32 @@
     function select_block_type_3(ctx2, dirty) {
       if (
         /*opened*/
-        ctx2[3][
+        ctx2[2][
           /*feature*/
-          ctx2[12]
+          ctx2[23]
         ]
       )
         return create_if_block_4;
       return create_else_block2;
     }
     __name(select_block_type_3, "select_block_type_3");
-    let current_block_type = select_block_type_3(ctx, -1);
+    let current_block_type = select_block_type_3(ctx, [-1, -1]);
     let if_block0 = current_block_type(ctx);
-    function click_handler_3() {
+    function click_handler_4() {
       return (
-        /*click_handler_3*/
-        ctx[11](
+        /*click_handler_4*/
+        ctx[21](
           /*feature*/
-          ctx[12]
+          ctx[23]
         )
       );
     }
-    __name(click_handler_3, "click_handler_3");
+    __name(click_handler_4, "click_handler_4");
     let if_block1 = (
       /*opened*/
-      ctx[3][
+      ctx[2][
         /*feature*/
-        ctx[12]
+        ctx[23]
       ] && create_if_block_22(ctx)
     );
     return {
@@ -15089,7 +15385,7 @@
         if (if_block1)
           if_block1.m(div1, null);
         if (!mounted) {
-          dispose = listen(div0, "click", click_handler_3);
+          dispose = listen(div0, "click", click_handler_4);
           mounted = true;
         }
       },
@@ -15105,9 +15401,9 @@
         }
         if (
           /*opened*/
-          ctx[3][
+          ctx[2][
             /*feature*/
-            ctx[12]
+            ctx[23]
           ]
         ) {
           if (if_block1) {
@@ -15198,7 +15494,7 @@
         }
       },
       p(ctx2, dirty) {
-        if (dirty & /*object*/
+        if (dirty[0] & /*object*/
         1) {
           each_value = ensure_array_like(
             /*object*/
@@ -15234,7 +15530,7 @@
     let each_1_anchor;
     let each_value_1 = ensure_array_like(
       /*item*/
-      ctx[13].data
+      ctx[24].data
     );
     let each_blocks = [];
     for (let i = 0; i < each_value_1.length; i += 1) {
@@ -15256,11 +15552,11 @@
         insert(target, each_1_anchor, anchor);
       },
       p(ctx2, dirty) {
-        if (dirty & /*object*/
+        if (dirty[0] & /*object*/
         1) {
           each_value_1 = ensure_array_like(
             /*item*/
-            ctx2[13].data
+            ctx2[24].data
           );
           let i;
           for (i = 0; i < each_value_1.length; i += 1) {
@@ -15295,7 +15591,7 @@
     let i_1_class_value;
     let t_value = (
       /*item*/
-      ctx[13].name + ""
+      ctx[24].name + ""
     );
     let t;
     return {
@@ -15306,7 +15602,7 @@
         t = text2(t_value);
         attr(i_1, "class", i_1_class_value = "bi bi-" + class_icons_default(
           /*feature*/
-          ctx[12]
+          ctx[23]
         ) + " text-light pe-2");
         attr(li, "class", "list-group-item ps-5");
       },
@@ -15317,9 +15613,9 @@
         append(small, t);
       },
       p(ctx2, dirty) {
-        if (dirty & /*object*/
+        if (dirty[0] & /*object*/
         1 && t_value !== (t_value = /*item*/
-        ctx2[13].name + ""))
+        ctx2[24].name + ""))
           set_data(t, t_value);
       },
       d(detaching) {
@@ -15336,14 +15632,14 @@
     let i_1_class_value;
     let t0_value = (
       /*item*/
-      ctx[13].name + ""
+      ctx[24].name + ""
     );
     let t0;
     let t1;
     let if_block_anchor;
     let if_block = (
       /*item*/
-      ctx[13].data && create_if_block_3(ctx)
+      ctx[24].data && create_if_block_3(ctx)
     );
     return {
       c() {
@@ -15356,7 +15652,7 @@
         if_block_anchor = empty();
         attr(i_1, "class", i_1_class_value = "bi bi-" + class_icons_default(
           /*item*/
-          ctx[13].name
+          ctx[24].name
         ) + " text-light pe-2");
         attr(li, "class", "list-group-item");
       },
@@ -15370,20 +15666,20 @@
         insert(target, if_block_anchor, anchor);
       },
       p(ctx2, dirty) {
-        if (dirty & /*object*/
+        if (dirty[0] & /*object*/
         1 && i_1_class_value !== (i_1_class_value = "bi bi-" + class_icons_default(
           /*item*/
-          ctx2[13].name
+          ctx2[24].name
         ) + " text-light pe-2")) {
           attr(i_1, "class", i_1_class_value);
         }
-        if (dirty & /*object*/
+        if (dirty[0] & /*object*/
         1 && t0_value !== (t0_value = /*item*/
-        ctx2[13].name + ""))
+        ctx2[24].name + ""))
           set_data(t0, t0_value);
         if (
           /*item*/
-          ctx2[13].data
+          ctx2[24].data
         ) {
           if (if_block) {
             if_block.p(ctx2, dirty);
@@ -15410,23 +15706,166 @@
   }
   __name(create_each_block3, "create_each_block");
   function create_fragment9(ctx) {
-    let if_block_anchor;
+    let div3;
+    let div0;
+    let t0;
+    let t1;
+    let t2_value = parseInt(
+      /*$w*/
+      ctx[6]
+    ) + "";
+    let t2;
+    let t3;
+    let t4_value = parseInt(
+      /*$h*/
+      ctx[7]
+    ) + "";
+    let t4;
+    let t5;
+    let button0;
+    let api_makeMovable_action;
+    let t6;
+    let div1;
+    let api_stopWheel_action;
+    let t7;
+    let div2;
+    let t8;
+    let t9;
+    let button1;
+    let api_makeResizable_action;
+    let div3_class_value;
+    let mounted;
+    let dispose;
     let if_block = (
       /*object*/
       ctx[0] && create_if_block3(ctx)
     );
     return {
       c() {
+        div3 = element("div");
+        div0 = element("div");
+        t0 = text2(
+          /*$caption*/
+          ctx[5]
+        );
+        t1 = text2(" (");
+        t2 = text2(t2_value);
+        t3 = text2("x");
+        t4 = text2(t4_value);
+        t5 = text2(")\n    ");
+        button0 = element("button");
+        button0.innerHTML = `<i class="bi bi-x"></i>`;
+        t6 = space();
+        div1 = element("div");
         if (if_block)
           if_block.c();
-        if_block_anchor = empty();
+        t7 = space();
+        div2 = element("div");
+        t8 = text2(
+          /*$status*/
+          ctx[8]
+        );
+        t9 = space();
+        button1 = element("button");
+        button1.innerHTML = `<i class="bi bi-grip-horizontal"></i>`;
+        attr(button0, "type", "button");
+        attr(button0, "class", "btn opacity-50");
+        set_style(button0, "position", "absolute");
+        set_style(button0, "right", "0");
+        set_style(button0, "top", "0");
+        set_style(button0, "padding", ".5rem");
+        attr(button0, "aria-label", "Close");
+        attr(div0, "class", "card-header user-select-none");
+        toggle_class(
+          div0,
+          "text-warning",
+          /*$selected*/
+          ctx[4]
+        );
+        attr(div1, "class", "card-body overflow-auto");
+        attr(button1, "type", "button");
+        attr(button1, "class", "btn opacity-50");
+        set_style(button1, "position", "absolute");
+        set_style(button1, "right", "0");
+        set_style(button1, "bottom", "0");
+        set_style(button1, "padding", ".5rem");
+        attr(button1, "aria-label", "Resize");
+        attr(div2, "class", "card-footer text-body-secondary");
+        attr(div3, "class", div3_class_value = "card text-bg-" + /*$context*/
+        ctx[3] + " h-100 m-0");
+        toggle_class(
+          div3,
+          "active",
+          /*$selected*/
+          ctx[4]
+        );
       },
       m(target, anchor) {
+        insert(target, div3, anchor);
+        append(div3, div0);
+        append(div0, t0);
+        append(div0, t1);
+        append(div0, t2);
+        append(div0, t3);
+        append(div0, t4);
+        append(div0, t5);
+        append(div0, button0);
+        append(div3, t6);
+        append(div3, div1);
         if (if_block)
-          if_block.m(target, anchor);
-        insert(target, if_block_anchor, anchor);
+          if_block.m(div1, null);
+        append(div3, t7);
+        append(div3, div2);
+        append(div2, t8);
+        append(div2, t9);
+        append(div2, button1);
+        if (!mounted) {
+          dispose = [
+            listen(
+              button0,
+              "click",
+              /*click_handler*/
+              ctx[17]
+            ),
+            action_destroyer(api_makeMovable_action = /*api*/
+            ctx[1].makeMovable(div0)),
+            action_destroyer(api_stopWheel_action = /*api*/
+            ctx[1].stopWheel(div1)),
+            action_destroyer(api_makeResizable_action = /*api*/
+            ctx[1].makeResizable(button1))
+          ];
+          mounted = true;
+        }
       },
-      p(ctx2, [dirty]) {
+      p(ctx2, dirty) {
+        if (dirty[0] & /*$caption*/
+        32)
+          set_data(
+            t0,
+            /*$caption*/
+            ctx2[5]
+          );
+        if (dirty[0] & /*$w*/
+        64 && t2_value !== (t2_value = parseInt(
+          /*$w*/
+          ctx2[6]
+        ) + ""))
+          set_data(t2, t2_value);
+        if (dirty[0] & /*$h*/
+        128 && t4_value !== (t4_value = parseInt(
+          /*$h*/
+          ctx2[7]
+        ) + ""))
+          set_data(t4, t4_value);
+        if (dirty[0] & /*$selected*/
+        16) {
+          toggle_class(
+            div0,
+            "text-warning",
+            /*$selected*/
+            ctx2[4]
+          );
+        }
         if (
           /*object*/
           ctx2[0]
@@ -15436,36 +15875,71 @@
           } else {
             if_block = create_if_block3(ctx2);
             if_block.c();
-            if_block.m(if_block_anchor.parentNode, if_block_anchor);
+            if_block.m(div1, null);
           }
         } else if (if_block) {
           if_block.d(1);
           if_block = null;
+        }
+        if (dirty[0] & /*$status*/
+        256)
+          set_data(
+            t8,
+            /*$status*/
+            ctx2[8]
+          );
+        if (dirty[0] & /*$context*/
+        8 && div3_class_value !== (div3_class_value = "card text-bg-" + /*$context*/
+        ctx2[3] + " h-100 m-0")) {
+          attr(div3, "class", div3_class_value);
+        }
+        if (dirty[0] & /*$context, $selected*/
+        24) {
+          toggle_class(
+            div3,
+            "active",
+            /*$selected*/
+            ctx2[4]
+          );
         }
       },
       i: noop,
       o: noop,
       d(detaching) {
         if (detaching) {
-          detach(if_block_anchor);
+          detach(div3);
         }
         if (if_block)
-          if_block.d(detaching);
+          if_block.d();
+        mounted = false;
+        run_all(dispose);
       }
     };
   }
   __name(create_fragment9, "create_fragment");
   function instance9($$self, $$props, $$invalidate) {
-    let $x, $$unsubscribe_x = noop, $$subscribe_x = /* @__PURE__ */ __name(() => ($$unsubscribe_x(), $$unsubscribe_x = subscribe(x, ($$value) => $$invalidate(4, $x = $$value)), x), "$$subscribe_x");
-    let $y, $$unsubscribe_y = noop, $$subscribe_y = /* @__PURE__ */ __name(() => ($$unsubscribe_y(), $$unsubscribe_y = subscribe(y, ($$value) => $$invalidate(5, $y = $$value)), y), "$$subscribe_y");
-    $$self.$$.on_destroy.push(() => $$unsubscribe_x());
-    $$self.$$.on_destroy.push(() => $$unsubscribe_y());
+    let $context;
+    let $selected;
+    let $caption;
+    let $w;
+    let $h;
+    let $status;
     let { stores } = $$props;
     let { object } = $$props;
-    let { x } = $$props;
-    $$subscribe_x();
-    let { y } = $$props;
-    $$subscribe_y();
+    let { api } = $$props;
+    const context = api.signal("context");
+    component_subscribe($$self, context, (value) => $$invalidate(3, $context = value));
+    const caption = api.signal("caption");
+    component_subscribe($$self, caption, (value) => $$invalidate(5, $caption = value));
+    const text3 = api.signal("text");
+    const status = api.signal("status");
+    component_subscribe($$self, status, (value) => $$invalidate(8, $status = value));
+    const w = api.signal("w");
+    component_subscribe($$self, w, (value) => $$invalidate(6, $w = value));
+    const h = api.signal("h");
+    component_subscribe($$self, h, (value) => $$invalidate(7, $h = value));
+    const selected = api.signal("selected");
+    component_subscribe($$self, selected, (value) => $$invalidate(4, $selected = value));
     let { paneItems } = $$props;
     let opened = {
       children: true,
@@ -15473,35 +15947,44 @@
       Method: true,
       Observables: true
     };
-    const click_handler = /* @__PURE__ */ __name((feature) => $$invalidate(3, opened[feature] = !opened[feature], opened), "click_handler");
-    const click_handler_1 = /* @__PURE__ */ __name((feature) => $$invalidate(3, opened[feature] = !opened[feature], opened), "click_handler_1");
-    const click_handler_2 = /* @__PURE__ */ __name((feature) => $$invalidate(3, opened[feature] = !opened[feature], opened), "click_handler_2");
-    const click_handler_3 = /* @__PURE__ */ __name((feature) => $$invalidate(3, opened[feature] = !opened[feature], opened), "click_handler_3");
+    const click_handler = /* @__PURE__ */ __name(() => api.removeApplication(), "click_handler");
+    const click_handler_1 = /* @__PURE__ */ __name((feature) => $$invalidate(2, opened[feature] = !opened[feature], opened), "click_handler_1");
+    const click_handler_2 = /* @__PURE__ */ __name((feature) => $$invalidate(2, opened[feature] = !opened[feature], opened), "click_handler_2");
+    const click_handler_3 = /* @__PURE__ */ __name((feature) => $$invalidate(2, opened[feature] = !opened[feature], opened), "click_handler_3");
+    const click_handler_4 = /* @__PURE__ */ __name((feature) => $$invalidate(2, opened[feature] = !opened[feature], opened), "click_handler_4");
     $$self.$$set = ($$props2) => {
       if ("stores" in $$props2)
-        $$invalidate(6, stores = $$props2.stores);
+        $$invalidate(15, stores = $$props2.stores);
       if ("object" in $$props2)
         $$invalidate(0, object = $$props2.object);
-      if ("x" in $$props2)
-        $$subscribe_x($$invalidate(1, x = $$props2.x));
-      if ("y" in $$props2)
-        $$subscribe_y($$invalidate(2, y = $$props2.y));
+      if ("api" in $$props2)
+        $$invalidate(1, api = $$props2.api);
       if ("paneItems" in $$props2)
-        $$invalidate(7, paneItems = $$props2.paneItems);
+        $$invalidate(16, paneItems = $$props2.paneItems);
     };
     return [
       object,
-      x,
-      y,
+      api,
       opened,
-      $x,
-      $y,
+      $context,
+      $selected,
+      $caption,
+      $w,
+      $h,
+      $status,
+      context,
+      caption,
+      status,
+      w,
+      h,
+      selected,
       stores,
       paneItems,
       click_handler,
       click_handler_1,
       click_handler_2,
-      click_handler_3
+      click_handler_3,
+      click_handler_4
     ];
   }
   __name(instance9, "instance");
@@ -15511,13 +15994,21 @@
     }
     constructor(options) {
       super();
-      init(this, options, instance9, create_fragment9, safe_not_equal, {
-        stores: 6,
-        object: 0,
-        x: 1,
-        y: 2,
-        paneItems: 7
-      });
+      init(
+        this,
+        options,
+        instance9,
+        create_fragment9,
+        safe_not_equal,
+        {
+          stores: 15,
+          object: 0,
+          api: 1,
+          paneItems: 16
+        },
+        null,
+        [-1, -1]
+      );
     }
   };
   var Interface_default3 = Interface3;
@@ -15558,18 +16049,14 @@
       mount() {
         this.foreign = new Instance(Foreign);
         this.createWindowComponent(this.foreign);
-        this.xWritable = writable(0);
-        this.yWritable = writable(0);
         this.component = new Interface_default3({
           target: this.foreign.body,
           props: {
-            x: this.xWritable,
-            y: this.yWritable,
+            api: this,
             object: null,
             paneItems: stores_default2.getPaneItems(this.getRoot())
           }
         });
-        this.addDisposable(stopWheel(this.foreign.body));
         this.pipe.on("in", (packet) => {
           const object = packet.object || this.getRoot().applications.get(packet.id);
           this.component.$set({ object });
@@ -15595,6 +16082,7 @@
     let t3;
     let p0;
     let t4;
+    let api_stopWheel_action;
     let t5;
     let hr;
     let t6;
@@ -15613,22 +16101,22 @@
         t1 = space();
         h4 = element("h4");
         t2 = text2(
-          /*caption*/
-          ctx[1]
+          /*$caption*/
+          ctx[3]
         );
         t3 = space();
         p0 = element("p");
         t4 = text2(
-          /*text*/
-          ctx[3]
+          /*$text*/
+          ctx[4]
         );
         t5 = space();
         hr = element("hr");
         t6 = space();
         p1 = element("p");
         t7 = text2(
-          /*note*/
-          ctx[4]
+          /*$status*/
+          ctx[5]
         );
         attr(button0, "type", "button");
         attr(button0, "class", "btn-close");
@@ -15645,17 +16133,18 @@
           h4,
           "text-warning",
           /*$selected*/
-          ctx[5]
+          ctx[2]
         );
+        attr(p0, "class", "overflow-auto");
         attr(p1, "class", "mb-0");
-        attr(div, "class", div_class_value = "alert alert-" + /*context*/
-        ctx[2] + " alert-dismissible h-100 m-0");
+        attr(div, "class", div_class_value = "alert alert-" + /*$context*/
+        ctx[1] + " alert-dismissible h-100 m-0");
         attr(div, "role", "alert");
         toggle_class(
           div,
           "active",
           /*$selected*/
-          ctx[5]
+          ctx[2]
         );
       },
       m(target, anchor) {
@@ -15680,59 +16169,61 @@
               button0,
               "click",
               /*click_handler*/
-              ctx[7]
+              ctx[11]
             ),
             action_destroyer(api_makeResizable_action = /*api*/
             ctx[0].makeResizable(button1)),
             action_destroyer(api_makeMovable_action = /*api*/
-            ctx[0].makeMovable(h4))
+            ctx[0].makeMovable(h4)),
+            action_destroyer(api_stopWheel_action = /*api*/
+            ctx[0].stopWheel(p0))
           ];
           mounted = true;
         }
       },
       p(ctx2, [dirty]) {
-        if (dirty & /*caption*/
-        2)
+        if (dirty & /*$caption*/
+        8)
           set_data(
             t2,
-            /*caption*/
-            ctx2[1]
+            /*$caption*/
+            ctx2[3]
           );
         if (dirty & /*$selected*/
-        32) {
+        4) {
           toggle_class(
             h4,
             "text-warning",
             /*$selected*/
-            ctx2[5]
+            ctx2[2]
           );
         }
-        if (dirty & /*text*/
-        8)
-          set_data(
-            t4,
-            /*text*/
-            ctx2[3]
-          );
-        if (dirty & /*note*/
+        if (dirty & /*$text*/
         16)
           set_data(
-            t7,
-            /*note*/
+            t4,
+            /*$text*/
             ctx2[4]
           );
-        if (dirty & /*context*/
-        4 && div_class_value !== (div_class_value = "alert alert-" + /*context*/
-        ctx2[2] + " alert-dismissible h-100 m-0")) {
+        if (dirty & /*$status*/
+        32)
+          set_data(
+            t7,
+            /*$status*/
+            ctx2[5]
+          );
+        if (dirty & /*$context*/
+        2 && div_class_value !== (div_class_value = "alert alert-" + /*$context*/
+        ctx2[1] + " alert-dismissible h-100 m-0")) {
           attr(div, "class", div_class_value);
         }
-        if (dirty & /*context, $selected*/
-        36) {
+        if (dirty & /*$context, $selected*/
+        6) {
           toggle_class(
             div,
             "active",
             /*$selected*/
-            ctx2[5]
+            ctx2[2]
           );
         }
       },
@@ -15749,28 +16240,42 @@
   }
   __name(create_fragment10, "create_fragment");
   function instance10($$self, $$props, $$invalidate) {
+    let $context;
     let $selected;
+    let $caption;
+    let $text;
+    let $status;
     let { api } = $$props;
-    let { caption } = $$props;
-    let { context } = $$props;
-    let { text: text3 } = $$props;
-    let { note } = $$props;
+    const caption = api.signal("caption");
+    component_subscribe($$self, caption, (value) => $$invalidate(3, $caption = value));
+    const context = api.signal("context");
+    component_subscribe($$self, context, (value) => $$invalidate(1, $context = value));
+    const text3 = api.signal("text");
+    component_subscribe($$self, text3, (value) => $$invalidate(4, $text = value));
+    const status = api.signal("status");
+    component_subscribe($$self, status, (value) => $$invalidate(5, $status = value));
+    1;
     const selected = api.signal("selected");
-    component_subscribe($$self, selected, (value) => $$invalidate(5, $selected = value));
+    component_subscribe($$self, selected, (value) => $$invalidate(2, $selected = value));
     const click_handler = /* @__PURE__ */ __name(() => api.removeApplication(), "click_handler");
     $$self.$$set = ($$props2) => {
       if ("api" in $$props2)
         $$invalidate(0, api = $$props2.api);
-      if ("caption" in $$props2)
-        $$invalidate(1, caption = $$props2.caption);
-      if ("context" in $$props2)
-        $$invalidate(2, context = $$props2.context);
-      if ("text" in $$props2)
-        $$invalidate(3, text3 = $$props2.text);
-      if ("note" in $$props2)
-        $$invalidate(4, note = $$props2.note);
     };
-    return [api, caption, context, text3, note, $selected, selected, click_handler];
+    return [
+      api,
+      $context,
+      $selected,
+      $caption,
+      $text,
+      $status,
+      caption,
+      context,
+      text3,
+      status,
+      selected,
+      click_handler
+    ];
   }
   __name(instance10, "instance");
   var Interface4 = class extends SvelteComponent {
@@ -15779,13 +16284,7 @@
     }
     constructor(options) {
       super();
-      init(this, options, instance10, create_fragment10, safe_not_equal, {
-        api: 0,
-        caption: 1,
-        context: 2,
-        text: 3,
-        note: 4
-      });
+      init(this, options, instance10, create_fragment10, safe_not_equal, { api: 0 });
     }
   };
   var Interface_default4 = Interface4;
@@ -15796,11 +16295,7 @@
       __name(this, "Alert");
     }
     static extends = [Application];
-    observables = {
-      context: "primary",
-      text: void 0,
-      note: void 0
-    };
+    observables = {};
     methods = {
       initialize() {
         this.serializables = "title context text note".split(" ");
@@ -15810,19 +16305,8 @@
         this.createWindowComponent(this.foreign);
         this.component = new Interface_default4({
           target: this.foreign.body,
-          props: {
-            api: this,
-            caption: this.caption,
-            context: this.context,
-            text: this.text,
-            note: this.note,
-            send: this.send.bind(this)
-          }
+          props: { api: this }
         });
-        this.on("name", (title) => this.component.$set({ title }));
-        this.on("text", (text3) => this.component.$set({ text: text3 }));
-        this.on("note", (note) => this.component.$set({ note }));
-        this.on("context", (context) => this.component.$set({ context }));
         this.addDisposable(stopWheel(this.foreign.body));
       },
       destroy() {

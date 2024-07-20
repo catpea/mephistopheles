@@ -8,9 +8,6 @@ export default class Hello {
   static extends = [Application];
 
   observables = {
-    context: 'primary',
-    text: 'Hello World',
-    note: 'This is a note',
   };
 
 

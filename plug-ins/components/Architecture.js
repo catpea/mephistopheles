@@ -25,7 +25,7 @@ export default class Architecture {
       this.component = new Interface({
           target: this.foreign.body,
           props: {
-            send: this.send.bind(this),
+            api: this,
             tree: stores.getApplicationTree(this)
           }
       });

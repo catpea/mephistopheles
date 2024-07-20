@@ -8,9 +8,6 @@ export default class Alert {
   static extends = [Application];
 
   observables = {
-    context: 'primary',
-    text: undefined,
-    note: undefined,
   };
 
 
@@ -26,20 +23,10 @@ export default class Alert {
 
       this.component = new Interface({
           target: this.foreign.body,
-          props: {
-            api: this,
-            caption: this.caption,
-            context: this.context,
-            text: this.text,
-            note: this.note,
-            send: this.send.bind(this),
-          }
+          props: { api: this }
       });
 
-      this.on('name', title=>this.component.$set({title}))
-      this.on('text', text=>this.component.$set({text}))
-      this.on('note', note=>this.component.$set({note}))
-      this.on('context', context=>this.component.$set({context}))
+
 
       this.addDisposable( stopWheel(this.foreign.body) );
 

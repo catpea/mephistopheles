@@ -4,7 +4,7 @@
   import classIcons from '/plug-ins/class-icons/index.js';
 
   export let item;
-  export let send;
+  export let api;
   export let controller;
 
   // local state
@@ -21,7 +21,7 @@
         <i class="bi bi-caret-right-fill align-top opacity-50" on:click={()=>open=!open}></i>
       {/if}
     {/if}
-    <span class="ps-2 text-muted" style="cursor: pointer;" on:click={()=>send('out', {object:item.object})}>{item.name}</span>
+    <span class="ps-2 text-muted" style="cursor: pointer;" on:click={()=>api.send('out', {object:item.object})}>{item.name}</span>
     <small class="opacity-50 float-end">
       {item.type}
       <i class="bi bi-{classIcons(item.type)} text-light ps-2" title="{item.id}"></i>
@@ -30,7 +30,7 @@
   {#if open}
     <ul class="list-unstyled ps-4" transition:slide={{ delay: 1, duration: 300, easing: quintOut, axis: 'y' }}>
       {#each item.children as item (item.id)}
-        <svelte:self {controller} {send} {item}/>
+        <svelte:self {controller} {api} {item}/>
       {/each}
     </ul>
   {/if}

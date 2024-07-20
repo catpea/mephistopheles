@@ -6,8 +6,15 @@
   export let stores;
   export let object;
 
-  export let x;
-  export let y;
+  export let api;
+
+  const context = api.signal('context');
+  const caption = api.signal('caption');
+  const text = api.signal('text');
+  const status = api.signal('status');
+  const w = api.signal('w');
+  const h = api.signal('h');
+  const selected = api.signal('selected');
 
   export let paneItems;
 
@@ -20,21 +27,29 @@
 
 </script>
 
-{#if object}
+<!-- <div use:api.stopWheel> -->
+<!--
 
-  <div class="container-fluid pt-3">
+style="height: {h}px;"
+style="overflow-y: scroll"
+ -->
+<div class="card text-bg-{$context} h-100 m-0" class:active={$selected} >
 
-      <div class="row">
-        <div class="col">
-        <h3>
-          {object.oo.name} Class;
-          <small class="text-body-secondary">id:{object.id} <span style="font-size: .92rem;">({$x}x{$y})<span></small>
-        </h3>
-        </div>
-      </div>
+  <div class="card-header user-select-none" class:text-warning={$selected} use:api.makeMovable>
+    {$caption} ({parseInt($w)}x{parseInt($h)})
+    <button type="button" class="btn opacity-50" style="position: absolute; right:0; top:0; padding: .5rem;" aria-label="Close" on:click={()=>api.removeApplication()}><i class="bi bi-x"></i></button>
+  </div>
 
-      <div class="row">
-      <div class="col">
+  <div class="card-body overflow-auto" use:api.stopWheel>
+
+  {#if object}
+
+    <h3>
+      {object.oo.name} Class;
+      <small class="text-body-secondary">id:{object.id} <span style="font-size: .92rem;"><span></small>
+    </h3>
+
+      <div class="">
 
 
       <nav aria-label="breadcrumb">
@@ -166,9 +181,18 @@
 
 
         </div>
-        </div>
 
 
 
-  </div>
 {/if}
+
+
+
+</div>
+<div class="card-footer text-body-secondary">
+  {$status}
+  <button type="button" class="btn opacity-50" style="position: absolute; right:0; bottom:0; padding: .5rem;" aria-label="Resize" use:api.makeResizable><i class="bi bi-grip-horizontal"></i></button>
+</div>
+</div>
+
+<!-- </div> -->

@@ -6,7 +6,7 @@
   const context = api.signal('context');
   const caption = api.signal('caption');
   const text = api.signal('text');
-  const note = api.signal('note');
+  const status = api.signal('status');
 
   const w = api.signal('w');
   const h = api.signal('h');
@@ -26,13 +26,13 @@
 
 </script>
 
-<div class="card alert-{$context} h-100 m-0" class:active={$selected} style="overflow-y: scroll;">
+<div class="card alert-{$context} h-100 m-0" class:active={$selected}>
   <div class="card-header user-select-none" class:text-warning={$selected} use:api.makeMovable>
     {$caption} ({parseInt($w)}x{parseInt($h)})
     <button type="button" class="btn opacity-50" style="position: absolute; right:0; top:0; padding: .5rem;" aria-label="Close" on:click={()=>api.removeApplication()}><i class="bi bi-x"></i></button>
 
   </div>
-  <div class="card-body">
+  <div class="card-body overflow-auto" use:api.stopWheel>
 
   <p>{$text}</p>
 
@@ -91,7 +91,7 @@
 
 
   <div class="card-footer text-body-secondary">
-    {$note}
+    {$status}
     <button type="button" class="btn opacity-50" style="position: absolute; right:0; bottom:0; padding: .5rem;" aria-label="Resize" use:api.makeResizable><i class="bi bi-grip-horizontal"></i></button>
   </div>
 

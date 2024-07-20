@@ -2,6 +2,8 @@
   "Backspace": "Remove",
   "Delete": "Remove",
   "1": "Unzoom",
+  "2": "Halfzoom",
+  "3": "Minimap",
 
   "Bork":"Bork"
 }

@@ -1,5 +1,7 @@
 import {Instance} from "/plug-ins/object-oriented-programming/index.js";
 import Window from "/plug-ins/windows/Window.js";
+import Bootstrap from "/plug-ins/windows/framework/Bootstrap.js";
+import Svelte from "/plug-ins/windows/framework/Svelte.js";
 import prioritySort from "/plug-ins/priority-sort/index.js";
 import EventEmitter from "/plug-ins/event-emitter/EventEmitter.js";
 
@@ -9,7 +11,7 @@ import Resize from "/plug-ins/mouse-services/Resize.js";
 import Select from "/plug-ins/mouse-services/Select.js";
 
 export default class Application {
-  static extends = [Window];
+  static extends = [Svelte, Bootstrap, Window];
 
   properties = {
     isApplication: true,

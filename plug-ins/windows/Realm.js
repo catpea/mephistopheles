@@ -201,6 +201,7 @@ export default class Realm {
       // NOTE: this uses mouse-services/Menu, triggers openMenu on root window, which will open /windows/menu
 
       const menu = new Menu({
+
         area: realmBody.body,
         transforms: ()=>this.getTransforms(this),
         show: ({x,y,tx,ty})=>{ // NOTE: tx and ty are translated
@@ -211,6 +212,7 @@ export default class Realm {
             x,y,
             root: this.getApplication().node.id,
             text: `New ${className}`,
+            icon: className,
             value: className,
             action:()=>{
               const node = new Instance(Node, {
@@ -291,9 +293,30 @@ export default class Realm {
 
 
       this.addDisposableFromSmartEmitter( this.getRoot().keyboard, 'Unzoom', ()=>{
-        this.zoom = 1;
+        const newZoom = 1;
+        const newPanX = this.panX * (newZoom / this.zoom) - (this.w * (newZoom / this.zoom - 1) / 2)
+        const newPanY = this.panY * (newZoom / this.zoom) - (this.h * (newZoom / this.zoom - 1) / 2)
+        this.panX = newPanX;
+        this.panY = newPanY;
+        this.zoom = newZoom;
       });
-      
+      this.addDisposableFromSmartEmitter( this.getRoot().keyboard, 'Halfzoom', ()=>{
+        const newZoom = .5;
+        const newPanX = this.panX * (newZoom / this.zoom) - (this.w * (newZoom / this.zoom - 1) / 2)
+        const newPanY = this.panY * (newZoom / this.zoom) - (this.h * (newZoom / this.zoom - 1) / 2)
+        this.panX = newPanX;
+        this.panY = newPanY;
+        this.zoom = newZoom;
+      });
+      this.addDisposableFromSmartEmitter( this.getRoot().keyboard, 'Minimap', ()=>{
+        const newZoom = .1;
+        const newPanX = this.panX * (newZoom / this.zoom) - (this.w * (newZoom / this.zoom - 1) / 2)
+        const newPanY = this.panY * (newZoom / this.zoom) - (this.h * (newZoom / this.zoom - 1) / 2)
+        this.panX = newPanX;
+        this.panY = newPanY;
+        this.zoom = newZoom;
+      });
+
     },
 
     clean(){

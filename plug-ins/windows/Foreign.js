@@ -40,7 +40,8 @@ export default class Foreign {
 
       this.body = html.div({
         style: {
-          'overflow-y': 'scroll',
+          width: this.w,
+          height: this.h,
         }
       });
 

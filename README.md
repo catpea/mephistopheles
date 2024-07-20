@@ -3,6 +3,7 @@ A Visual Programming Language
 
 ## TODO
 
+- [ ] unzoom panning should center on cener of screen
 - [ ] promote ```const serializables =  'id x y w h'.split(' ');``` to object-oriented...
 - [ ] serializables should indicate type! {id:'string', showCaption:'Boolean'}
 
