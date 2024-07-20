@@ -23,8 +23,8 @@ export default class Window {
   observables = {
     caption: 'Untitled',
 
-    showCaption: true,
-    isResizable: true,
+    showCaption: false,
+    isResizable: false,
     showMenu: false,
     showStatus: false,
 
@@ -56,8 +56,14 @@ export default class Window {
       if(this.oo.name == 'Pipe') return;
 
         this.r = 5;
-        this.b = 5;
+        this.b = 0;
         this.s = 3;
+
+
+
+    },
+
+    mount(){
 
       if(this.isResizable){
         let width = 32;
@@ -91,11 +97,7 @@ export default class Window {
         this.addDisposable(resize);
 
       }
-
-    },
-
-    mount(){
-
+      
       // ADD DRAGGABLE CAPTION (aka handle)
       this.draw(); // WARNING: you must draw the window before drawing the caption, so that the caption is on top
 

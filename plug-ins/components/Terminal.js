@@ -12,6 +12,16 @@ export default class Terminal {
 
   methods = {
 
+    initialize(){
+      this.showCaption = true;
+      this.isResizable = true;
+      this.b = 5;
+
+      this.createSocket('in', 0);
+      this.createSocket('out', 1);
+
+    },
+
     mount(){
 
       this.foreign = new Instance(Foreign);
@@ -122,6 +132,8 @@ export default class Terminal {
               term.writeln(['Gatehring data...'].join('\r\n'));
               const xml = this.getRoot().saveXml();
               term.writeln(xml);
+              this.send('out', xml)
+
               term.writeln(['Save complete', 'data printed in the web console'].join('\r\n'));
               term.prompt(term);
             },
@@ -152,6 +164,14 @@ export default class Terminal {
 
 
       runFakeTerm();
+
+
+      this.pipe.on('in', (packet)=>{
+        const object = packet.object||this.getRoot().applications.get(packet.id);
+        term.writeln( JSON.stringify(packet) );
+
+      })
+
     },
 
     destroy(){

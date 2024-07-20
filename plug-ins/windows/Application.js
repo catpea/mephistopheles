@@ -3,6 +3,11 @@ import Window from "/plug-ins/windows/Window.js";
 import prioritySort from "/plug-ins/priority-sort/index.js";
 import EventEmitter from "/plug-ins/event-emitter/EventEmitter.js";
 
+import Move from "/plug-ins/mouse-services/Move.js";
+import Focus from "/plug-ins/mouse-services/Focus.js";
+import Resize from "/plug-ins/mouse-services/Resize.js";
+import Select from "/plug-ins/mouse-services/Select.js";
+
 export default class Application {
   static extends = [Window];
 
@@ -17,6 +22,48 @@ export default class Application {
   };
 
   traits = {
+
+    makeResizable(el){
+      const resize = new Resize({
+        area: window,
+        minimumX:128,
+        minimumY:128,
+        handle: el,
+        scale: ()=>this.getScale(this),
+        box:  this.getApplication(this),
+        before: ()=>{},
+        movement: ({x,y})=>{},
+        after: ()=>{},
+      });
+
+      this.addDisposable(resize);
+    },
+
+    makeMovable(el){
+      const move = new Move({
+        area: window,
+        handle: el,
+        scale: ()=>this.getScale(this),
+        before: ()=>{},
+        movement: ({x,y})=>{
+          this.node.x -= x;
+          this.node.y -= y;
+        },
+        after: ()=>{},
+      });
+      this.addDisposable(move);
+      const select = new Select({
+        component: this,
+        handle: el,
+      });
+      this.addDisposable(select);
+      const focus = new Focus({
+        handle: this.scene, // TIP: set to caption above to react to window captions only
+        component: this,
+        element: ()=> this.scene,
+      });
+      this.addDisposable(focus);
+    },
 
 
       removeApplication(){

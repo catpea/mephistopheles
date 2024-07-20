@@ -6696,6 +6696,19 @@
         }, "callback2");
         return observables.map((event) => this.on(event, callback2, void 0, { manualDispose: true }));
       };
+      this.signal = function(name) {
+        return {
+          get value() {
+            return this[name];
+          },
+          set value(v) {
+            this[name] = v;
+          },
+          subscribe: (subscriber) => {
+            return this.on(name, subscriber, { manual: true });
+          }
+        };
+      };
       const stateConstraints = {};
       const stateConstraint = /* @__PURE__ */ __name(function(constraints, constraintName) {
         if (constraints[constraintName]) {
@@ -8546,8 +8559,8 @@
     static extends = [Sockets, Vertical];
     observables = {
       caption: "Untitled",
-      showCaption: true,
-      isResizable: true,
+      showCaption: false,
+      isResizable: false,
       showMenu: false,
       showStatus: false
       // selected: false,
@@ -8569,8 +8582,10 @@
         if (this.oo.name == "Pipe")
           return;
         this.r = 5;
-        this.b = 5;
+        this.b = 0;
         this.s = 3;
+      },
+      mount() {
         if (this.isResizable) {
           let width = 32;
           let height = 32;
@@ -8601,8 +8616,6 @@
           });
           this.addDisposable(resize);
         }
-      },
-      mount() {
         this.draw();
         if (this.isRootWindow)
           return;
@@ -8675,6 +8688,51 @@
       url: null
     };
     traits = {
+      makeResizable(el) {
+        const resize = new Resize({
+          area: window,
+          minimumX: 128,
+          minimumY: 128,
+          handle: el,
+          scale: () => this.getScale(this),
+          box: this.getApplication(this),
+          before: () => {
+          },
+          movement: ({ x, y }) => {
+          },
+          after: () => {
+          }
+        });
+        this.addDisposable(resize);
+      },
+      makeMovable(el) {
+        const move = new Move_default({
+          area: window,
+          handle: el,
+          scale: () => this.getScale(this),
+          before: () => {
+          },
+          movement: ({ x, y }) => {
+            this.node.x -= x;
+            this.node.y -= y;
+          },
+          after: () => {
+          }
+        });
+        this.addDisposable(move);
+        const select = new Select({
+          component: this,
+          handle: el
+        });
+        this.addDisposable(select);
+        const focus = new Focus({
+          handle: this.scene,
+          // TIP: set to caption above to react to window captions only
+          component: this,
+          element: () => this.scene
+        });
+        this.addDisposable(focus);
+      },
       removeApplication() {
         const item = this;
         const realm = item.getGroup().realm;
@@ -9135,6 +9193,14 @@
     return unsub.unsubscribe ? () => unsub.unsubscribe() : unsub;
   }
   __name(subscribe, "subscribe");
+  function component_subscribe(component, store, callback) {
+    component.$$.on_destroy.push(subscribe(store, callback));
+  }
+  __name(component_subscribe, "component_subscribe");
+  function action_destroyer(action_result) {
+    return action_result && is_function(action_result.destroy) ? action_result.destroy : noop;
+  }
+  __name(action_destroyer, "action_destroyer");
 
   // node_modules/svelte/src/runtime/internal/environment.js
   var is_client = typeof window !== "undefined";
@@ -11507,70 +11573,184 @@
     };
   };
 
-  // plug-ins/components/hello/index.svelte
+  // plug-ins/class-icons/index.js
+  function class_icons_default(className) {
+    let response;
+    switch (className) {
+      case "Workspace":
+        response = "box";
+        break;
+      case "Window":
+        response = "window-fullscreen";
+        break;
+      case "Terminal":
+        response = "terminal";
+        break;
+      case "Editor":
+        response = "window-sidebar";
+        break;
+      case "Architecture":
+        response = "gem";
+        break;
+      case "Analysis":
+        response = "diagram-3";
+        break;
+      case "Pipe":
+        response = "share-fill";
+        break;
+      case "Realm":
+        response = "globe";
+        break;
+      case "Caption":
+        response = "usb";
+        break;
+      case "Label":
+        response = "alphabet";
+        break;
+      case "Foreign":
+        response = "wrench-adjustable";
+        break;
+      case "Sockets":
+        response = "node-plus";
+        break;
+      case "Vertical":
+        response = "arrows-vertical";
+        break;
+      case "Hortizontal":
+        response = "arrows";
+        break;
+      case "Container":
+        response = "box2-heart";
+        break;
+      case "Component":
+        response = "heart-pulse";
+        break;
+      case "Application":
+        response = "brightness-high";
+        break;
+      case "Trait":
+        response = "gear-wide";
+        break;
+      case "Method":
+        response = "gear-wide-connected";
+        break;
+      case "Group":
+        response = "box";
+        break;
+      case "Viewport":
+        response = "binoculars";
+        break;
+      default:
+        response = "list";
+    }
+    return response;
+  }
+  __name(class_icons_default, "default");
+
+  // plug-ins/components/hello/Interface.svelte
   function create_fragment6(ctx) {
-    let div7;
-    let div2;
+    let div10;
+    let div0;
+    let t0;
     let t1;
-    let label0;
+    let t2_value = parseInt(
+      /*$w*/
+      ctx[7]
+    ) + "";
+    let t2;
     let t3;
-    let input2;
+    let t4_value = parseInt(
+      /*$h*/
+      ctx[8]
+    ) + "";
     let t4;
+    let t5;
+    let button0;
+    let api_makeMovable_action;
+    let t6;
+    let div8;
+    let p0;
+    let t7;
+    let t8;
+    let div3;
+    let t10;
+    let label0;
+    let t12;
+    let input2;
+    let t13;
     let datalist;
     let option0;
     let option1;
     let option2;
     let option3;
     let option4;
-    let t5;
-    let hr0;
-    let t6;
-    let label1;
-    let t8;
-    let input3;
-    let t9;
-    let hr1;
-    let t10;
-    let label2;
-    let t11;
-    let t12;
-    let t13;
-    let input4;
     let t14;
-    let hr2;
+    let hr0;
     let t15;
-    let input5;
-    let t16;
-    let input6;
+    let label1;
     let t17;
-    let p;
+    let input3;
     let t18;
+    let hr1;
     let t19;
+    let label2;
     let t20;
     let t21;
-    let t22_value = (
-      /*a*/
-      ctx[0] + /*b*/
-      ctx[1] + ""
-    );
     let t22;
+    let input4;
     let t23;
-    let hr3;
+    let hr2;
     let t24;
+    let input5;
+    let t25;
+    let input6;
+    let t26;
+    let p1;
+    let t27;
+    let t28;
+    let hr3;
+    let t29;
     let form;
+    let t42;
+    let div9;
+    let t43;
+    let t44;
+    let button2;
+    let api_makeResizable_action;
+    let div10_class_value;
     let mounted;
     let dispose;
     return {
       c() {
-        div7 = element("div");
-        div2 = element("div");
-        div2.innerHTML = `<div class="col"><input type="text" class="form-control" placeholder="First name" aria-label="First name"/></div> <div class="col"><input type="text" class="form-control" placeholder="Last name" aria-label="Last name"/></div>`;
-        t1 = space();
+        div10 = element("div");
+        div0 = element("div");
+        t0 = text2(
+          /*$caption*/
+          ctx[6]
+        );
+        t1 = text2(" (");
+        t2 = text2(t2_value);
+        t3 = text2("x");
+        t4 = text2(t4_value);
+        t5 = text2(")\n    ");
+        button0 = element("button");
+        button0.innerHTML = `<i class="bi bi-x"></i>`;
+        t6 = space();
+        div8 = element("div");
+        p0 = element("p");
+        t7 = text2(
+          /*$text*/
+          ctx[9]
+        );
+        t8 = space();
+        div3 = element("div");
+        div3.innerHTML = `<div class="col"><input type="text" class="form-control" placeholder="First name" aria-label="First name"/></div> <div class="col"><input type="text" class="form-control" placeholder="Last name" aria-label="Last name"/></div>`;
+        t10 = space();
         label0 = element("label");
         label0.textContent = "Datalist example";
-        t3 = space();
+        t12 = space();
         input2 = element("input");
-        t4 = space();
+        t13 = space();
         datalist = element("datalist");
         option0 = element("option");
         option0.innerHTML = ``;
@@ -11582,49 +11762,65 @@
         option3.innerHTML = ``;
         option4 = element("option");
         option4.innerHTML = ``;
-        t5 = space();
+        t14 = space();
         hr0 = element("hr");
-        t6 = space();
+        t15 = space();
         label1 = element("label");
         label1.textContent = "Color picker";
-        t8 = space();
-        input3 = element("input");
-        t9 = space();
-        hr1 = element("hr");
-        t10 = space();
-        label2 = element("label");
-        t11 = text2("Example range = ");
-        t12 = text2(
-          /*c*/
-          ctx[2]
-        );
-        t13 = space();
-        input4 = element("input");
-        t14 = space();
-        hr2 = element("hr");
-        t15 = space();
-        input5 = element("input");
-        t16 = space();
-        input6 = element("input");
         t17 = space();
-        p = element("p");
-        t18 = text2(
-          /*a*/
-          ctx[0]
+        input3 = element("input");
+        t18 = space();
+        hr1 = element("hr");
+        t19 = space();
+        label2 = element("label");
+        t20 = text2("Example range = ");
+        t21 = text2(
+          /*c*/
+          ctx[3]
         );
-        t19 = text2(" + ");
-        t20 = text2(
-          /*b*/
-          ctx[1]
-        );
-        t21 = text2(" = ");
-        t22 = text2(t22_value);
+        t22 = space();
+        input4 = element("input");
         t23 = space();
-        hr3 = element("hr");
+        hr2 = element("hr");
         t24 = space();
+        input5 = element("input");
+        t25 = space();
+        input6 = element("input");
+        t26 = space();
+        p1 = element("p");
+        t27 = text2(
+          /*c*/
+          ctx[3]
+        );
+        t28 = space();
+        hr3 = element("hr");
+        t29 = space();
         form = element("form");
         form.innerHTML = `<div class="mb-3"><label for="exampleInputEmail1" class="form-label">Email address</label> <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp"/> <div id="emailHelp" class="form-text">We&#39;ll never share your email with anyone else.</div></div> <div class="mb-3"><label for="exampleInputPassword1" class="form-label">Password</label> <input type="password" class="form-control" id="exampleInputPassword1"/></div> <div class="mb-3 form-check"><input type="checkbox" class="form-check-input" id="exampleCheck1"/> <label class="form-check-label" for="exampleCheck1">Check me out</label></div> <button type="submit" class="btn btn-primary">Submit</button>`;
-        attr(div2, "class", "row");
+        t42 = space();
+        div9 = element("div");
+        t43 = text2(
+          /*$note*/
+          ctx[10]
+        );
+        t44 = space();
+        button2 = element("button");
+        button2.innerHTML = `<i class="bi bi-grip-horizontal"></i>`;
+        attr(button0, "type", "button");
+        attr(button0, "class", "btn opacity-50");
+        set_style(button0, "position", "absolute");
+        set_style(button0, "right", "0");
+        set_style(button0, "top", "0");
+        set_style(button0, "padding", ".5rem");
+        attr(button0, "aria-label", "Close");
+        attr(div0, "class", "card-header user-select-none");
+        toggle_class(
+          div0,
+          "text-warning",
+          /*$selected*/
+          ctx[5]
+        );
+        attr(div3, "class", "row");
         attr(label0, "for", "exampleDataList");
         attr(label0, "class", "form-label");
         attr(input2, "class", "form-control");
@@ -11658,158 +11854,242 @@
         attr(input4, "id", "customRange2");
         attr(input5, "type", "number");
         attr(input6, "type", "number");
-        attr(div7, "class", "container-fluid pt-3");
-        set_style(div7, "overflow-y", "scroll");
+        attr(div8, "class", "card-body");
+        attr(button2, "type", "button");
+        attr(button2, "class", "btn opacity-50");
+        set_style(button2, "position", "absolute");
+        set_style(button2, "right", "0");
+        set_style(button2, "bottom", "0");
+        set_style(button2, "padding", ".5rem");
+        attr(button2, "aria-label", "Resize");
+        attr(div9, "class", "card-footer text-body-secondary");
+        attr(div10, "class", div10_class_value = "card alert-" + /*$context*/
+        ctx[4] + " h-100 m-0");
+        set_style(div10, "overflow-y", "scroll");
+        toggle_class(
+          div10,
+          "active",
+          /*$selected*/
+          ctx[5]
+        );
       },
       m(target, anchor) {
-        insert(target, div7, anchor);
-        append(div7, div2);
-        append(div7, t1);
-        append(div7, label0);
-        append(div7, t3);
-        append(div7, input2);
-        append(div7, t4);
-        append(div7, datalist);
+        insert(target, div10, anchor);
+        append(div10, div0);
+        append(div0, t0);
+        append(div0, t1);
+        append(div0, t2);
+        append(div0, t3);
+        append(div0, t4);
+        append(div0, t5);
+        append(div0, button0);
+        append(div10, t6);
+        append(div10, div8);
+        append(div8, p0);
+        append(p0, t7);
+        append(div8, t8);
+        append(div8, div3);
+        append(div8, t10);
+        append(div8, label0);
+        append(div8, t12);
+        append(div8, input2);
+        append(div8, t13);
+        append(div8, datalist);
         append(datalist, option0);
         append(datalist, option1);
         append(datalist, option2);
         append(datalist, option3);
         append(datalist, option4);
-        append(div7, t5);
-        append(div7, hr0);
-        append(div7, t6);
-        append(div7, label1);
-        append(div7, t8);
-        append(div7, input3);
-        append(div7, t9);
-        append(div7, hr1);
-        append(div7, t10);
-        append(div7, label2);
-        append(label2, t11);
-        append(label2, t12);
-        append(div7, t13);
-        append(div7, input4);
+        append(div8, t14);
+        append(div8, hr0);
+        append(div8, t15);
+        append(div8, label1);
+        append(div8, t17);
+        append(div8, input3);
+        append(div8, t18);
+        append(div8, hr1);
+        append(div8, t19);
+        append(div8, label2);
+        append(label2, t20);
+        append(label2, t21);
+        append(div8, t22);
+        append(div8, input4);
         set_input_value(
           input4,
           /*c*/
-          ctx[2]
+          ctx[3]
         );
-        append(div7, t14);
-        append(div7, hr2);
-        append(div7, t15);
-        append(div7, input5);
+        append(div8, t23);
+        append(div8, hr2);
+        append(div8, t24);
+        append(div8, input5);
         set_input_value(
           input5,
           /*a*/
-          ctx[0]
+          ctx[1]
         );
-        append(div7, t16);
-        append(div7, input6);
+        append(div8, t25);
+        append(div8, input6);
         set_input_value(
           input6,
           /*b*/
-          ctx[1]
+          ctx[2]
         );
-        append(div7, t17);
-        append(div7, p);
-        append(p, t18);
-        append(p, t19);
-        append(p, t20);
-        append(p, t21);
-        append(p, t22);
-        append(div7, t23);
-        append(div7, hr3);
-        append(div7, t24);
-        append(div7, form);
+        append(div8, t26);
+        append(div8, p1);
+        append(p1, t27);
+        append(div8, t28);
+        append(div8, hr3);
+        append(div8, t29);
+        append(div8, form);
+        append(div10, t42);
+        append(div10, div9);
+        append(div9, t43);
+        append(div9, t44);
+        append(div9, button2);
         if (!mounted) {
           dispose = [
+            listen(
+              button0,
+              "click",
+              /*click_handler*/
+              ctx[18]
+            ),
+            action_destroyer(api_makeMovable_action = /*api*/
+            ctx[0].makeMovable(div0)),
             listen(
               input4,
               "change",
               /*input4_change_input_handler*/
-              ctx[3]
+              ctx[19]
             ),
             listen(
               input4,
               "input",
               /*input4_change_input_handler*/
-              ctx[3]
+              ctx[19]
             ),
             listen(
               input5,
               "input",
               /*input5_input_handler*/
-              ctx[4]
+              ctx[20]
             ),
             listen(
               input6,
               "input",
               /*input6_input_handler*/
-              ctx[5]
-            )
+              ctx[21]
+            ),
+            action_destroyer(api_makeResizable_action = /*api*/
+            ctx[0].makeResizable(button2))
           ];
           mounted = true;
         }
       },
       p(ctx2, [dirty]) {
-        if (dirty & /*c*/
-        4)
+        if (dirty & /*$caption*/
+        64)
           set_data(
-            t12,
-            /*c*/
-            ctx2[2]
+            t0,
+            /*$caption*/
+            ctx2[6]
+          );
+        if (dirty & /*$w*/
+        128 && t2_value !== (t2_value = parseInt(
+          /*$w*/
+          ctx2[7]
+        ) + ""))
+          set_data(t2, t2_value);
+        if (dirty & /*$h*/
+        256 && t4_value !== (t4_value = parseInt(
+          /*$h*/
+          ctx2[8]
+        ) + ""))
+          set_data(t4, t4_value);
+        if (dirty & /*$selected*/
+        32) {
+          toggle_class(
+            div0,
+            "text-warning",
+            /*$selected*/
+            ctx2[5]
+          );
+        }
+        if (dirty & /*$text*/
+        512)
+          set_data(
+            t7,
+            /*$text*/
+            ctx2[9]
           );
         if (dirty & /*c*/
-        4) {
+        8)
+          set_data(
+            t21,
+            /*c*/
+            ctx2[3]
+          );
+        if (dirty & /*c*/
+        8) {
           set_input_value(
             input4,
             /*c*/
-            ctx2[2]
+            ctx2[3]
           );
         }
         if (dirty & /*a*/
-        1 && to_number(input5.value) !== /*a*/
-        ctx2[0]) {
+        2 && to_number(input5.value) !== /*a*/
+        ctx2[1]) {
           set_input_value(
             input5,
             /*a*/
-            ctx2[0]
+            ctx2[1]
           );
         }
         if (dirty & /*b*/
-        2 && to_number(input6.value) !== /*b*/
-        ctx2[1]) {
+        4 && to_number(input6.value) !== /*b*/
+        ctx2[2]) {
           set_input_value(
             input6,
             /*b*/
-            ctx2[1]
+            ctx2[2]
           );
         }
-        if (dirty & /*a*/
-        1)
+        if (dirty & /*c*/
+        8)
           set_data(
-            t18,
-            /*a*/
-            ctx2[0]
+            t27,
+            /*c*/
+            ctx2[3]
           );
-        if (dirty & /*b*/
-        2)
+        if (dirty & /*$note*/
+        1024)
           set_data(
-            t20,
-            /*b*/
-            ctx2[1]
+            t43,
+            /*$note*/
+            ctx2[10]
           );
-        if (dirty & /*a, b*/
-        3 && t22_value !== (t22_value = /*a*/
-        ctx2[0] + /*b*/
-        ctx2[1] + ""))
-          set_data(t22, t22_value);
+        if (dirty & /*$context*/
+        16 && div10_class_value !== (div10_class_value = "card alert-" + /*$context*/
+        ctx2[4] + " h-100 m-0")) {
+          attr(div10, "class", div10_class_value);
+        }
+        if (dirty & /*$context, $selected*/
+        48) {
+          toggle_class(
+            div10,
+            "active",
+            /*$selected*/
+            ctx2[5]
+          );
+        }
       },
       i: noop,
       o: noop,
       d(detaching) {
         if (detaching) {
-          detach(div7);
+          detach(div10);
         }
         mounted = false;
         run_all(dispose);
@@ -11818,62 +12098,150 @@
   }
   __name(create_fragment6, "create_fragment");
   function instance6($$self, $$props, $$invalidate) {
+    let c;
+    let $context;
+    let $selected;
+    let $caption;
+    let $w;
+    let $h;
+    let $text;
+    let $note;
+    let { api } = $$props;
+    const context = api.signal("context");
+    component_subscribe($$self, context, (value) => $$invalidate(4, $context = value));
+    const caption = api.signal("caption");
+    component_subscribe($$self, caption, (value) => $$invalidate(6, $caption = value));
+    const text3 = api.signal("text");
+    component_subscribe($$self, text3, (value) => $$invalidate(9, $text = value));
+    const note = api.signal("note");
+    component_subscribe($$self, note, (value) => $$invalidate(10, $note = value));
+    const w = api.signal("w");
+    component_subscribe($$self, w, (value) => $$invalidate(7, $w = value));
+    const h = api.signal("h");
+    component_subscribe($$self, h, (value) => $$invalidate(8, $h = value));
     let a = 1;
     let b = 2;
-    let c = 3;
+    const x = api.signal("h");
+    const selected = api.signal("selected");
+    component_subscribe($$self, selected, (value) => $$invalidate(5, $selected = value));
+    const click_handler = /* @__PURE__ */ __name(() => api.removeApplication(), "click_handler");
     function input4_change_input_handler() {
       c = to_number(this.value);
-      $$invalidate(2, c);
+      $$invalidate(3, c), $$invalidate(1, a), $$invalidate(2, b);
     }
     __name(input4_change_input_handler, "input4_change_input_handler");
     function input5_input_handler() {
       a = to_number(this.value);
-      $$invalidate(0, a);
+      $$invalidate(1, a);
     }
     __name(input5_input_handler, "input5_input_handler");
     function input6_input_handler() {
       b = to_number(this.value);
-      $$invalidate(1, b);
+      $$invalidate(2, b);
     }
     __name(input6_input_handler, "input6_input_handler");
+    $$self.$$set = ($$props2) => {
+      if ("api" in $$props2)
+        $$invalidate(0, api = $$props2.api);
+    };
+    $$self.$$.update = () => {
+      if ($$self.$$.dirty & /*a, b*/
+      6) {
+        $:
+          $$invalidate(3, c = a + b);
+      }
+      if ($$self.$$.dirty & /*api, a, b, c*/
+      15) {
+        $:
+          api.send("out", { a, b, c });
+      }
+      if ($$self.$$.dirty & /*api, a*/
+      3) {
+        $:
+          api.send("a", a);
+      }
+      if ($$self.$$.dirty & /*api, b*/
+      5) {
+        $:
+          api.send("b", b);
+      }
+      if ($$self.$$.dirty & /*api, c*/
+      9) {
+        $:
+          api.send("c", c);
+      }
+    };
     return [
+      api,
       a,
       b,
       c,
+      $context,
+      $selected,
+      $caption,
+      $w,
+      $h,
+      $text,
+      $note,
+      context,
+      caption,
+      text3,
+      note,
+      w,
+      h,
+      selected,
+      click_handler,
       input4_change_input_handler,
       input5_input_handler,
       input6_input_handler
     ];
   }
   __name(instance6, "instance");
-  var Hello = class extends SvelteComponent {
+  var Interface = class extends SvelteComponent {
     static {
-      __name(this, "Hello");
+      __name(this, "Interface");
     }
     constructor(options) {
       super();
-      init(this, options, instance6, create_fragment6, safe_not_equal, {});
+      init(this, options, instance6, create_fragment6, safe_not_equal, { api: 0 });
     }
   };
-  var hello_default = Hello;
+  var Interface_default = Interface;
 
   // plug-ins/components/Hello.js
-  var Hello2 = class {
+  var Hello = class {
     static {
       __name(this, "Hello");
     }
     static extends = [Application];
-    properties = {};
+    observables = {
+      context: "primary",
+      text: "Hello World",
+      note: "This is a note"
+    };
     methods = {
       initialize() {
+        this.serializables = "title context text note".split(" ");
+        this.w = 888;
+        this.h = 888;
         this.createSocket("out", 1);
+        this.createSocket("a", 1);
+        this.createSocket("b", 1);
+        this.createSocket("c", 1);
       },
       mount() {
         this.foreign = new Instance(Foreign);
         this.createWindowComponent(this.foreign);
-        this.component = new hello_default({
+        this.component = new Interface_default({
           target: this.foreign.body,
-          props: {}
+          props: {
+            api: this,
+            // context: this.context,
+            // caption: this.caption,
+            // text: this.text,
+            // note: this.note,
+            send: this.send.bind(this)
+          }
         });
         this.addDisposable(stopWheel(this.foreign.body));
       },
@@ -11892,6 +12260,13 @@
     static extends = [Application];
     properties = {};
     methods = {
+      initialize() {
+        this.showCaption = true;
+        this.isResizable = true;
+        this.b = 5;
+        this.createSocket("in", 0);
+        this.createSocket("out", 1);
+      },
       mount() {
         this.foreign = new Instance(Foreign);
         this.createWindowComponent(this.foreign);
@@ -11977,6 +12352,7 @@
               term.writeln(["Gatehring data..."].join("\r\n"));
               const xml = this.getRoot().saveXml();
               term.writeln(xml);
+              this.send("out", xml);
               term.writeln(["Save complete", "data printed in the web console"].join("\r\n"));
               term.prompt(term);
             },
@@ -11997,6 +12373,10 @@
         }
         __name(runCommand, "runCommand");
         runFakeTerm();
+        this.pipe.on("in", (packet) => {
+          const object = packet.object || this.getRoot().applications.get(packet.id);
+          term.writeln(JSON.stringify(packet));
+        });
       },
       destroy() {
         console.info(`TODO!!!!!!!!!!!! Terminal Got Destroyed`);
@@ -12018,6 +12398,13 @@
     static extends = [Application];
     properties = {};
     methods = {
+      initialize() {
+        this.showCaption = true;
+        this.isResizable = true;
+        this.b = 5;
+        this.createSocket("in", 0);
+        this.createSocket("out", 1);
+      },
       mount() {
         this.foreign = new Instance(Foreign);
         this.createWindowComponent(this.foreign);
@@ -12027,7 +12414,10 @@
           EditorView.lineWrapping,
           //NOTE: EditorView.lineWrapping does/did not honor code indents
           keymap.of([indentWithTab]),
-          // EditorView.updateListener.of((update) => {if (update.docChanged) value = update.state.doc.toString(); }),
+          EditorView.updateListener.of((update3) => {
+            if (update3.docChanged) {
+            }
+          }),
           oneDark,
           EditorView.theme({
             "&": { maxHeight: this.h + "px" },
@@ -12045,6 +12435,12 @@
           doc: "// Hello!\njavaScript.go('Brrrrr...');\n",
           extensions,
           parent: this.foreign.body
+        });
+        this.pipe.on("in", (packet) => {
+          const descriptor = { changes: { from: 0, to: this.editorView.state.doc.length, insert: new String(packet).toString() } };
+          const transaction = this.editorView.state.update(descriptor);
+          const update3 = this.editorView.state.update(transaction);
+          this.editorView.update([update3]);
         });
         this.addDisposableFromEvent(this.foreign.body, "click", () => this.editorView.focus());
         this.addDisposable(this.editorView);
@@ -12253,80 +12649,6 @@
     };
   }
   __name(slide, "slide");
-
-  // plug-ins/class-icons/index.js
-  function class_icons_default(className) {
-    let response;
-    switch (className) {
-      case "Workspace":
-        response = "box";
-        break;
-      case "Window":
-        response = "window-fullscreen";
-        break;
-      case "Terminal":
-        response = "terminal";
-        break;
-      case "Editor":
-        response = "window-sidebar";
-        break;
-      case "Architecture":
-        response = "gem";
-        break;
-      case "Analysis":
-        response = "diagram-3";
-        break;
-      case "Pipe":
-        response = "share-fill";
-        break;
-      case "Realm":
-        response = "globe";
-        break;
-      case "Caption":
-        response = "usb";
-        break;
-      case "Label":
-        response = "alphabet";
-        break;
-      case "Foreign":
-        response = "wrench-adjustable";
-        break;
-      case "Sockets":
-        response = "node-plus";
-        break;
-      case "Vertical":
-        response = "arrows-vertical";
-        break;
-      case "Hortizontal":
-        response = "arrows";
-        break;
-      case "Container":
-        response = "box2-heart";
-        break;
-      case "Component":
-        response = "heart-pulse";
-        break;
-      case "Application":
-        response = "brightness-high";
-        break;
-      case "Trait":
-        response = "gear-wide";
-        break;
-      case "Method":
-        response = "gear-wide-connected";
-        break;
-      case "Group":
-        response = "box";
-        break;
-      case "Viewport":
-        response = "binoculars";
-        break;
-      default:
-        response = "list";
-    }
-    return response;
-  }
-  __name(class_icons_default, "default");
 
   // plug-ins/components/architecture/Entry.svelte
   function get_each_context2(ctx, list, i) {
@@ -12952,7 +13274,7 @@
     return [send, tree, $tree, click_handler];
   }
   __name(instance8, "instance");
-  var Interface = class extends SvelteComponent {
+  var Interface2 = class extends SvelteComponent {
     static {
       __name(this, "Interface");
     }
@@ -12961,7 +13283,7 @@
       init(this, options, instance8, create_fragment8, safe_not_equal, { send: 0, tree: 1 });
     }
   };
-  var Interface_default = Interface;
+  var Interface_default2 = Interface2;
 
   // node_modules/svelte/src/runtime/store/index.js
   var subscriber_queue = [];
@@ -13063,7 +13385,7 @@
       mount() {
         this.foreign = new Instance(Foreign);
         this.createWindowComponent(this.foreign);
-        this.component = new Interface_default({
+        this.component = new Interface_default2({
           target: this.foreign.body,
           props: {
             send: this.send.bind(this),
@@ -15177,7 +15499,7 @@
     ];
   }
   __name(instance9, "instance");
-  var Interface2 = class extends SvelteComponent {
+  var Interface3 = class extends SvelteComponent {
     static {
       __name(this, "Interface");
     }
@@ -15192,7 +15514,7 @@
       });
     }
   };
-  var Interface_default2 = Interface2;
+  var Interface_default3 = Interface3;
 
   // plug-ins/components/analysis/stores.js
   function getPaneItems(root) {
@@ -15232,7 +15554,7 @@
         this.createWindowComponent(this.foreign);
         this.xWritable = writable(0);
         this.yWritable = writable(0);
-        this.component = new Interface_default2({
+        this.component = new Interface_default3({
           target: this.foreign.body,
           props: {
             x: this.xWritable,
@@ -15256,97 +15578,140 @@
   // plug-ins/components/alert/Interface.svelte
   function create_fragment10(ctx) {
     let div;
-    let button;
+    let button0;
     let t0;
-    let h4;
+    let button1;
+    let api_makeResizable_action;
     let t1;
+    let h4;
     let t2;
-    let p0;
+    let api_makeMovable_action;
     let t3;
+    let p0;
     let t4;
-    let hr;
     let t5;
-    let p1;
+    let hr;
     let t6;
+    let p1;
+    let t7;
     let div_class_value;
     let mounted;
     let dispose;
     return {
       c() {
         div = element("div");
-        button = element("button");
+        button0 = element("button");
         t0 = space();
+        button1 = element("button");
+        button1.innerHTML = `<i class="bi bi-grip-horizontal"></i>`;
+        t1 = space();
         h4 = element("h4");
-        t1 = text2(
-          /*title*/
+        t2 = text2(
+          /*caption*/
           ctx[1]
         );
-        t2 = space();
+        t3 = space();
         p0 = element("p");
-        t3 = text2(
+        t4 = text2(
           /*text*/
           ctx[3]
         );
-        t4 = space();
-        hr = element("hr");
         t5 = space();
+        hr = element("hr");
+        t6 = space();
         p1 = element("p");
-        t6 = text2(
+        t7 = text2(
           /*note*/
           ctx[4]
         );
-        attr(button, "type", "button");
-        attr(button, "class", "btn-close");
-        attr(button, "aria-label", "Close");
-        attr(h4, "class", "alert-heading");
+        attr(button0, "type", "button");
+        attr(button0, "class", "btn-close");
+        attr(button0, "aria-label", "Close");
+        attr(button1, "type", "button");
+        attr(button1, "class", "btn opacity-50");
+        set_style(button1, "position", "absolute");
+        set_style(button1, "right", "0");
+        set_style(button1, "bottom", "0");
+        set_style(button1, "padding", ".5rem");
+        attr(button1, "aria-label", "Resize");
+        attr(h4, "class", "alert-heading user-select-none");
+        toggle_class(
+          h4,
+          "text-warning",
+          /*$selected*/
+          ctx[5]
+        );
         attr(p1, "class", "mb-0");
         attr(div, "class", div_class_value = "alert alert-" + /*context*/
         ctx[2] + " alert-dismissible h-100 m-0");
         attr(div, "role", "alert");
+        toggle_class(
+          div,
+          "active",
+          /*$selected*/
+          ctx[5]
+        );
       },
       m(target, anchor) {
         insert(target, div, anchor);
-        append(div, button);
+        append(div, button0);
         append(div, t0);
+        append(div, button1);
+        append(div, t1);
         append(div, h4);
-        append(h4, t1);
-        append(div, t2);
+        append(h4, t2);
+        append(div, t3);
         append(div, p0);
-        append(p0, t3);
-        append(div, t4);
-        append(div, hr);
+        append(p0, t4);
         append(div, t5);
+        append(div, hr);
+        append(div, t6);
         append(div, p1);
-        append(p1, t6);
+        append(p1, t7);
         if (!mounted) {
-          dispose = listen(
-            button,
-            "click",
-            /*click_handler*/
-            ctx[5]
-          );
+          dispose = [
+            listen(
+              button0,
+              "click",
+              /*click_handler*/
+              ctx[7]
+            ),
+            action_destroyer(api_makeResizable_action = /*api*/
+            ctx[0].makeResizable(button1)),
+            action_destroyer(api_makeMovable_action = /*api*/
+            ctx[0].makeMovable(h4))
+          ];
           mounted = true;
         }
       },
       p(ctx2, [dirty]) {
-        if (dirty & /*title*/
+        if (dirty & /*caption*/
         2)
           set_data(
-            t1,
-            /*title*/
+            t2,
+            /*caption*/
             ctx2[1]
           );
+        if (dirty & /*$selected*/
+        32) {
+          toggle_class(
+            h4,
+            "text-warning",
+            /*$selected*/
+            ctx2[5]
+          );
+        }
         if (dirty & /*text*/
         8)
           set_data(
-            t3,
+            t4,
             /*text*/
             ctx2[3]
           );
         if (dirty & /*note*/
         16)
           set_data(
-            t6,
+            t7,
             /*note*/
             ctx2[4]
           );
@@ -15354,6 +15719,15 @@
         4 && div_class_value !== (div_class_value = "alert alert-" + /*context*/
         ctx2[2] + " alert-dismissible h-100 m-0")) {
           attr(div, "class", div_class_value);
+        }
+        if (dirty & /*context, $selected*/
+        36) {
+          toggle_class(
+            div,
+            "active",
+            /*$selected*/
+            ctx2[5]
+          );
         }
       },
       i: noop,
@@ -15363,23 +15737,26 @@
           detach(div);
         }
         mounted = false;
-        dispose();
+        run_all(dispose);
       }
     };
   }
   __name(create_fragment10, "create_fragment");
   function instance10($$self, $$props, $$invalidate) {
+    let $selected;
     let { api } = $$props;
-    let { title } = $$props;
+    let { caption } = $$props;
     let { context } = $$props;
     let { text: text3 } = $$props;
     let { note } = $$props;
+    const selected = api.signal("selected");
+    component_subscribe($$self, selected, (value) => $$invalidate(5, $selected = value));
     const click_handler = /* @__PURE__ */ __name(() => api.removeApplication(), "click_handler");
     $$self.$$set = ($$props2) => {
       if ("api" in $$props2)
         $$invalidate(0, api = $$props2.api);
-      if ("title" in $$props2)
-        $$invalidate(1, title = $$props2.title);
+      if ("caption" in $$props2)
+        $$invalidate(1, caption = $$props2.caption);
       if ("context" in $$props2)
         $$invalidate(2, context = $$props2.context);
       if ("text" in $$props2)
@@ -15387,10 +15764,10 @@
       if ("note" in $$props2)
         $$invalidate(4, note = $$props2.note);
     };
-    return [api, title, context, text3, note, click_handler];
+    return [api, caption, context, text3, note, $selected, selected, click_handler];
   }
   __name(instance10, "instance");
-  var Interface3 = class extends SvelteComponent {
+  var Interface4 = class extends SvelteComponent {
     static {
       __name(this, "Interface");
     }
@@ -15398,14 +15775,14 @@
       super();
       init(this, options, instance10, create_fragment10, safe_not_equal, {
         api: 0,
-        title: 1,
+        caption: 1,
         context: 2,
         text: 3,
         note: 4
       });
     }
   };
-  var Interface_default3 = Interface3;
+  var Interface_default4 = Interface4;
 
   // plug-ins/components/Alert.js
   var Alert = class {
@@ -15415,9 +15792,9 @@
     static extends = [Application];
     observables = {
       context: "primary",
-      text: void 0
+      text: void 0,
+      note: void 0
     };
-    traits;
     methods = {
       initialize() {
         this.serializables = "title context text note".split(" ");
@@ -15425,11 +15802,11 @@
       mount() {
         this.foreign = new Instance(Foreign);
         this.createWindowComponent(this.foreign);
-        this.component = new Interface_default3({
+        this.component = new Interface_default4({
           target: this.foreign.body,
           props: {
             api: this,
-            title: this.title,
+            caption: this.caption,
             context: this.context,
             text: this.text,
             note: this.note,
@@ -15452,7 +15829,7 @@
   var components2 = {
     Group,
     Pipe: Pipe2,
-    Hello: Hello2,
+    Hello,
     Architecture,
     Analysis,
     Terminal,

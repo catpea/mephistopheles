@@ -1,9 +1,7 @@
 import {Instance} from "/plug-ins/object-oriented-programming/index.js";
 import Application from "/plug-ins/windows/Application.js";
 import Foreign from "/plug-ins/windows/Foreign.js";
-
 import Interface from '/plug-ins/components/alert/Interface.svelte';
-
 import stopWheel from '/plug-ins/stop-wheel/index.js';
 
 export default class Alert {
@@ -12,9 +10,9 @@ export default class Alert {
   observables = {
     context: 'primary',
     text: undefined,
+    note: undefined,
   };
 
-  traits
 
   methods = {
     initialize(){
@@ -30,7 +28,7 @@ export default class Alert {
           target: this.foreign.body,
           props: {
             api: this,
-            title: this.title,
+            caption: this.caption,
             context: this.context,
             text: this.text,
             note: this.note,
@@ -38,13 +36,12 @@ export default class Alert {
           }
       });
 
-
       this.on('name', title=>this.component.$set({title}))
       this.on('text', text=>this.component.$set({text}))
       this.on('note', note=>this.component.$set({note}))
       this.on('context', context=>this.component.$set({context}))
 
-    this.addDisposable( stopWheel(this.foreign.body) );
+      this.addDisposable( stopWheel(this.foreign.body) );
 
     },
 

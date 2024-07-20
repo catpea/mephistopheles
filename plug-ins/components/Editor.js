@@ -20,6 +20,14 @@ export default class Editor {
 
   methods = {
 
+    initialize(){
+      this.showCaption = true;
+      this.isResizable = true;
+      this.b = 5;
+      this.createSocket('in', 0);
+      this.createSocket('out', 1);
+    },
+
     mount(){
 
       this.foreign = new Instance(Foreign);
@@ -30,7 +38,11 @@ export default class Editor {
         javascript(),
         EditorView.lineWrapping, //NOTE: EditorView.lineWrapping does/did not honor code indents
         keymap.of([indentWithTab]),
-        // EditorView.updateListener.of((update) => {if (update.docChanged) value = update.state.doc.toString(); }),
+        EditorView.updateListener.of((update) => {
+          if (update.docChanged){
+             //this.send('out', update.state.doc.toString()) ;
+          }
+        }),
         oneDark,
         EditorView.theme({
 
@@ -51,6 +63,16 @@ export default class Editor {
         extensions,
         parent: this.foreign.body
       });
+
+
+      this.pipe.on('in', (packet)=>{
+
+        const descriptor = {changes: {from: 0, to: this.editorView.state.doc.length, insert: new String(packet).toString() }};
+        const transaction = this.editorView.state.update(descriptor);
+        const update = this.editorView.state.update(transaction);
+        this.editorView.update([update]);
+      })
+
 
       // HACK: code mirror inside a foreign element does not correctly receive focus - we monitor for its parent's click and manually set focus
       this.addDisposableFromEvent( this.foreign.body, 'click', ()=>this.editorView.focus() );

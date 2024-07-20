@@ -116,7 +116,7 @@ export class Instance {
       } // if
     }
 
- 
+
 
     // Install Traits (a trait is bound to the nice object)
     for (const inherited of this.oo.specifications) {
@@ -294,6 +294,8 @@ export class Instance {
       return response
     }
 
+
+
     this.on = function(eventPath, observerCallback, options, control){
       const [name, path] = eventPath.split('.', 2);
       // if(!observableData[name]) console.info(`property "${name}" not defined on ${this.oo.name} (${Object.keys(observableData).join(', ')})`);
@@ -347,6 +349,33 @@ export class Instance {
       // console.info('must manually dispose!');
       return observables.map(event=>this.on(event, callback2, undefined, {manualDispose: true}));
     }
+
+    this.signal = function(name){
+     return {
+        get value() { return this[name]; },
+        set value(v) { this[name] = v; },
+        subscribe: (subscriber) => {
+          return this.on(name, subscriber, {manual:true});
+        },
+      }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     // Install State (must come after methods as it may call come of them)
     const stateConstraints = {};
