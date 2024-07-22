@@ -22,9 +22,11 @@ export default class Sockets {
       const id = [this.id, name].join('/');
       const socket = new Instance(Socket, { id, name, side, parent: this.parent, control:this, scene: this.scene } )
       this.sockets.create(socket);
+      // socket.start()
     },
 
     removeSocket(id){
+      // this.sockets.get(id).stop();
       this.sockets.remove(id);
     },
 

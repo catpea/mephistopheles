@@ -24,6 +24,9 @@ export default class Menu {
   #mount(){
 
     this.contextMenuHandler = (e) => {
+      const isAllowed = e.target?.classList.contains("viewport-background");
+      if(!isAllowed) return;
+
       e.preventDefault();
       e.stopPropagation();
 
@@ -34,6 +37,7 @@ export default class Menu {
 
 
       this.show({x,y,tx,ty});
+
     };
 
     this.area.addEventListener('contextmenu', this.contextMenuHandler);

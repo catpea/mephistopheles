@@ -12,6 +12,7 @@ export default class KeyboardMonitor extends CuteEmitter {
 		const defaults = {
 			source: globalThis.window,
 		};
+
 		const options = Object.assign({}, defaults, configuration)
 
 		this.source = options.source;
@@ -24,9 +25,11 @@ export default class KeyboardMonitor extends CuteEmitter {
 		const self = this;
 
 		this.keyDownListener = function(e){
+
 			// https://developer.mozilla.org/en-US/docs/Web/API/UI_Events/Keyboard_event_key_values
 			console.log(`Keyboard key "${e.key}" interpreted as: ${chart[e.key]}`);
-			self.emit(chart[e.key], e)
+			self.emit(chart[e.key], e);
+
 		}
 
 		this.source.addEventListener('keydown', this.keyDownListener);

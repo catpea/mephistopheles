@@ -64,13 +64,22 @@ export default class Workspace {
   methods = {
 
     initialize(){
+      this.p = 0;
+      this.r = 0;
+      this.s = 0;
       // NOTE: this is the main keyboard handler that components may subscribe to via getRoot()
       this.keyboard = new KeyboardMonitor();
       this.addDisposable(this.keyboard);
     },
 
     saveXml(){
-      const $ = cheerio.load(`<?xml version="1.0"?><${this.oo.name} name="${pkg.name}" description="${pkg.description}" version="${pkg.version}"></${this.oo.name}>`, { xmlMode: true, decodeEntities: true, withStartIndices: true, withEndIndices: true });
+
+      const attributes = this.oo.serializables
+        .filter(o=>this[o.name]) // remove empty
+        .filter(o=>this[o.name]!==o.value.default) // remove empty
+        .map(o=>`${o.name}=${JSON.stringify(this[o.name])}`).join(' ') // create xml string
+
+      const $ = cheerio.load(`<?xml version="1.0"?><${this.oo.name} name="${pkg.name}" description="${pkg.description}" version="${pkg.version}" ${attributes}></${this.oo.name}>`, { xmlMode: true, decodeEntities: true, withStartIndices: true, withEndIndices: true });
       if (this.realm) {
         $(this.oo.name).append(this.realm.getXml());
       }

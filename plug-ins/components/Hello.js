@@ -13,7 +13,6 @@ export default class Hello {
 
   methods = {
     initialize(){
-      this.serializables = 'title context text note'   .split(' ');
       this.w = 888;
       this.h = 888;
       this.createSocket('out', 1);

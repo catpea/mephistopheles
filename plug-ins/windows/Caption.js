@@ -62,7 +62,7 @@ export default class Caption {
       this.horizontal.start();
 
       this.on("selected", selected => selected?info1.el.Container.classList.add('selected'):info1.el.Container.classList.remove('selected'));
-      this.on('text',  text=>info1.text=text, );
+      this.on('text',  text=>info1.text=text);
       this.any(['x','y','w','h',  ],  ({x,y,w,h})=>Object.assign(this.horizontal, {x,y,w,h }));
 
       let maximized = false;

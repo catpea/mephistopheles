@@ -42,7 +42,7 @@ export default class Editor {
         keymap.of([indentWithTab]),
         EditorView.updateListener.of((update) => {
           if (update.docChanged){
-             //this.send('out', update.state.doc.toString()) ;
+             this.send('out', update.state.doc.toString()) ;
           }
         }),
         oneDark,

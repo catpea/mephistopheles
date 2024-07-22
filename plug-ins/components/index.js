@@ -1,6 +1,7 @@
 import Workspace from './Workspace.js';
 import Group from './Group.js';
 import Hello from './Hello.js';
+import Fetch from './Fetch.js';
 import Terminal from './Terminal.js';
 import Editor from './Editor.js';
 import Pipe from './Pipe.js';
@@ -14,21 +15,29 @@ import Alert from './Alert.js';
 
 const components = {
 
+  // Core
+  Workspace,
   Group,
   Pipe,
 
-  Hello,
+  // UI
+  Alert,
 
+  // Reflection
   Architecture,
   Analysis,
 
+  // Tests
+  Hello,
+
+  // Data Services
+  Fetch,
+
+  // Applications
   Terminal,
   Editor,
 
-  Alert,
 
-  Workspace,
-  
 }
 
 export default components;

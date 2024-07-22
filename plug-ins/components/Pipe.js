@@ -7,10 +7,14 @@ export default class Pipe {
   static extends = [Window];
 
   properties = {
-    serializables: 'id from to out in'.split(' ')
   };
 
-
+  serializables = {
+    from: 'string',
+    to: 'string',
+    out: 'string',
+    in: 'string',
+  };
 
   methods = {
     initialize(){
@@ -18,7 +22,7 @@ export default class Pipe {
       this.showCaption = false;
       this.isResizable = false;
 
-      console.log(this);
+      // console.log(this);
 
     },
     mount(){

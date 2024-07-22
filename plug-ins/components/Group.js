@@ -8,7 +8,13 @@ export default class Group {
 
   properties = {
     isGroup: true,
-    serializables: 'id x y w h showMenu showStatus zoom library'.split(' ')
+  };
+
+  serializables = {
+    zoom: 'string',
+    panX: 'string',
+    panY: 'string',
+    library: 'string',
   };
 
   traits = {
@@ -30,10 +36,20 @@ export default class Group {
 
       this.realm = new Instance(Realm, {library: this.library});
 
+
+      Object.defineProperty(this, 'zoom', { get: function() { return this.realm.zoom; } } );
+      Object.defineProperty(this, 'panX', { get: function() { return this.realm.panX; } } );
+      Object.defineProperty(this, 'panY', { get: function() { return this.realm.panY; } } );
+
+
       this.on("node", (node) => {
+
         node.on("url", url => this.realm.url = url);
+
         node.on("zoom", zoom => this.realm.zoom = zoom);
-        this.realm.on("zoom", zoom => this.zoom = zoom);
+        node.on("panX", panX => this.realm.panX = panX);
+        node.on("panY", panY => this.realm.panY = panY);
+
       });
 
       this.createWindowComponent( this.realm );

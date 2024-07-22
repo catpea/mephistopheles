@@ -404,20 +404,20 @@
             function(module2, exports2, __webpack_require__) {
               "use strict";
               var __extends = this && this.__extends || function() {
-                var extendStatics = Object.setPrototypeOf || { __proto__: [] } instanceof Array && function(d, b2) {
-                  d.__proto__ = b2;
-                } || function(d, b2) {
-                  for (var p in b2)
-                    if (b2.hasOwnProperty(p))
-                      d[p] = b2[p];
+                var extendStatics = Object.setPrototypeOf || { __proto__: [] } instanceof Array && function(d, b3) {
+                  d.__proto__ = b3;
+                } || function(d, b3) {
+                  for (var p in b3)
+                    if (b3.hasOwnProperty(p))
+                      d[p] = b3[p];
                 };
-                return function(d, b2) {
-                  extendStatics(d, b2);
+                return function(d, b3) {
+                  extendStatics(d, b3);
                   function __() {
                     this.constructor = d;
                   }
                   __name(__, "__");
-                  d.prototype = b2 === null ? Object.create(b2) : (__.prototype = b2.prototype, new __());
+                  d.prototype = b3 === null ? Object.create(b3) : (__.prototype = b3.prototype, new __());
                 };
               }();
               Object.defineProperty(exports2, "__esModule", { value: true });
@@ -6442,8 +6442,8 @@
     }
     instance;
     root;
-    constructor({ Class, instance: instance11, specification }) {
-      this.instance = instance11;
+    constructor({ Class, instance: instance15, specification }) {
+      this.instance = instance15;
       this.instance.oo.extends.push(Class);
       this.collectClasses(Class.extends);
       this.instantiateSuperclasses();
@@ -6461,15 +6461,15 @@
     instantiateSuperclasses() {
       let parent;
       for (const Class of this.instance.oo.extends) {
-        const instance11 = new Class();
-        instance11.name = Class.name;
-        if (!instance11.traits)
-          instance11.traits = [];
-        if (!instance11.methods)
-          instance11.methods = [];
-        this.instance.oo.specifications.push(instance11);
-        instance11.parent = parent;
-        parent = instance11;
+        const instance15 = new Class();
+        instance15.name = Class.name;
+        if (!instance15.traits)
+          instance15.traits = [];
+        if (!instance15.methods)
+          instance15.methods = [];
+        this.instance.oo.specifications.push(instance15);
+        instance15.parent = parent;
+        parent = instance15;
       }
     }
   };
@@ -6490,6 +6490,7 @@
       this.oo.types = specification.types;
       this.oo.specification = specification;
       this.oo.attributes = [];
+      this.oo.serializables = [];
       this.oo.extends = [];
       this.oo.disposables = [];
       this.oo.specifications = [];
@@ -6527,6 +6528,27 @@
                 enumerable: true,
                 configurable: false
               });
+            }
+          }
+        }
+      }
+      const serializablesLookup = {};
+      for (const inherited of this.oo.specifications) {
+        if (inherited.serializables) {
+          for (const [name, data2] of Object.entries(inherited.serializables).reverse()) {
+            if (name in serializablesLookup === false) {
+              let value;
+              if (typeof data2 === "string") {
+                value = { type: data2 };
+              } else {
+                value = data2;
+              }
+              const origin = inherited.name;
+              const object = { name, value, origin };
+              this.oo.serializables.unshift(object);
+              serializablesLookup[name] = object;
+            } else {
+              console.log(`Serializable named ${name} already defined in ${serializablesLookup[name].origin}`);
             }
           }
         }
@@ -6697,12 +6719,14 @@
         return observables.map((event) => this.on(event, callback2, void 0, { manualDispose: true }));
       };
       this.signal = function(name) {
+        const that2 = this;
         return {
           get value() {
-            return this[name];
+            return that2[name];
           },
-          set value(v) {
-            this[name] = v;
+          // get() { return that[name]; },
+          set(v) {
+            that2[name] = v;
           },
           subscribe: (subscriber) => {
             return this.on(name, subscriber, { manual: true });
@@ -6900,9 +6924,7 @@
       const pureEvent = eventName == this.name;
       if (pureEvent) {
         if (options.autorun) {
-          for (const item of this.#value) {
-            observerCallback(item);
-          }
+          observerCallback(this.#value);
         }
       }
       if (options.initialize) {
@@ -7071,19 +7093,19 @@
   __name(debounce_default, "default");
 
   // plug-ins/boolean/index.js
-  function intersection(a2, b2) {
+  function intersection(a3, b3) {
     const response = /* @__PURE__ */ new Set();
-    for (const item of a2) {
-      if (b2.has(item))
+    for (const item of a3) {
+      if (b3.has(item))
         response.add(item);
     }
     return response;
   }
   __name(intersection, "intersection");
-  function difference(a2, b2) {
+  function difference(a3, b3) {
     const response = /* @__PURE__ */ new Set();
-    for (const item of a2) {
-      if (!b2.has(item))
+    for (const item of a3) {
+      if (!b3.has(item))
         response.add(item);
     }
     return response;
@@ -7395,6 +7417,13 @@
       flexible: false
       // whether or not component fills all available x,y space in ceratin situations
     };
+    serializables = {
+      id: "string",
+      x: "float",
+      y: "float",
+      w: "float",
+      h: "float"
+    };
     constraints = {
       scene: {
         ".scene must be an instance of HTMLElement": function() {
@@ -7519,18 +7548,18 @@
       },
       getParentScale(component) {
         const list = this.getTransforms(component).slice(0, -1);
-        const scale = list.map((o) => o.zoom).reduce((a2, c) => a2 * c, 1);
+        const scale = list.map((o) => o.zoom).reduce((a3, c) => a3 * c, 1);
         return scale;
       },
       getScale(component) {
         const list = this.getTransforms(component);
-        const scale = list.map((o) => o.zoom).reduce((a2, c) => a2 * c, 1);
+        const scale = list.map((o) => o.zoom).reduce((a3, c) => a3 * c, 1);
         return scale;
       },
       getTransforms(element2, list = [], root = true) {
         if (!element2)
           element2 = this;
-        const isTransform = element2.hasOwnProperty("panX") && element2.hasOwnProperty("panY") && element2.hasOwnProperty("zoom");
+        const isTransform = element2.isGroup;
         if (isTransform) {
           let offsetX = element2.viewport.x - element2.x;
           let offsetY = element2.viewport.y - element2.y;
@@ -7559,7 +7588,7 @@
           node.on("h", (h) => this.h = h);
           node.on("H", (H) => this.H = H);
           node.on("r", (r) => this.r = r);
-          node.on("b", (b2) => this.b = b2);
+          node.on("b", (b3) => this.b = b3);
           node.on("p", (p) => this.p = p);
           node.on("s", (s) => this.s = s);
           node.on("data", (data) => this.data = data);
@@ -8322,10 +8351,10 @@
     if (!Type)
       return;
     const { Object: attr2, Array: children2, Function: init2 } = byType(input);
-    const instance11 = new Instance(Type, attr2);
+    const instance15 = new Instance(Type, attr2);
     if (init2)
-      init2(instance11, this ? this.parent : null);
-    return [instance11, children2?.map((child) => nest.bind({ parent: instance11 })(...child)).map(([ins, chi]) => chi ? [ins, chi] : ins)];
+      init2(instance15, this ? this.parent : null);
+    return [instance15, children2?.map((child) => nest.bind({ parent: instance15 })(...child)).map(([ins, chi]) => chi ? [ins, chi] : ins)];
   }
   __name(nest, "nest");
 
@@ -8558,7 +8587,7 @@
     }
     static extends = [Sockets, Vertical];
     observables = {
-      caption: "Untitled",
+      caption: "",
       showCaption: false,
       isResizable: false,
       showMenu: false,
@@ -8576,7 +8605,6 @@
     };
     methods = {
       initialize() {
-        this.caption = `${this.name || this.oo.name}`;
         if (this.isRootWindow)
           return;
         if (this.oo.name == "Pipe")
@@ -8605,7 +8633,8 @@
             minimumX: 128,
             minimumY: 128,
             handle: this.el.ResizeHandle,
-            scale: () => this.getScale(this),
+            scale: () => this.getScale(this.parent),
+            // BUG WARNING, it should say this not this.parent
             box: this.getApplication(this),
             before: () => {
             },
@@ -8630,7 +8659,7 @@
           const move = new Move_default({
             area: window,
             handle: this.captionComponent.handle,
-            scale: () => this.getScale(this),
+            scale: () => this.getScale(this.parent),
             before: () => {
             },
             movement: ({ x, y }) => {
@@ -8667,8 +8696,13 @@
     static extends = [];
     observables = {
       context: "dark",
-      text: "Hello World",
-      status: "This is a kitchen sink hello world note"
+      text: "",
+      status: ""
+    };
+    serializables = {
+      context: { type: "string", enum: ["primary", "secondary", "success", "danger", "warning", "info", "light", "dark"], default: "dark" },
+      text: "string",
+      note: "string"
     };
     traits = {};
     methods = {
@@ -8681,7 +8715,7 @@
 
   // plug-ins/constants/index.js
   function constants_default(CONSTANTS) {
-    const constants = Object.fromEntries(CONSTANTS.split(" ").map((o) => o.trim()).filter((o) => o).map((o) => [o, o]));
+    const constants = Object.fromEntries([...CONSTANTS.split(" ").map((o) => o.trim()).filter((o) => o).entries()].map((a3) => a3.reverse()));
     return new Proxy(constants, {
       get(target, prop) {
         if (prop in target) {
@@ -8725,22 +8759,57 @@
   }
   __name(stopWheel, "stopWheel");
 
+  // plug-ins/constants/Direction.js
+  var Direction_default = constants_default(" INPUT OUTPUT ");
+
+  // plug-ins/windows/framework/svelte/Field.js
+  var Field = class {
+    static {
+      __name(this, "Field");
+    }
+    observables = {
+      id: uuid(),
+      type: "String",
+      direction: Direction_default.INPUT,
+      label: "Unlabeled",
+      validator: null,
+      help: "",
+      x: 0,
+      y: 0
+    };
+    methods = {
+      initialize() {
+      }
+    };
+  };
+
   // plug-ins/windows/framework/Svelte.js
   var Svelte = class {
     static {
       __name(this, "Svelte");
     }
     static extends = [];
-    observables = {};
+    observables = {
+      fields: []
+    };
     traits = {
       stopWheel(el) {
         this.addDisposable(stopWheel(el));
+      },
+      createField(options) {
+        const { id, direction, label, validator } = options;
+        this.createSocket(id, direction);
+        const field = new Instance(Field, options);
+        this.fields.create(field);
+        field.start();
+      },
+      removeField(id) {
+        this.fields.get(id).stop();
+        this.fields.remove(id);
       }
     };
     methods = {
       initialize() {
-      },
-      clean() {
       }
     };
   };
@@ -8748,12 +8817,12 @@
   // plug-ins/priority-sort/index.js
   function prioritySort(list, priority, field) {
     const WILDCARD = priority.indexOf("*") == -1 ? priority.length - 1 : priority.indexOf("*");
-    const indexer = /* @__PURE__ */ __name(function(a2) {
-      const value = priority.indexOf(field(a2));
+    const indexer = /* @__PURE__ */ __name(function(a3) {
+      const value = priority.indexOf(field(a3));
       return value === -1 ? WILDCARD : value;
     }, "indexer");
-    const sorter = /* @__PURE__ */ __name(function(a2, b2) {
-      return indexer(a2) - indexer(b2);
+    const sorter = /* @__PURE__ */ __name(function(a3, b3) {
+      return indexer(a3) - indexer(b3);
     }, "sorter");
     return [...list].sort(sorter);
   }
@@ -8890,6 +8959,28 @@
     };
   };
 
+  // plug-ins/cast/index.js
+  function cast2(value, type) {
+    if (type === "string") {
+      return new String(value).toString();
+    } else if (type === "object") {
+      if (typeof value === "string") {
+        JSON.parse(value);
+      } else {
+        return value;
+      }
+    } else if (type === "float") {
+      return parseFloat(value);
+    } else if (type === "integer") {
+      return parseInt(value);
+    } else if (type === "boolean") {
+      return String(value).toLowerCase() == "true";
+    } else {
+      throw new TypeError(`Unknown type "${type}", no cast procedure`);
+    }
+  }
+  __name(cast2, "cast");
+
   // plug-ins/mouse-services/Pan.js
   var Pan = class extends Drag {
     static {
@@ -8919,7 +9010,7 @@
     x1 = x1 - locationX;
     y1 = y1 - locationY;
     const self = localList[localList.length - 1];
-    const finalZoom = localList.map((o) => o.zoom).reduce((a2, c) => a2 * c, 1) / self.zoom;
+    const finalZoom = localList.map((o) => o.zoom).reduce((a3, c) => a3 * c, 1) / self.zoom;
     x1 = x1 / finalZoom;
     y1 = y1 / finalZoom;
     x1 = x1 / self.zoom;
@@ -9066,6 +9157,9 @@
     }
     #mount() {
       this.contextMenuHandler = (e) => {
+        const isAllowed = e.target?.classList.contains("viewport-background");
+        if (!isAllowed)
+          return;
         e.preventDefault();
         e.stopPropagation();
         let x = e.clientX;
@@ -9261,8 +9355,8 @@
     return typeof thing === "function";
   }
   __name(is_function, "is_function");
-  function safe_not_equal(a2, b2) {
-    return a2 != a2 ? b2 == b2 : a2 !== b2 || a2 && typeof a2 === "object" || typeof a2 === "function";
+  function safe_not_equal(a3, b3) {
+    return a3 != a3 ? b3 == b3 : a3 !== b3 || a3 && typeof a3 === "object" || typeof a3 === "function";
   }
   __name(safe_not_equal, "safe_not_equal");
   function is_empty(obj2) {
@@ -9466,6 +9560,21 @@
       node.setAttribute(attribute, value);
   }
   __name(attr, "attr");
+  function init_binding_group(group) {
+    let _inputs;
+    return {
+      /* push */
+      p(...inputs) {
+        _inputs = inputs;
+        _inputs.forEach((input) => group.push(input));
+      },
+      /* remove */
+      r() {
+        _inputs.forEach((input) => group.splice(group.indexOf(input), 1));
+      }
+    };
+  }
+  __name(init_binding_group, "init_binding_group");
   function to_number(value) {
     return value === "" ? null : +value;
   }
@@ -9513,6 +9622,10 @@
     return result;
   }
   __name(get_custom_elements_slots, "get_custom_elements_slots");
+  function construct_svelte_component(component, props) {
+    return new component(props);
+  }
+  __name(construct_svelte_component, "construct_svelte_component");
 
   // node_modules/svelte/src/runtime/internal/style_manager.js
   var managed_styles = /* @__PURE__ */ new Map();
@@ -9531,15 +9644,15 @@
     return info;
   }
   __name(create_style_information, "create_style_information");
-  function create_rule(node, a2, b2, duration, delay, ease, fn, uid = 0) {
+  function create_rule(node, a3, b3, duration, delay, ease, fn, uid = 0) {
     const step = 16.666 / duration;
     let keyframes = "{\n";
     for (let p = 0; p <= 1; p += step) {
-      const t = a2 + (b2 - a2) * ease(p);
+      const t = a3 + (b3 - a3) * ease(p);
       keyframes += p * 100 + `%{${fn(t, 1 - t)}}
 `;
     }
-    const rule = keyframes + `100% {${fn(b2, 1 - b2)}}
+    const rule = keyframes + `100% {${fn(b3, 1 - b3)}}
 }`;
     const name = `__svelte_${hash(rule)}_${uid}`;
     const doc = get_root_for_style(node);
@@ -9589,6 +9702,16 @@
     current_component = component;
   }
   __name(set_current_component, "set_current_component");
+  function get_current_component() {
+    if (!current_component)
+      throw new Error("Function called outside component initialization");
+    return current_component;
+  }
+  __name(get_current_component, "get_current_component");
+  function onMount(fn) {
+    get_current_component().$$.on_mount.push(fn);
+  }
+  __name(onMount, "onMount");
 
   // node_modules/svelte/src/runtime/internal/scheduler.js
   var dirty_components = [];
@@ -9761,24 +9884,24 @@
       };
     }
     __name(init2, "init");
-    function go(b2) {
+    function go(b3) {
       const {
         delay = 0,
         duration = 300,
         easing = identity,
-        tick = noop,
+        tick: tick2 = noop,
         css
       } = config || null_transition;
       const program = {
         start: now() + delay,
-        b: b2
+        b: b3
       };
-      if (!b2) {
+      if (!b3) {
         program.group = outros;
         outros.r += 1;
       }
       if ("inert" in node) {
-        if (b2) {
+        if (b3) {
           if (original_inert_value !== void 0) {
             node.inert = original_inert_value;
           }
@@ -9793,12 +9916,12 @@
       } else {
         if (css) {
           clear_animation();
-          animation_name = create_rule(node, t, b2, duration, delay, easing, css);
+          animation_name = create_rule(node, t, b3, duration, delay, easing, css);
         }
-        if (b2)
-          tick(0, 1);
+        if (b3)
+          tick2(0, 1);
         running_program = init2(program, duration);
-        add_render_callback(() => dispatch(node, b2, "start"));
+        add_render_callback(() => dispatch(node, b3, "start"));
         loop((now2) => {
           if (pending_program && now2 > pending_program.start) {
             running_program = init2(pending_program, duration);
@@ -9819,7 +9942,7 @@
           }
           if (running_program) {
             if (now2 >= running_program.end) {
-              tick(t = running_program.b, 1 - t);
+              tick2(t = running_program.b, 1 - t);
               dispatch(node, running_program.b, "end");
               if (!pending_program) {
                 if (running_program.b) {
@@ -9833,7 +9956,7 @@
             } else if (now2 >= running_program.start) {
               const p = now2 - running_program.start;
               t = running_program.a + running_program.d * easing(p / running_program.duration);
-              tick(t, 1 - t);
+              tick2(t, 1 - t);
             }
           }
           return !!(running_program || pending_program);
@@ -9842,15 +9965,15 @@
     }
     __name(go, "go");
     return {
-      run(b2) {
+      run(b3) {
         if (is_function(config)) {
           wait().then(() => {
-            const opts = { direction: b2 ? "in" : "out" };
+            const opts = { direction: b3 ? "in" : "out" };
             config = config(opts);
-            go(b2);
+            go(b3);
           });
         } else {
-          go(b2);
+          go(b3);
         }
       },
       end() {
@@ -9872,7 +9995,7 @@
     });
   }
   __name(outro_and_destroy_block, "outro_and_destroy_block");
-  function update_keyed_each(old_blocks, dirty, get_key, dynamic, ctx, list, lookup, node, destroy, create_each_block4, next, get_context) {
+  function update_keyed_each(old_blocks, dirty, get_key, dynamic, ctx, list, lookup, node, destroy, create_each_block7, next, get_context) {
     let o = old_blocks.length;
     let n = list.length;
     let i = o;
@@ -9889,7 +10012,7 @@
       const key = get_key(child_ctx);
       let block = lookup.get(key);
       if (!block) {
-        block = create_each_block4(key, child_ctx);
+        block = create_each_block7(key, child_ctx);
         block.c();
       } else if (dynamic) {
         updates.push(() => block.p(child_ctx, dirty));
@@ -10017,7 +10140,7 @@
     component.$$.dirty[i / 31 | 0] |= 1 << i % 31;
   }
   __name(make_dirty, "make_dirty");
-  function init(component, options, instance11, create_fragment11, not_equal, props, append_styles = null, dirty = [-1]) {
+  function init(component, options, instance15, create_fragment15, not_equal, props, append_styles = null, dirty = [-1]) {
     const parent_component = current_component;
     set_current_component(component);
     const $$ = component.$$ = {
@@ -10043,7 +10166,7 @@
     };
     append_styles && append_styles($$.root);
     let ready = false;
-    $$.ctx = instance11 ? instance11(component, options.props || {}, (i, ret, ...rest) => {
+    $$.ctx = instance15 ? instance15(component, options.props || {}, (i, ret, ...rest) => {
       const value = rest.length ? rest[0] : ret;
       if ($$.ctx && not_equal($$.ctx[i], $$.ctx[i] = value)) {
         if (!$$.skip_bound && $$.bound[i])
@@ -10056,7 +10179,7 @@
     $$.update();
     ready = true;
     run_all($$.before_update);
-    $$.fragment = create_fragment11 ? create_fragment11($$.ctx) : false;
+    $$.fragment = create_fragment15 ? create_fragment15($$.ctx) : false;
     if (options.target) {
       if (options.hydrate) {
         start_hydrating();
@@ -11016,12 +11139,24 @@
       pipes: [],
       components: { ...components_default }
     };
+    serializables = {
+      library: "string",
+      panX: "float",
+      panY: "float",
+      zoom: "float"
+    };
     traits = {
       async loadXml(url) {
         if (!url)
           return;
         const xml = await (await fetch(url)).text();
         const $ = cheerio.load(xml, { xmlMode: true, decodeEntities: true, withStartIndices: true, withEndIndices: true });
+        console.log("TODO: Ease reliance on .node");
+        let types = Object.fromEntries(this.oo.serializables.map((o) => [o.name, o.value.type]));
+        let serializables = this.oo.serializables.map((o) => o.name);
+        let blacklist = ["id", "x", "y", "w", "h"];
+        let attributes = Object.fromEntries(Object.entries($("Workspace").get(0).attribs).filter(([k, v]) => serializables.indexOf(k) !== -1).filter(([k, v]) => !blacklist.includes(k)).map(([k, v]) => [k, cast2(v, types[k])]));
+        Object.assign(this, attributes);
         for (const el of $("Workspace").children()) {
           const node = new Instance(Node, { origin: this.getApplication().id });
           const data = {};
@@ -11040,16 +11175,14 @@
         }
       },
       getXml() {
-        const serializables = "id x y w h".split(" ");
         const $ = cheerio.load(``, { xmlMode: true, decodeEntities: true, withStartIndices: true, withEndIndices: true });
         for (const application of this.applications) {
           let body = "";
           if (application.realm) {
             body = application.realm.getXml();
           }
-          const attributeNames = serializables.concat(application.serializables || []);
-          console.log({ attributeNames });
-          const attributes = attributeNames.filter((key) => application[key]).map((key) => `${key}="${application[key]}"`).join(" ");
+          const attributeNames = application.oo.serializables;
+          const attributes = attributeNames.filter((o) => application[o.name]).filter((o) => application[o.name] !== o.value.default).map((o) => `${o.name}=${JSON.stringify(application[o.name])}`).join(" ");
           $.root().append(`<${application.oo.name} ${attributes}>${body}</${application.oo.name}>`);
         }
         const xml = $.root().html();
@@ -11103,11 +11236,14 @@
           let root = svg.g({ id: node.id, name: "element" });
           realmBody.content.appendChild(root);
           const options = { node, scene: root, parent: this, id: node.id, content: node.content, library: node.library };
-          const attributes = {};
-          for (const name of node.oo.attributes) {
-            attributes[name] = node[name];
+          const application = new Instance(Application2, options);
+          for (const serializable of application.oo.serializables) {
+            const name = serializable.name;
+            const type = serializable.value.type;
+            const value = cast2(node[name], type);
+            application[name] = value;
+            console.log(`Set ${name} of ${application.oo.name} to`, value);
           }
-          const application = new Instance(Application2, Object.assign(attributes, options));
           this.applications.create(application);
           application.start();
         }, { replay: true });
@@ -11226,8 +11362,13 @@
     }
     static extends = [Application];
     properties = {
-      isGroup: true,
-      serializables: "id x y w h showMenu showStatus zoom library".split(" ")
+      isGroup: true
+    };
+    serializables = {
+      zoom: "string",
+      panX: "string",
+      panY: "string",
+      library: "string"
     };
     traits = {};
     methods = {
@@ -11240,10 +11381,20 @@
       },
       mount() {
         this.realm = new Instance(Realm, { library: this.library });
+        Object.defineProperty(this, "zoom", { get: function() {
+          return this.realm.zoom;
+        } });
+        Object.defineProperty(this, "panX", { get: function() {
+          return this.realm.panX;
+        } });
+        Object.defineProperty(this, "panY", { get: function() {
+          return this.realm.panY;
+        } });
         this.on("node", (node) => {
           node.on("url", (url) => this.realm.url = url);
           node.on("zoom", (zoom) => this.realm.zoom = zoom);
-          this.realm.on("zoom", (zoom) => this.zoom = zoom);
+          node.on("panX", (panX) => this.realm.panX = panX);
+          node.on("panY", (panY) => this.realm.panY = panY);
         });
         this.createWindowComponent(this.realm);
       },
@@ -11745,11 +11896,15 @@
     };
     methods = {
       initialize() {
+        this.p = 0;
+        this.r = 0;
+        this.s = 0;
         this.keyboard = new KeyboardMonitor();
         this.addDisposable(this.keyboard);
       },
       saveXml() {
-        const $ = cheerio2.load(`<?xml version="1.0"?><${this.oo.name} name="${package_default.name}" description="${package_default.description}" version="${package_default.version}"></${this.oo.name}>`, { xmlMode: true, decodeEntities: true, withStartIndices: true, withEndIndices: true });
+        const attributes = this.oo.serializables.filter((o) => this[o.name]).filter((o) => this[o.name] !== o.value.default).map((o) => `${o.name}=${JSON.stringify(this[o.name])}`).join(" ");
+        const $ = cheerio2.load(`<?xml version="1.0"?><${this.oo.name} name="${package_default.name}" description="${package_default.description}" version="${package_default.version}" ${attributes}></${this.oo.name}>`, { xmlMode: true, decodeEntities: true, withStartIndices: true, withEndIndices: true });
         if (this.realm) {
           $(this.oo.name).append(this.realm.getXml());
         }
@@ -12234,25 +12389,25 @@
     component_subscribe($$self, w, (value) => $$invalidate(7, $w = value));
     const h = api.signal("h");
     component_subscribe($$self, h, (value) => $$invalidate(8, $h = value));
-    let a2 = 1;
-    let b2 = 2;
+    let a3 = 1;
+    let b3 = 2;
     const x = api.signal("h");
     const selected = api.signal("selected");
     component_subscribe($$self, selected, (value) => $$invalidate(5, $selected = value));
     const click_handler = /* @__PURE__ */ __name(() => api.removeApplication(), "click_handler");
     function input4_change_input_handler() {
       c = to_number(this.value);
-      $$invalidate(3, c), $$invalidate(1, a2), $$invalidate(2, b2);
+      $$invalidate(3, c), $$invalidate(1, a3), $$invalidate(2, b3);
     }
     __name(input4_change_input_handler, "input4_change_input_handler");
     function input5_input_handler() {
-      a2 = to_number(this.value);
-      $$invalidate(1, a2);
+      a3 = to_number(this.value);
+      $$invalidate(1, a3);
     }
     __name(input5_input_handler, "input5_input_handler");
     function input6_input_handler() {
-      b2 = to_number(this.value);
-      $$invalidate(2, b2);
+      b3 = to_number(this.value);
+      $$invalidate(2, b3);
     }
     __name(input6_input_handler, "input6_input_handler");
     $$self.$$set = ($$props2) => {
@@ -12263,22 +12418,22 @@
       if ($$self.$$.dirty & /*a, b*/
       6) {
         $:
-          $$invalidate(3, c = a2 + b2);
+          $$invalidate(3, c = a3 + b3);
       }
       if ($$self.$$.dirty & /*api, a, b, c*/
       15) {
         $:
-          api.send("out", { a: a2, b: b2, c });
+          api.send("out", { a: a3, b: b3, c });
       }
       if ($$self.$$.dirty & /*api, a*/
       3) {
         $:
-          api.send("a", a2);
+          api.send("a", a3);
       }
       if ($$self.$$.dirty & /*api, b*/
       5) {
         $:
-          api.send("b", b2);
+          api.send("b", b3);
       }
       if ($$self.$$.dirty & /*api, c*/
       9) {
@@ -12288,8 +12443,8 @@
     };
     return [
       api,
-      a2,
-      b2,
+      a3,
+      b3,
       c,
       $context,
       $selected,
@@ -12332,7 +12487,6 @@
     observables = {};
     methods = {
       initialize() {
-        this.serializables = "title context text note".split(" ");
         this.w = 888;
         this.h = 888;
         this.createSocket("out", 1);
@@ -12353,6 +12507,1152 @@
             // note: this.note,
             send: this.send.bind(this)
           }
+        });
+        this.addDisposable(stopWheel(this.foreign.body));
+      },
+      destroy() {
+        this.component.$destroy();
+      }
+    };
+  };
+
+  // plug-ins/fields/WebUrl.svelte
+  function create_fragment7(ctx) {
+    let div1;
+    let label;
+    let t0_value = (
+      /*field*/
+      ctx[0].label + ""
+    );
+    let t0;
+    let t1;
+    let t2;
+    let t3;
+    let t4_value = (
+      /*field*/
+      ctx[0].id + ""
+    );
+    let t4;
+    let t5;
+    let label_for_value;
+    let t6;
+    let input;
+    let input_id_value;
+    let input_aria_describedby_value;
+    let t7;
+    let div0;
+    let t8_value = (
+      /*field*/
+      ctx[0].help + ""
+    );
+    let t8;
+    let div0_id_value;
+    let mounted;
+    let dispose;
+    return {
+      c() {
+        div1 = element("div");
+        label = element("label");
+        t0 = text2(t0_value);
+        t1 = text2(" (");
+        t2 = text2(
+          /*$value*/
+          ctx[1]
+        );
+        t3 = space();
+        t4 = text2(t4_value);
+        t5 = text2(")");
+        t6 = space();
+        input = element("input");
+        t7 = space();
+        div0 = element("div");
+        t8 = text2(t8_value);
+        attr(label, "for", label_for_value = "field" + /*field*/
+        ctx[0].id);
+        attr(label, "class", "form-label");
+        attr(input, "type", "string");
+        attr(input, "class", "form-control");
+        attr(input, "id", input_id_value = "field" + /*field*/
+        ctx[0].id);
+        attr(input, "aria-describedby", input_aria_describedby_value = /*field*/
+        ctx[0].id + "Help");
+        attr(div0, "id", div0_id_value = /*field*/
+        ctx[0].id + "Help");
+        attr(div0, "class", "form-text");
+        attr(div1, "class", "mb-3");
+      },
+      m(target, anchor) {
+        insert(target, div1, anchor);
+        append(div1, label);
+        append(label, t0);
+        append(label, t1);
+        append(label, t2);
+        append(label, t3);
+        append(label, t4);
+        append(label, t5);
+        append(div1, t6);
+        append(div1, input);
+        set_input_value(
+          input,
+          /*$value*/
+          ctx[1]
+        );
+        append(div1, t7);
+        append(div1, div0);
+        append(div0, t8);
+        if (!mounted) {
+          dispose = listen(
+            input,
+            "input",
+            /*input_input_handler*/
+            ctx[4]
+          );
+          mounted = true;
+        }
+      },
+      p(ctx2, [dirty]) {
+        if (dirty & /*field*/
+        1 && t0_value !== (t0_value = /*field*/
+        ctx2[0].label + ""))
+          set_data(t0, t0_value);
+        if (dirty & /*$value*/
+        2)
+          set_data(
+            t2,
+            /*$value*/
+            ctx2[1]
+          );
+        if (dirty & /*field*/
+        1 && t4_value !== (t4_value = /*field*/
+        ctx2[0].id + ""))
+          set_data(t4, t4_value);
+        if (dirty & /*field*/
+        1 && label_for_value !== (label_for_value = "field" + /*field*/
+        ctx2[0].id)) {
+          attr(label, "for", label_for_value);
+        }
+        if (dirty & /*field*/
+        1 && input_id_value !== (input_id_value = "field" + /*field*/
+        ctx2[0].id)) {
+          attr(input, "id", input_id_value);
+        }
+        if (dirty & /*field*/
+        1 && input_aria_describedby_value !== (input_aria_describedby_value = /*field*/
+        ctx2[0].id + "Help")) {
+          attr(input, "aria-describedby", input_aria_describedby_value);
+        }
+        if (dirty & /*$value*/
+        2) {
+          set_input_value(
+            input,
+            /*$value*/
+            ctx2[1]
+          );
+        }
+        if (dirty & /*field*/
+        1 && t8_value !== (t8_value = /*field*/
+        ctx2[0].help + ""))
+          set_data(t8, t8_value);
+        if (dirty & /*field*/
+        1 && div0_id_value !== (div0_id_value = /*field*/
+        ctx2[0].id + "Help")) {
+          attr(div0, "id", div0_id_value);
+        }
+      },
+      i: noop,
+      o: noop,
+      d(detaching) {
+        if (detaching) {
+          detach(div1);
+        }
+        mounted = false;
+        dispose();
+      }
+    };
+  }
+  __name(create_fragment7, "create_fragment");
+  function instance7($$self, $$props, $$invalidate) {
+    let $value;
+    let { api } = $$props;
+    let { field } = $$props;
+    let value = api.signal(field.id);
+    component_subscribe($$self, value, (value2) => $$invalidate(1, $value = value2));
+    function input_input_handler() {
+      $value = this.value;
+      value.set($value);
+    }
+    __name(input_input_handler, "input_input_handler");
+    $$self.$$set = ($$props2) => {
+      if ("api" in $$props2)
+        $$invalidate(3, api = $$props2.api);
+      if ("field" in $$props2)
+        $$invalidate(0, field = $$props2.field);
+    };
+    return [field, $value, value, api, input_input_handler];
+  }
+  __name(instance7, "instance");
+  var WebUrl = class extends SvelteComponent {
+    static {
+      __name(this, "WebUrl");
+    }
+    constructor(options) {
+      super();
+      init(this, options, instance7, create_fragment7, safe_not_equal, { api: 3, field: 0 });
+    }
+  };
+  var WebUrl_default = WebUrl;
+
+  // plug-ins/descriptions/http-method.js
+  var http_method_default = [
+    { id: "get", name: "GET", description: "Retrieves data from a server at the specified resource." },
+    { id: "head", name: "HEAD", description: "Similar to GET, but it retrieves only the header information and not the body of the request." },
+    { id: "post", name: "POST", description: "Sends data to the server to create a new resource. Often used when submitting form data." },
+    { id: "put", name: "PUT", description: "Replaces all current representations of the target resource with the uploaded content." },
+    { id: "delete", name: "DELETE", description: "Removes all current representations of the target resource given by a URL." },
+    { id: "connect", name: "CONNECT", description: "Establishes a tunnel to the server identified by the target resource." },
+    { id: "options", name: "OPTIONS", description: "Describes the communication options for the target resource." },
+    { id: "trace", name: "TRACE", description: "Performs a message loop-back test along the path to the target resource." },
+    { id: "patch", name: "PATCH", description: "Applies partial modifications to a resource." }
+  ];
+
+  // plug-ins/fields/HttpMethod.svelte
+  function get_each_context2(ctx, list, i) {
+    const child_ctx = ctx.slice();
+    child_ctx[6] = list[i];
+    child_ctx[8] = i;
+    return child_ctx;
+  }
+  __name(get_each_context2, "get_each_context");
+  function create_each_block2(ctx) {
+    let input;
+    let input_id_value;
+    let input_value_value;
+    let t0;
+    let label;
+    let label_for_value;
+    let binding_group;
+    let mounted;
+    let dispose;
+    binding_group = init_binding_group(
+      /*$$binding_groups*/
+      ctx[5][0]
+    );
+    return {
+      c() {
+        input = element("input");
+        t0 = space();
+        label = element("label");
+        label.textContent = `${/*method*/
+        ctx[6].name}`;
+        attr(input, "type", "radio");
+        attr(input, "class", "btn-check");
+        attr(input, "name", "httpMethod");
+        attr(input, "id", input_id_value = "httpMethod" + /*method*/
+        ctx[6].id);
+        attr(input, "autocomplete", "off");
+        input.__value = input_value_value = /*method*/
+        ctx[6].name;
+        set_input_value(input, input.__value);
+        attr(label, "class", "btn btn-outline-secondary");
+        attr(label, "for", label_for_value = "httpMethod" + /*method*/
+        ctx[6].id);
+        binding_group.p(input);
+      },
+      m(target, anchor) {
+        insert(target, input, anchor);
+        input.checked = input.__value === /*$value*/
+        ctx[0];
+        insert(target, t0, anchor);
+        insert(target, label, anchor);
+        if (!mounted) {
+          dispose = listen(
+            input,
+            "change",
+            /*input_change_handler*/
+            ctx[4]
+          );
+          mounted = true;
+        }
+      },
+      p(ctx2, dirty) {
+        if (dirty & /*$value*/
+        1) {
+          input.checked = input.__value === /*$value*/
+          ctx2[0];
+        }
+      },
+      d(detaching) {
+        if (detaching) {
+          detach(input);
+          detach(t0);
+          detach(label);
+        }
+        binding_group.r();
+        mounted = false;
+        dispose();
+      }
+    };
+  }
+  __name(create_each_block2, "create_each_block");
+  function create_fragment8(ctx) {
+    let div;
+    let each_value = ensure_array_like(http_method_default);
+    let each_blocks = [];
+    for (let i = 0; i < each_value.length; i += 1) {
+      each_blocks[i] = create_each_block2(get_each_context2(ctx, each_value, i));
+    }
+    return {
+      c() {
+        div = element("div");
+        for (let i = 0; i < each_blocks.length; i += 1) {
+          each_blocks[i].c();
+        }
+        attr(div, "class", "btn-group mb-3");
+        attr(div, "role", "group");
+        attr(div, "aria-label", "Http Methods");
+      },
+      m(target, anchor) {
+        insert(target, div, anchor);
+        for (let i = 0; i < each_blocks.length; i += 1) {
+          if (each_blocks[i]) {
+            each_blocks[i].m(div, null);
+          }
+        }
+      },
+      p(ctx2, [dirty]) {
+        if (dirty & /*$value*/
+        1) {
+          each_value = ensure_array_like(http_method_default);
+          let i;
+          for (i = 0; i < each_value.length; i += 1) {
+            const child_ctx = get_each_context2(ctx2, each_value, i);
+            if (each_blocks[i]) {
+              each_blocks[i].p(child_ctx, dirty);
+            } else {
+              each_blocks[i] = create_each_block2(child_ctx);
+              each_blocks[i].c();
+              each_blocks[i].m(div, null);
+            }
+          }
+          for (; i < each_blocks.length; i += 1) {
+            each_blocks[i].d(1);
+          }
+          each_blocks.length = each_value.length;
+        }
+      },
+      i: noop,
+      o: noop,
+      d(detaching) {
+        if (detaching) {
+          detach(div);
+        }
+        destroy_each(each_blocks, detaching);
+      }
+    };
+  }
+  __name(create_fragment8, "create_fragment");
+  function instance8($$self, $$props, $$invalidate) {
+    let $value;
+    let { api } = $$props;
+    let { field } = $$props;
+    let value = api.signal(field.id);
+    component_subscribe($$self, value, (value2) => $$invalidate(0, $value = value2));
+    const $$binding_groups = [[]];
+    function input_change_handler() {
+      $value = this.__value;
+      value.set($value);
+    }
+    __name(input_change_handler, "input_change_handler");
+    $$self.$$set = ($$props2) => {
+      if ("api" in $$props2)
+        $$invalidate(2, api = $$props2.api);
+      if ("field" in $$props2)
+        $$invalidate(3, field = $$props2.field);
+    };
+    return [$value, value, api, field, input_change_handler, $$binding_groups];
+  }
+  __name(instance8, "instance");
+  var HttpMethod = class extends SvelteComponent {
+    static {
+      __name(this, "HttpMethod");
+    }
+    constructor(options) {
+      super();
+      init(this, options, instance8, create_fragment8, safe_not_equal, { api: 2, field: 3 });
+    }
+  };
+  var HttpMethod_default = HttpMethod;
+
+  // plug-ins/descriptions/fetch-response.js
+  var fetch_response_default = [
+    { id: "json", name: "JSON", description: "Parses the response body text as JSON, converting the JSON-encoded content into JavaScript objects." },
+    { id: "text", name: "Text", description: "Returns the response body as plain text, useful for reading text or other types of structured data that are not in JSON format." },
+    { id: "formData", name: "Form Data", description: "Transforms the response body into a FormData object, making it easy to inspect and manipulate form data returned from the server." },
+    { id: "arrayBuffer", name: "Array Buffer", description: "Reads the response body and returns it as an ArrayBuffer, which represents a generic, fixed-length raw binary data buffer." },
+    { id: "blob", name: "Blob", description: "Retrieves the response body as a Blob object, which can handle binary data such as images and sounds directly." }
+  ];
+
+  // plug-ins/fields/FetchResponse.svelte
+  function get_each_context3(ctx, list, i) {
+    const child_ctx = ctx.slice();
+    child_ctx[6] = list[i];
+    child_ctx[8] = i;
+    return child_ctx;
+  }
+  __name(get_each_context3, "get_each_context");
+  function create_each_block3(ctx) {
+    let input;
+    let input_id_value;
+    let input_value_value;
+    let t0;
+    let label;
+    let t1_value = (
+      /*response*/
+      ctx[6].name + ""
+    );
+    let t1;
+    let t2;
+    let t3_value = (
+      /*$value*/
+      (ctx[0] == /*response*/
+      ctx[6].id) + ""
+    );
+    let t3;
+    let t4;
+    let t5;
+    let t6;
+    let t7_value = (
+      /*response*/
+      ctx[6].id + ""
+    );
+    let t7;
+    let label_for_value;
+    let binding_group;
+    let mounted;
+    let dispose;
+    binding_group = init_binding_group(
+      /*$$binding_groups*/
+      ctx[5][0]
+    );
+    return {
+      c() {
+        input = element("input");
+        t0 = space();
+        label = element("label");
+        t1 = text2(t1_value);
+        t2 = space();
+        t3 = text2(t3_value);
+        t4 = space();
+        t5 = text2(
+          /*$value*/
+          ctx[0]
+        );
+        t6 = text2("/");
+        t7 = text2(t7_value);
+        attr(input, "type", "radio");
+        attr(input, "class", "btn-check");
+        attr(input, "name", "fetchResponse");
+        attr(input, "id", input_id_value = "fetchResponse" + /*response*/
+        ctx[6].id);
+        attr(input, "autocomplete", "off");
+        input.__value = input_value_value = /*response*/
+        ctx[6].id;
+        set_input_value(input, input.__value);
+        attr(label, "class", "btn btn-outline-secondary");
+        attr(label, "for", label_for_value = "fetchResponse" + /*response*/
+        ctx[6].id);
+        binding_group.p(input);
+      },
+      m(target, anchor) {
+        insert(target, input, anchor);
+        input.checked = input.__value === /*$value*/
+        ctx[0];
+        insert(target, t0, anchor);
+        insert(target, label, anchor);
+        append(label, t1);
+        append(label, t2);
+        append(label, t3);
+        append(label, t4);
+        append(label, t5);
+        append(label, t6);
+        append(label, t7);
+        if (!mounted) {
+          dispose = listen(
+            input,
+            "change",
+            /*input_change_handler*/
+            ctx[4]
+          );
+          mounted = true;
+        }
+      },
+      p(ctx2, dirty) {
+        if (dirty & /*$value*/
+        1) {
+          input.checked = input.__value === /*$value*/
+          ctx2[0];
+        }
+        if (dirty & /*$value*/
+        1 && t3_value !== (t3_value = /*$value*/
+        (ctx2[0] == /*response*/
+        ctx2[6].id) + ""))
+          set_data(t3, t3_value);
+        if (dirty & /*$value*/
+        1)
+          set_data(
+            t5,
+            /*$value*/
+            ctx2[0]
+          );
+      },
+      d(detaching) {
+        if (detaching) {
+          detach(input);
+          detach(t0);
+          detach(label);
+        }
+        binding_group.r();
+        mounted = false;
+        dispose();
+      }
+    };
+  }
+  __name(create_each_block3, "create_each_block");
+  function create_fragment9(ctx) {
+    let div;
+    let each_value = ensure_array_like(fetch_response_default);
+    let each_blocks = [];
+    for (let i = 0; i < each_value.length; i += 1) {
+      each_blocks[i] = create_each_block3(get_each_context3(ctx, each_value, i));
+    }
+    return {
+      c() {
+        div = element("div");
+        for (let i = 0; i < each_blocks.length; i += 1) {
+          each_blocks[i].c();
+        }
+        attr(div, "class", "btn-group mb-3");
+        attr(div, "role", "group");
+        attr(div, "aria-label", "Http Methods");
+      },
+      m(target, anchor) {
+        insert(target, div, anchor);
+        for (let i = 0; i < each_blocks.length; i += 1) {
+          if (each_blocks[i]) {
+            each_blocks[i].m(div, null);
+          }
+        }
+      },
+      p(ctx2, [dirty]) {
+        if (dirty & /*$value*/
+        1) {
+          each_value = ensure_array_like(fetch_response_default);
+          let i;
+          for (i = 0; i < each_value.length; i += 1) {
+            const child_ctx = get_each_context3(ctx2, each_value, i);
+            if (each_blocks[i]) {
+              each_blocks[i].p(child_ctx, dirty);
+            } else {
+              each_blocks[i] = create_each_block3(child_ctx);
+              each_blocks[i].c();
+              each_blocks[i].m(div, null);
+            }
+          }
+          for (; i < each_blocks.length; i += 1) {
+            each_blocks[i].d(1);
+          }
+          each_blocks.length = each_value.length;
+        }
+      },
+      i: noop,
+      o: noop,
+      d(detaching) {
+        if (detaching) {
+          detach(div);
+        }
+        destroy_each(each_blocks, detaching);
+      }
+    };
+  }
+  __name(create_fragment9, "create_fragment");
+  function instance9($$self, $$props, $$invalidate) {
+    let $value;
+    let { api } = $$props;
+    let { field } = $$props;
+    let value = api.signal(field.id);
+    component_subscribe($$self, value, (value2) => $$invalidate(0, $value = value2));
+    const $$binding_groups = [[]];
+    function input_change_handler() {
+      $value = this.__value;
+      value.set($value);
+    }
+    __name(input_change_handler, "input_change_handler");
+    $$self.$$set = ($$props2) => {
+      if ("api" in $$props2)
+        $$invalidate(2, api = $$props2.api);
+      if ("field" in $$props2)
+        $$invalidate(3, field = $$props2.field);
+    };
+    return [$value, value, api, field, input_change_handler, $$binding_groups];
+  }
+  __name(instance9, "instance");
+  var FetchResponse = class extends SvelteComponent {
+    static {
+      __name(this, "FetchResponse");
+    }
+    constructor(options) {
+      super();
+      init(this, options, instance9, create_fragment9, safe_not_equal, { api: 2, field: 3 });
+    }
+  };
+  var FetchResponse_default = FetchResponse;
+
+  // plug-ins/components/fetch/Fetch.svelte
+  function get_each_context4(ctx, list, i) {
+    const child_ctx = ctx.slice();
+    child_ctx[21] = list[i];
+    child_ctx[23] = i;
+    return child_ctx;
+  }
+  __name(get_each_context4, "get_each_context");
+  function create_each_block4(ctx) {
+    let switch_instance;
+    let switch_instance_anchor;
+    let current;
+    var switch_value = (
+      /*components*/
+      ctx[9][
+        /*field*/
+        ctx[21].type
+      ]
+    );
+    function switch_props(ctx2, dirty) {
+      return {
+        props: {
+          field: (
+            /*field*/
+            ctx2[21]
+          ),
+          api: (
+            /*api*/
+            ctx2[0]
+          )
+        }
+      };
+    }
+    __name(switch_props, "switch_props");
+    if (switch_value) {
+      switch_instance = construct_svelte_component(switch_value, switch_props(ctx));
+    }
+    return {
+      c() {
+        if (switch_instance)
+          create_component(switch_instance.$$.fragment);
+        switch_instance_anchor = empty();
+      },
+      m(target, anchor) {
+        if (switch_instance)
+          mount_component(switch_instance, target, anchor);
+        insert(target, switch_instance_anchor, anchor);
+        current = true;
+      },
+      p(ctx2, dirty) {
+        if (dirty & /*$fields*/
+        2 && switch_value !== (switch_value = /*components*/
+        ctx2[9][
+          /*field*/
+          ctx2[21].type
+        ])) {
+          if (switch_instance) {
+            group_outros();
+            const old_component = switch_instance;
+            transition_out(old_component.$$.fragment, 1, 0, () => {
+              destroy_component(old_component, 1);
+            });
+            check_outros();
+          }
+          if (switch_value) {
+            switch_instance = construct_svelte_component(switch_value, switch_props(ctx2, dirty));
+            create_component(switch_instance.$$.fragment);
+            transition_in(switch_instance.$$.fragment, 1);
+            mount_component(switch_instance, switch_instance_anchor.parentNode, switch_instance_anchor);
+          } else {
+            switch_instance = null;
+          }
+        } else if (switch_value) {
+          const switch_instance_changes = {};
+          if (dirty & /*$fields*/
+          2)
+            switch_instance_changes.field = /*field*/
+            ctx2[21];
+          if (dirty & /*api*/
+          1)
+            switch_instance_changes.api = /*api*/
+            ctx2[0];
+          switch_instance.$set(switch_instance_changes);
+        }
+      },
+      i(local) {
+        if (current)
+          return;
+        if (switch_instance)
+          transition_in(switch_instance.$$.fragment, local);
+        current = true;
+      },
+      o(local) {
+        if (switch_instance)
+          transition_out(switch_instance.$$.fragment, local);
+        current = false;
+      },
+      d(detaching) {
+        if (detaching) {
+          detach(switch_instance_anchor);
+        }
+        if (switch_instance)
+          destroy_component(switch_instance, detaching);
+      }
+    };
+  }
+  __name(create_each_block4, "create_each_block");
+  function create_fragment10(ctx) {
+    let div4;
+    let div0;
+    let t0;
+    let t1;
+    let t2_value = parseInt(
+      /*$w*/
+      ctx[5]
+    ) + "";
+    let t2;
+    let t3;
+    let t4_value = parseInt(
+      /*$h*/
+      ctx[6]
+    ) + "";
+    let t4;
+    let t5;
+    let button0;
+    let api_makeMovable_action;
+    let t6;
+    let div2;
+    let p;
+    let t7;
+    let t8;
+    let t9;
+    let div1;
+    let input;
+    let api_stopWheel_action;
+    let t10;
+    let div3;
+    let t11;
+    let t12;
+    let button1;
+    let api_makeResizable_action;
+    let div4_class_value;
+    let current;
+    let mounted;
+    let dispose;
+    let each_value = ensure_array_like(
+      /*$fields*/
+      ctx[1]
+    );
+    let each_blocks = [];
+    for (let i = 0; i < each_value.length; i += 1) {
+      each_blocks[i] = create_each_block4(get_each_context4(ctx, each_value, i));
+    }
+    const out = /* @__PURE__ */ __name((i) => transition_out(each_blocks[i], 1, 1, () => {
+      each_blocks[i] = null;
+    }), "out");
+    return {
+      c() {
+        div4 = element("div");
+        div0 = element("div");
+        t0 = text2(
+          /*$caption*/
+          ctx[4]
+        );
+        t1 = text2(" (");
+        t2 = text2(t2_value);
+        t3 = text2("x");
+        t4 = text2(t4_value);
+        t5 = text2(")\n    ");
+        button0 = element("button");
+        button0.innerHTML = `<i class="bi bi-x"></i>`;
+        t6 = space();
+        div2 = element("div");
+        p = element("p");
+        t7 = text2(
+          /*$text*/
+          ctx[7]
+        );
+        t8 = space();
+        for (let i = 0; i < each_blocks.length; i += 1) {
+          each_blocks[i].c();
+        }
+        t9 = space();
+        div1 = element("div");
+        input = element("input");
+        t10 = space();
+        div3 = element("div");
+        t11 = text2(
+          /*$status*/
+          ctx[8]
+        );
+        t12 = space();
+        button1 = element("button");
+        button1.innerHTML = `<i class="bi bi-grip-horizontal"></i>`;
+        attr(button0, "type", "button");
+        attr(button0, "class", "btn opacity-50");
+        set_style(button0, "position", "absolute");
+        set_style(button0, "right", "0");
+        set_style(button0, "top", "0");
+        set_style(button0, "padding", ".5rem");
+        attr(button0, "aria-label", "Close");
+        attr(div0, "class", "card-header user-select-none");
+        toggle_class(
+          div0,
+          "text-warning",
+          /*$selected*/
+          ctx[3]
+        );
+        attr(input, "class", "btn btn-primary");
+        attr(input, "type", "button");
+        input.value = "Run";
+        attr(div1, "class", "mb-3");
+        attr(div2, "class", "card-body overflow-auto");
+        attr(button1, "type", "button");
+        attr(button1, "class", "btn opacity-50");
+        set_style(button1, "position", "absolute");
+        set_style(button1, "right", "0");
+        set_style(button1, "bottom", "0");
+        set_style(button1, "padding", ".5rem");
+        attr(button1, "aria-label", "Resize");
+        attr(div3, "class", "card-footer text-body-secondary");
+        attr(div4, "class", div4_class_value = "card alert-" + /*$context*/
+        ctx[2] + " h-100 m-0");
+        toggle_class(
+          div4,
+          "active",
+          /*$selected*/
+          ctx[3]
+        );
+      },
+      m(target, anchor) {
+        insert(target, div4, anchor);
+        append(div4, div0);
+        append(div0, t0);
+        append(div0, t1);
+        append(div0, t2);
+        append(div0, t3);
+        append(div0, t4);
+        append(div0, t5);
+        append(div0, button0);
+        append(div4, t6);
+        append(div4, div2);
+        append(div2, p);
+        append(p, t7);
+        append(div2, t8);
+        for (let i = 0; i < each_blocks.length; i += 1) {
+          if (each_blocks[i]) {
+            each_blocks[i].m(div2, null);
+          }
+        }
+        append(div2, t9);
+        append(div2, div1);
+        append(div1, input);
+        append(div4, t10);
+        append(div4, div3);
+        append(div3, t11);
+        append(div3, t12);
+        append(div3, button1);
+        current = true;
+        if (!mounted) {
+          dispose = [
+            listen(
+              button0,
+              "click",
+              /*click_handler*/
+              ctx[19]
+            ),
+            action_destroyer(api_makeMovable_action = /*api*/
+            ctx[0].makeMovable(div0)),
+            listen(input, "click", function() {
+              if (is_function(
+                /*api*/
+                ctx[0].execute()
+              ))
+                ctx[0].execute().apply(this, arguments);
+            }),
+            action_destroyer(api_stopWheel_action = /*api*/
+            ctx[0].stopWheel(div2)),
+            action_destroyer(api_makeResizable_action = /*api*/
+            ctx[0].makeResizable(button1))
+          ];
+          mounted = true;
+        }
+      },
+      p(new_ctx, [dirty]) {
+        ctx = new_ctx;
+        if (!current || dirty & /*$caption*/
+        16)
+          set_data(
+            t0,
+            /*$caption*/
+            ctx[4]
+          );
+        if ((!current || dirty & /*$w*/
+        32) && t2_value !== (t2_value = parseInt(
+          /*$w*/
+          ctx[5]
+        ) + ""))
+          set_data(t2, t2_value);
+        if ((!current || dirty & /*$h*/
+        64) && t4_value !== (t4_value = parseInt(
+          /*$h*/
+          ctx[6]
+        ) + ""))
+          set_data(t4, t4_value);
+        if (!current || dirty & /*$selected*/
+        8) {
+          toggle_class(
+            div0,
+            "text-warning",
+            /*$selected*/
+            ctx[3]
+          );
+        }
+        if (!current || dirty & /*$text*/
+        128)
+          set_data(
+            t7,
+            /*$text*/
+            ctx[7]
+          );
+        if (dirty & /*components, $fields, api*/
+        515) {
+          each_value = ensure_array_like(
+            /*$fields*/
+            ctx[1]
+          );
+          let i;
+          for (i = 0; i < each_value.length; i += 1) {
+            const child_ctx = get_each_context4(ctx, each_value, i);
+            if (each_blocks[i]) {
+              each_blocks[i].p(child_ctx, dirty);
+              transition_in(each_blocks[i], 1);
+            } else {
+              each_blocks[i] = create_each_block4(child_ctx);
+              each_blocks[i].c();
+              transition_in(each_blocks[i], 1);
+              each_blocks[i].m(div2, t9);
+            }
+          }
+          group_outros();
+          for (i = each_value.length; i < each_blocks.length; i += 1) {
+            out(i);
+          }
+          check_outros();
+        }
+        if (!current || dirty & /*$status*/
+        256)
+          set_data(
+            t11,
+            /*$status*/
+            ctx[8]
+          );
+        if (!current || dirty & /*$context*/
+        4 && div4_class_value !== (div4_class_value = "card alert-" + /*$context*/
+        ctx[2] + " h-100 m-0")) {
+          attr(div4, "class", div4_class_value);
+        }
+        if (!current || dirty & /*$context, $selected*/
+        12) {
+          toggle_class(
+            div4,
+            "active",
+            /*$selected*/
+            ctx[3]
+          );
+        }
+      },
+      i(local) {
+        if (current)
+          return;
+        for (let i = 0; i < each_value.length; i += 1) {
+          transition_in(each_blocks[i]);
+        }
+        current = true;
+      },
+      o(local) {
+        each_blocks = each_blocks.filter(Boolean);
+        for (let i = 0; i < each_blocks.length; i += 1) {
+          transition_out(each_blocks[i]);
+        }
+        current = false;
+      },
+      d(detaching) {
+        if (detaching) {
+          detach(div4);
+        }
+        destroy_each(each_blocks, detaching);
+        mounted = false;
+        run_all(dispose);
+      }
+    };
+  }
+  __name(create_fragment10, "create_fragment");
+  var a = 1;
+  var b = 2;
+  function instance10($$self, $$props, $$invalidate) {
+    let c;
+    let $fields;
+    let $context;
+    let $selected;
+    let $caption;
+    let $w;
+    let $h;
+    let $text;
+    let $status;
+    const components3 = { WebUrl: WebUrl_default, HttpMethod: HttpMethod_default, FetchResponse: FetchResponse_default };
+    let { api } = $$props;
+    const context = api.signal("context");
+    component_subscribe($$self, context, (value) => $$invalidate(2, $context = value));
+    const caption = api.signal("caption");
+    component_subscribe($$self, caption, (value) => $$invalidate(4, $caption = value));
+    const text3 = api.signal("text");
+    component_subscribe($$self, text3, (value) => $$invalidate(7, $text = value));
+    const status = api.signal("status");
+    component_subscribe($$self, status, (value) => $$invalidate(8, $status = value));
+    const fields = api.signal("fields");
+    component_subscribe($$self, fields, (value) => $$invalidate(1, $fields = value));
+    const w = api.signal("w");
+    component_subscribe($$self, w, (value) => $$invalidate(5, $w = value));
+    const h = api.signal("h");
+    component_subscribe($$self, h, (value) => $$invalidate(6, $h = value));
+    const x = api.signal("h");
+    const selected = api.signal("selected");
+    component_subscribe($$self, selected, (value) => $$invalidate(3, $selected = value));
+    onMount(() => {
+      console.log("the component has mounted", $fields);
+    });
+    const click_handler = /* @__PURE__ */ __name(() => api.removeApplication(), "click_handler");
+    $$self.$$set = ($$props2) => {
+      if ("api" in $$props2)
+        $$invalidate(0, api = $$props2.api);
+    };
+    $$self.$$.update = () => {
+      if ($$self.$$.dirty & /*api, c*/
+      262145) {
+        $:
+          api.send("out", { a, b, c });
+      }
+      if ($$self.$$.dirty & /*api*/
+      1) {
+        $:
+          api.send("a", a);
+      }
+      if ($$self.$$.dirty & /*api*/
+      1) {
+        $:
+          api.send("b", b);
+      }
+      if ($$self.$$.dirty & /*api, c*/
+      262145) {
+        $:
+          api.send("c", c);
+      }
+      if ($$self.$$.dirty & /*$fields*/
+      2) {
+        $: {
+          console.log("FFF", $fields);
+        }
+      }
+    };
+    $:
+      $$invalidate(18, c = a + b);
+    return [
+      api,
+      $fields,
+      $context,
+      $selected,
+      $caption,
+      $w,
+      $h,
+      $text,
+      $status,
+      components3,
+      context,
+      caption,
+      text3,
+      status,
+      fields,
+      w,
+      h,
+      selected,
+      c,
+      click_handler
+    ];
+  }
+  __name(instance10, "instance");
+  var Fetch = class extends SvelteComponent {
+    static {
+      __name(this, "Fetch");
+    }
+    constructor(options) {
+      super();
+      init(this, options, instance10, create_fragment10, safe_not_equal, { api: 0 });
+    }
+  };
+  var Fetch_default = Fetch;
+
+  // plug-ins/components/Fetch.js
+  var Fetch2 = class {
+    static {
+      __name(this, "Fetch");
+    }
+    static extends = [Application];
+    observables = {
+      url: "wwww",
+      method: "GET",
+      headers: void 0,
+      format: "json",
+      body: void 0
+    };
+    serializables = {
+      url: "string",
+      method: "string",
+      format: "string",
+      headers: "object",
+      body: "object"
+    };
+    traits = {
+      async execute() {
+        const response = await fetch(this.url, {
+          headers: this.headers,
+          method: this.method,
+          body: JSON.stringify(this.body)
+        });
+        const data = await response[this.format]();
+        this.send("out", data);
+      }
+    };
+    methods = {
+      initialize() {
+        this.w = 800;
+        this.h = 400;
+        this.createSocket("out", 1);
+        this.createField({ id: "url", type: "WebUrl", label: "Web Address" });
+        this.createField({ id: "method", type: "HttpMethod" });
+        this.createField({ id: "format", type: "FetchResponse" });
+        this.createSocket("b", 1);
+        this.createSocket("c", 1);
+      },
+      mount() {
+        this.foreign = new Instance(Foreign);
+        this.createWindowComponent(this.foreign);
+        this.component = new Fetch_default({
+          target: this.foreign.body,
+          props: { api: this }
         });
         this.addDisposable(stopWheel(this.foreign.body));
       },
@@ -12528,6 +13828,7 @@
           keymap.of([indentWithTab]),
           EditorView.updateListener.of((update3) => {
             if (update3.docChanged) {
+              this.send("out", update3.state.doc.toString());
             }
           }),
           oneDark,
@@ -12684,14 +13985,17 @@
       __name(this, "Pipe");
     }
     static extends = [Window];
-    properties = {
-      serializables: "id from to out in".split(" ")
+    properties = {};
+    serializables = {
+      from: "string",
+      to: "string",
+      out: "string",
+      in: "string"
     };
     methods = {
       initialize() {
         this.showCaption = false;
         this.isResizable = false;
-        console.log(this);
       },
       mount() {
         this.connector = new Instance(Connector, {
@@ -12763,12 +14067,12 @@
   __name(slide, "slide");
 
   // plug-ins/components/architecture/Entry.svelte
-  function get_each_context2(ctx, list, i) {
+  function get_each_context5(ctx, list, i) {
     const child_ctx = ctx.slice();
     child_ctx[2] = list[i];
     return child_ctx;
   }
-  __name(get_each_context2, "get_each_context");
+  __name(get_each_context5, "get_each_context");
   function create_if_block_1(ctx) {
     let if_block_anchor;
     function select_block_type(ctx2, dirty) {
@@ -12891,9 +14195,9 @@
       ctx2[2].id
     ), "get_key");
     for (let i = 0; i < each_value.length; i += 1) {
-      let child_ctx = get_each_context2(ctx, each_value, i);
+      let child_ctx = get_each_context5(ctx, each_value, i);
       let key = get_key(child_ctx);
-      each_1_lookup.set(key, each_blocks[i] = create_each_block2(key, child_ctx));
+      each_1_lookup.set(key, each_blocks[i] = create_each_block5(key, child_ctx));
     }
     return {
       c() {
@@ -12920,7 +14224,7 @@
             ctx2[2].children
           );
           group_outros();
-          each_blocks = update_keyed_each(each_blocks, dirty, get_key, 1, ctx2, each_value, each_1_lookup, ul, outro_and_destroy_block, create_each_block2, null, get_each_context2);
+          each_blocks = update_keyed_each(each_blocks, dirty, get_key, 1, ctx2, each_value, each_1_lookup, ul, outro_and_destroy_block, create_each_block5, null, get_each_context5);
           check_outros();
         }
       },
@@ -12985,7 +14289,7 @@
     };
   }
   __name(create_if_block2, "create_if_block");
-  function create_each_block2(key_1, ctx) {
+  function create_each_block5(key_1, ctx) {
     let first;
     let entry;
     let current;
@@ -13053,8 +14357,8 @@
       }
     };
   }
-  __name(create_each_block2, "create_each_block");
-  function create_fragment7(ctx) {
+  __name(create_each_block5, "create_each_block");
+  function create_fragment11(ctx) {
     let li;
     let div;
     let t0;
@@ -13225,8 +14529,8 @@
       }
     };
   }
-  __name(create_fragment7, "create_fragment");
-  function instance7($$self, $$props, $$invalidate) {
+  __name(create_fragment11, "create_fragment");
+  function instance11($$self, $$props, $$invalidate) {
     let { item } = $$props;
     let { api } = $$props;
     let { controller } = $$props;
@@ -13244,20 +14548,20 @@
     };
     return [api, controller, item, open, click_handler, click_handler_1, click_handler_2];
   }
-  __name(instance7, "instance");
+  __name(instance11, "instance");
   var Entry = class extends SvelteComponent {
     static {
       __name(this, "Entry");
     }
     constructor(options) {
       super();
-      init(this, options, instance7, create_fragment7, safe_not_equal, { item: 2, api: 0, controller: 1 });
+      init(this, options, instance11, create_fragment11, safe_not_equal, { item: 2, api: 0, controller: 1 });
     }
   };
   var Entry_default = Entry;
 
   // plug-ins/components/architecture/Interface.svelte
-  function create_fragment8(ctx) {
+  function create_fragment12(ctx) {
     let div9;
     let div0;
     let t0;
@@ -13532,10 +14836,10 @@
       }
     };
   }
-  __name(create_fragment8, "create_fragment");
-  var a = 1;
-  var b = 2;
-  function instance8($$self, $$props, $$invalidate) {
+  __name(create_fragment12, "create_fragment");
+  var a2 = 1;
+  var b2 = 2;
+  function instance12($$self, $$props, $$invalidate) {
     let c;
     let $context;
     let $selected;
@@ -13574,17 +14878,17 @@
       if ($$self.$$.dirty & /*api, c*/
       32770) {
         $:
-          api.send("out", { a, b, c });
+          api.send("out", { a: a2, b: b2, c });
       }
       if ($$self.$$.dirty & /*api*/
       2) {
         $:
-          api.send("a", a);
+          api.send("a", a2);
       }
       if ($$self.$$.dirty & /*api*/
       2) {
         $:
-          api.send("b", b);
+          api.send("b", b2);
       }
       if ($$self.$$.dirty & /*api, c*/
       32770) {
@@ -13593,7 +14897,7 @@
       }
     };
     $:
-      $$invalidate(15, c = a + b);
+      $$invalidate(15, c = a2 + b2);
     return [
       tree,
       api,
@@ -13615,14 +14919,14 @@
       click_handler_1
     ];
   }
-  __name(instance8, "instance");
+  __name(instance12, "instance");
   var Interface2 = class extends SvelteComponent {
     static {
       __name(this, "Interface");
     }
     constructor(options) {
       super();
-      init(this, options, instance8, create_fragment8, safe_not_equal, { tree: 0, api: 1 });
+      init(this, options, instance12, create_fragment12, safe_not_equal, { tree: 0, api: 1 });
     }
   };
   var Interface_default2 = Interface2;
@@ -13779,13 +15083,13 @@
   __name(getFunctionSignature, "getFunctionSignature");
 
   // plug-ins/components/analysis/Interface.svelte
-  function get_each_context3(ctx, list, i) {
+  function get_each_context6(ctx, list, i) {
     const child_ctx = ctx.slice();
     child_ctx[24] = list[i];
     child_ctx[26] = i;
     return child_ctx;
   }
-  __name(get_each_context3, "get_each_context");
+  __name(get_each_context6, "get_each_context");
   function get_each_context_1(ctx, list, i) {
     const child_ctx = ctx.slice();
     child_ctx[24] = list[i];
@@ -15475,7 +16779,7 @@
     );
     let each_blocks = [];
     for (let i = 0; i < each_value.length; i += 1) {
-      each_blocks[i] = create_each_block3(get_each_context3(ctx, each_value, i));
+      each_blocks[i] = create_each_block6(get_each_context6(ctx, each_value, i));
     }
     return {
       c() {
@@ -15502,11 +16806,11 @@
           );
           let i;
           for (i = 0; i < each_value.length; i += 1) {
-            const child_ctx = get_each_context3(ctx2, each_value, i);
+            const child_ctx = get_each_context6(ctx2, each_value, i);
             if (each_blocks[i]) {
               each_blocks[i].p(child_ctx, dirty);
             } else {
-              each_blocks[i] = create_each_block3(child_ctx);
+              each_blocks[i] = create_each_block6(child_ctx);
               each_blocks[i].c();
               each_blocks[i].m(ul, null);
             }
@@ -15626,7 +16930,7 @@
     };
   }
   __name(create_each_block_1, "create_each_block_1");
-  function create_each_block3(ctx) {
+  function create_each_block6(ctx) {
     let li;
     let i_1;
     let i_1_class_value;
@@ -15704,8 +17008,8 @@
       }
     };
   }
-  __name(create_each_block3, "create_each_block");
-  function create_fragment9(ctx) {
+  __name(create_each_block6, "create_each_block");
+  function create_fragment13(ctx) {
     let div3;
     let div0;
     let t0;
@@ -15916,8 +17220,8 @@
       }
     };
   }
-  __name(create_fragment9, "create_fragment");
-  function instance9($$self, $$props, $$invalidate) {
+  __name(create_fragment13, "create_fragment");
+  function instance13($$self, $$props, $$invalidate) {
     let $context;
     let $selected;
     let $caption;
@@ -15987,7 +17291,7 @@
       click_handler_4
     ];
   }
-  __name(instance9, "instance");
+  __name(instance13, "instance");
   var Interface3 = class extends SvelteComponent {
     static {
       __name(this, "Interface");
@@ -15997,8 +17301,8 @@
       init(
         this,
         options,
-        instance9,
-        create_fragment9,
+        instance13,
+        create_fragment13,
         safe_not_equal,
         {
           stores: 15,
@@ -16069,7 +17373,7 @@
   };
 
   // plug-ins/components/alert/Interface.svelte
-  function create_fragment10(ctx) {
+  function create_fragment14(ctx) {
     let div;
     let button0;
     let t0;
@@ -16115,7 +17419,7 @@
         t6 = space();
         p1 = element("p");
         t7 = text2(
-          /*$status*/
+          /*$note*/
           ctx[5]
         );
         attr(button0, "type", "button");
@@ -16205,11 +17509,11 @@
             /*$text*/
             ctx2[4]
           );
-        if (dirty & /*$status*/
+        if (dirty & /*$note*/
         32)
           set_data(
             t7,
-            /*$status*/
+            /*$note*/
             ctx2[5]
           );
         if (dirty & /*$context*/
@@ -16238,13 +17542,13 @@
       }
     };
   }
-  __name(create_fragment10, "create_fragment");
-  function instance10($$self, $$props, $$invalidate) {
+  __name(create_fragment14, "create_fragment");
+  function instance14($$self, $$props, $$invalidate) {
     let $context;
     let $selected;
     let $caption;
     let $text;
-    let $status;
+    let $note;
     let { api } = $$props;
     const caption = api.signal("caption");
     component_subscribe($$self, caption, (value) => $$invalidate(3, $caption = value));
@@ -16252,9 +17556,8 @@
     component_subscribe($$self, context, (value) => $$invalidate(1, $context = value));
     const text3 = api.signal("text");
     component_subscribe($$self, text3, (value) => $$invalidate(4, $text = value));
-    const status = api.signal("status");
-    component_subscribe($$self, status, (value) => $$invalidate(5, $status = value));
-    1;
+    const note = api.signal("note");
+    component_subscribe($$self, note, (value) => $$invalidate(5, $note = value));
     const selected = api.signal("selected");
     component_subscribe($$self, selected, (value) => $$invalidate(2, $selected = value));
     const click_handler = /* @__PURE__ */ __name(() => api.removeApplication(), "click_handler");
@@ -16268,23 +17571,23 @@
       $selected,
       $caption,
       $text,
-      $status,
+      $note,
       caption,
       context,
       text3,
-      status,
+      note,
       selected,
       click_handler
     ];
   }
-  __name(instance10, "instance");
+  __name(instance14, "instance");
   var Interface4 = class extends SvelteComponent {
     static {
       __name(this, "Interface");
     }
     constructor(options) {
       super();
-      init(this, options, instance10, create_fragment10, safe_not_equal, { api: 0 });
+      init(this, options, instance14, create_fragment14, safe_not_equal, { api: 0 });
     }
   };
   var Interface_default4 = Interface4;
@@ -16296,9 +17599,11 @@
     }
     static extends = [Application];
     observables = {};
+    serializables = {
+      caption: "string"
+    };
     methods = {
       initialize() {
-        this.serializables = "title context text note".split(" ");
       },
       mount() {
         this.foreign = new Instance(Foreign);
@@ -16317,15 +17622,22 @@
 
   // plug-ins/components/index.js
   var components2 = {
+    // Core
+    Workspace,
     Group,
     Pipe: Pipe2,
-    Hello,
+    // UI
+    Alert,
+    // Reflection
     Architecture,
     Analysis,
+    // Tests
+    Hello,
+    // Data Services
+    Fetch: Fetch2,
+    // Applications
     Terminal,
-    Editor,
-    Alert,
-    Workspace
+    Editor
   };
   var components_default = components2;
 

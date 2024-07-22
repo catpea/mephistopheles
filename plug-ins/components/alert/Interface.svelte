@@ -6,7 +6,7 @@
   const caption = api.signal('caption');
   const context = api.signal('context');
   const text = api.signal('text');
-  const status = api.signal('status');1
+  const note = api.signal('note');
 
   const selected = api.signal('selected');
 
@@ -20,6 +20,6 @@
   <h4 class="alert-heading user-select-none" class:text-warning={$selected} use:api.makeMovable>{$caption}</h4>
   <p class="overflow-auto" use:api.stopWheel>{$text}</p>
   <hr>
-  <p class="mb-0">{$status}</p>
+  <p class="mb-0">{$note}</p>
 
 </div>

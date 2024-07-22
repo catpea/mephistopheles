@@ -1,0 +1,4 @@
+- From https://github.com/HackerNews/API?tab=readme-ov-file
+- front page https://hacker-news.firebaseio.com/v0/topstories.json?print=pretty
+- story details https://hacker-news.firebaseio.com/v0/item/8863.json?print=pretty
+- comments https://hacker-news.firebaseio.com/v0/item/2921983.json?print=pretty

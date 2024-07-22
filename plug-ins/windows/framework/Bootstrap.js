@@ -5,8 +5,14 @@ export default class Bootstrap {
 
   observables = {
     context: 'dark',
-    text: 'Hello World',
-    status: 'This is a kitchen sink hello world note',
+    text: '',
+    status: '',
+  };
+
+  serializables = {
+    context: {type: 'string', enum: ['primary', 'secondary', 'success', 'danger', 'warning', 'info', 'light', 'dark'], default:'dark'},
+    text:    'string',
+    note:    'string',
   };
 
   traits = {

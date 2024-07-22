@@ -58,6 +58,7 @@ export class Instance {
     this.oo.types = specification.types;
     this.oo.specification = specification;
     this.oo.attributes = [];
+    this.oo.serializables = [];
 
     this.oo.extends = [];
     this.oo.disposables = [];
@@ -111,6 +112,32 @@ export class Instance {
               enumerable: true,
               configurable: false,
             });
+          }
+        } // for properties
+      } // if
+    }
+
+    // Install Serializables
+    const serializablesLookup = {};
+    for (const inherited of this.oo.specifications) {
+
+      // begin at top, avoid properties that already exist.
+      if(inherited.serializables){
+        for (const [name, data] of Object.entries(inherited.serializables).reverse()) {
+          if(name in serializablesLookup === false){
+            // Promote string shorthand to object
+            let value;
+            if(typeof data === 'string'){
+              value = {type: data}
+            }else{
+              value = data;
+            }
+            const origin = inherited.name; // log origin class
+            const object = {name, value, origin}; // create the object
+            this.oo.serializables.unshift(object); // add it to database
+            serializablesLookup[name] = object;
+          }else{
+            console.log(`Serializable named ${name} already defined in ${serializablesLookup[name].origin}`);
           }
         } // for properties
       } // if
@@ -351,13 +378,16 @@ export class Instance {
     }
 
     this.signal = function(name){
+     const that = this;
      return {
-        get value() { return this[name]; },
-        set value(v) { this[name] = v; },
+        get value() { return that[name]; },
+        // get() { return that[name]; },
+        set(v) { that[name] = v; },
         subscribe: (subscriber) => {
           return this.on(name, subscriber, {manual:true});
         },
       }
+
     }
 
 
@@ -621,7 +651,8 @@ export class List {
     const pureEvent = eventName == this.name;
     if( pureEvent ){ // will not spew for xxx.created or xxx.deleted just xxx
       if(options.autorun){
-        for (const item of this.#value) { observerCallback(item) }
+        // for (const item of this.#value) { observerCallback(item) }
+        observerCallback( this.#value );
       }
     }
 
@@ -634,7 +665,6 @@ export class List {
     if( options.replay ){
       for (const item of this.#value) { observerCallback(item) }
     }
-
     this.#observers[eventName].push(observerCallback);
 
     return () => {

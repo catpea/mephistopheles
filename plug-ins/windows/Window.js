@@ -21,7 +21,7 @@ export default class Window {
   static extends = [Sockets, Vertical];
 
   observables = {
-    caption: 'Untitled',
+    caption: '',
 
     showCaption: false,
     isResizable: false,
@@ -50,7 +50,6 @@ export default class Window {
 
     initialize(){
 
-      this.caption = `${this.name||this.oo.name}`;
 
       if(this.isRootWindow) return;
       if(this.oo.name == 'Pipe') return;
@@ -87,7 +86,7 @@ export default class Window {
           minimumX:128,
           minimumY:128,
           handle: this.el.ResizeHandle,
-          scale: ()=>this.getScale(this),
+          scale: ()=>this.getScale(this.parent), // BUG WARNING, it should say this not this.parent
           box:  this.getApplication(this),
           before: ()=>{},
           movement: ({x,y})=>{},
@@ -97,7 +96,7 @@ export default class Window {
         this.addDisposable(resize);
 
       }
-      
+
       // ADD DRAGGABLE CAPTION (aka handle)
       this.draw(); // WARNING: you must draw the window before drawing the caption, so that the caption is on top
 
@@ -116,7 +115,7 @@ export default class Window {
         const move = new Move({
           area: window,
           handle: this.captionComponent.handle,
-          scale: ()=>this.getScale(this),
+          scale: ()=>this.getScale(this.parent),
           before: ()=>{},
           movement: ({x,y})=>{
             this.node.x -= x;

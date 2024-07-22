@@ -1,5 +1,6 @@
 import { svg, update, click, text } from "/plug-ins/domek/index.js"
 import {nest} from "/plug-ins/nest/index.js";
+import cast from "/plug-ins/cast/index.js";
 
 import Pan from "/plug-ins/mouse-services/Pan.js";
 import Zoom from "/plug-ins/mouse-services/Zoom.js";
@@ -64,19 +65,36 @@ export default class Realm {
     components:{...components},
 
   };
-
+  serializables = {
+    library: 'string',
+    panX: 'float',
+    panY: 'float',
+    zoom: 'float',
+  };
   traits = {
 
     async loadXml(url){
       if(!url) return;
       const xml = await (await fetch(url)).text();
       const $ = cheerio.load(xml, { xmlMode: true, decodeEntities: true, withStartIndices: true, withEndIndices: true });
+
+      console.log('TODO: Ease reliance on .node');
+      let types = Object.fromEntries(this.oo.serializables.map(o=>[o.name, o.value.type]));
+      let serializables = this.oo.serializables.map(o=>o.name);
+      let blacklist = ['id','x','y','w','h'];
+      let attributes = Object.fromEntries( Object.entries($('Workspace').get(0).attribs).filter(([k,v])=>serializables.indexOf(k)!==-1).filter(([k,v])=>!blacklist.includes(k)).map(([k,v])=>[k,cast(v,types[k])]) )
+      Object.assign(this, attributes)
+
       for (const el of $('Workspace').children()) {
         const node = new Instance(Node, { origin: this.getApplication().id });
         const data = {}; //? NOTE: this can use await...
+        // console.log('loadXml', el.name, el.attribs);
+
         node.assign({type:el.name, ...el.attribs, }, data, [$, $(el).children()]);
         this.elements.create( node ); // -> see project #onStart for creation.
       }
+
+
     },
 
     loadElements([$, children]){
@@ -84,22 +102,28 @@ export default class Realm {
       for (const el of children) {
         const node = new Instance(Node, { origin: this.getApplication().id });
         const data = {}; //? NOTE: this can use await...
+        // console.log('loadElements', el.attribs);
         node.assign({type:el.name, ...el.attribs}, data, [$, $(el).children()]);
         this.elements.create( node ); // -> see project #onStart for creation.
       }
     },
 
     getXml(){
-      const serializables =  'id x y w h'.split(' ');
+
+
       const $ = cheerio.load(``, { xmlMode: true, decodeEntities: true, withStartIndices: true, withEndIndices: true });
         for (const application of this.applications) {
           let body = "";
           if(application.realm){
             body = application.realm.getXml();
           }
-          const attributeNames = serializables.concat(application.serializables||[]);
-          console.log({attributeNames});
-          const attributes = attributeNames.filter(key=>application[key]).map(key=>`${key}="${application[key]}"`).join(' ')
+
+          const attributeNames = application.oo.serializables;
+          const attributes = attributeNames
+            .filter(o=>application[o.name]) // remove empty
+            .filter(o=>application[o.name]!==o.value.default) // remove empty
+            .map(o=>`${o.name}=${JSON.stringify(application[o.name])}`).join(' ') // create xml string
+
           $.root().append(`<${application.oo.name} ${attributes}>${body}</${application.oo.name}>`);
         }
       const xml = $.root().html();
@@ -179,9 +203,16 @@ export default class Realm {
         let root = svg.g({ id:node.id, name: 'element' });
         realmBody.content.appendChild(root);
         const options = { node, scene: root, parent: this, id:node.id, content:node.content, library:node.library };
-        const attributes = {};
-        for (const name of node.oo.attributes) { attributes[name] = node[name] }
-        const application = new Instance(Application, Object.assign(attributes, options));
+        const application = new Instance(Application, options);
+
+        for (const serializable of application.oo.serializables) {
+          const name = serializable.name;
+          const type = serializable.value.type;
+          const value = cast(node[name], type);
+          application[name] = value;
+          console.log(`Set ${name} of ${application.oo.name} to`, value);
+        }
+
         this.applications.create(application);
         application.start(); // start the state machine
 

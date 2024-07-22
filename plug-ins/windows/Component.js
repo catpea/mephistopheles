@@ -42,6 +42,14 @@ export default class Component {
 
   };
 
+  serializables = {
+    id: 'string',
+    x: 'float',
+    y: 'float',
+    w: 'float',
+    h: 'float',
+  };
+
   constraints = {
 
     scene: {
@@ -176,13 +184,15 @@ export default class Component {
 
     getScale(component){
       const list = this.getTransforms(component);
+      // console.log('XXX TRANSFORMS', list.map(o=>o.name));
       const scale = list.map(o=>o.zoom).reduce((a,c)=>a*c, 1) ;
       return scale;
     },
 
     getTransforms(element, list=[], root=true) {
       if(!element) element = this;
-      const isTransform = element.hasOwnProperty('panX')&&element.hasOwnProperty('panY')&&element.hasOwnProperty('zoom');
+      // const isTransform = element.hasOwnProperty('panX')&&element.hasOwnProperty('panY')&&element.hasOwnProperty('zoom');
+      const isTransform = element.isGroup;
       if(isTransform){
         let offsetX = element.viewport.x - element.x;
         let offsetY = element.viewport.y - element.y;
