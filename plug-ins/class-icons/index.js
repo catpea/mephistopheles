@@ -87,6 +87,22 @@ export default function(className){
       response = 'binoculars';
       break;
 
+    case 'Gradients':
+      response = 'palette2';
+      break;
+
+    case 'Hello':
+      response = 'telephone';
+      break;
+
+    case 'Fetch':
+      response = 'download';
+      break;
+
+    case 'Alert':
+      response = 'exclamation-diamond';
+      break;
+
     default:
       response = 'list';
   }

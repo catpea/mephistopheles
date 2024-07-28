@@ -35,26 +35,29 @@ export default class Gradients {
   methods = {
     initialize(){
 
-      this.w = 800;
-      this.h = 400;
+
 
       this.createSocket('out', 1);
 
     },
+
     mount(){
 
-      const motif = new Motif('bg');
+      this.w = 400;
+      this.h = 700;
+
+      const motif = new Motif('background');
       motif.addColor('#2e3743', '0%').addColor('#343a49', '20%').addColor('#141d25', '100%');
+
       motif.hi('caption').addColor('#3b4650', '0%').addColor('#1a1e29', '100%');
       motif.lo('body').addColor('#0f141d', '0%').addColor('#2c3645', '45%').addColor('#131821', '100%');
       motif.hi('footer').addColor('#3b4650', '0%').addColor('#1a1e29', '100%');
-
       motif.get('body').bt('btn-1').addColor('#ecb349', '0%').addColor('#da5a03', '100%');
       motif.get('body').bt('btn-2').addColor('#d443f1', '0%').addColor('#3c1968', '100%');
 
       this.motif = motif;
 
-      console.log('XXX', this.motif);
+
 
       this.foreign = new Instance(Foreign);
       this.createWindowComponent( this.foreign );

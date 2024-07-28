@@ -603,14 +603,14 @@ export class Primitive {
     }
   }
 
-  notifyAll() {
-    if (Array.isArray(this.#observers[this.name])){
-      console.log('XXX', this.#value);
-      if(this.#value !== undefined){
-        this.#observers[this.name].forEach((observerCallback) => observerCallback(this.#value));
-      }
-    }
-  }
+  // notifyAll() {
+  //   if (Array.isArray(this.#observers[this.name])){
+  //     console.log('XXX', this.#value);
+  //     if(this.#value !== undefined){
+  //       this.#observers[this.name].forEach((observerCallback) => observerCallback(this.#value));
+  //     }
+  //   }
+  // }
 
   status(){
 

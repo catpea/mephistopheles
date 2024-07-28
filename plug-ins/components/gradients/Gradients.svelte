@@ -7,39 +7,27 @@
 
   export let api;
 
+  const selected = api.signal('selected');
   const context = api.signal('context');
   const caption = api.signal('caption');
   const text = api.signal('text');
   const status = api.signal('status');
 
-  const motif = api.signal('motif');
 
   const w = api.signal('w');
   const h = api.signal('h');
 
-  let a = 1;
-  let b = 2;
-  $: c = a + b;
+  // $: api.send('out', {a,b,c})
 
-  $: api.send('out', {a,b,c})
 
+  // ---
+
+  const motif = api.signal('motif');
   let selection = null;
-
-  const x = api.signal('h');
-  const selected = api.signal('selected');
-
-  $:{
-    console.log('XXX', $motif);
-    console.log('XXX', motif );
-  }
+  $: colors = selection?$motif.get(selection).colors.get():[];
 
   onMount(() => {
-		console.log('XXX the component has mounted', $motif);
 	});
-
-  function refresh(){
-    motif.notify()
-  }
 
 </script>
 
@@ -50,25 +38,18 @@
     <button type="button" class="btn opacity-50" style="position: absolute; right:0; top:0; padding: .5rem;" aria-label="Close" on:click={()=>api.removeApplication()}><i class="bi bi-x"></i></button>
   </div>
 
-  <div class="card-body overflow-auto m-0 p-0" style="background-color: black;" use:api.stopWheel>
-    <!-- <p>{$text}</p> -->
-    {#each [$motif] as motif, index}
-      <Preview {api} {motif} bind:selection/>
+  <div class="card-body overflow-auto m-0 p-0 tx-lo" use:api.stopWheel>
+    {#each [$motif] as {id, padding, angle, stops, levels}, index}
+      <Preview {api} {id} {padding} {angle} {...stops} {levels} bind:selection/>
     {/each}
+    {#if selection}
+      {#each colors as {color, length}}
+         <Color {api} {color} {length} />
+      {/each}
+    {/if}
     <!-- <input class="btn btn-primary tx-hi" type="button" value="Export" on:click={api.execute()}> -->
   </div>
 
-  {#if selection}
-
-    {selection.id}
-
-    {#key selection}
-    {#each selection.colors as stop, index}
-        <Color {api} {stop} {refresh}/>
-    {/each}
-    {/key}
-
-  {/if}
 
   <div class="card-footer text-body-secondary tx-hi py-0 px-1">
     {$status}

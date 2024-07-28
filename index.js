@@ -137,8 +137,8 @@
           if (!mode) {
             autodetect = true;
             if (!_input.sorted) {
-              _input.autodetect = _input.autodetect.sort(function(a4, b4) {
-                return b4.p - a4.p;
+              _input.autodetect = _input.autodetect.sort(function(a3, b3) {
+                return b3.p - a3.p;
               });
               _input.sorted = true;
             }
@@ -185,15 +185,15 @@
           var ref = unpack$A(args, "rgb");
           var r = ref[0];
           var g = ref[1];
-          var b4 = ref[2];
+          var b3 = ref[2];
           r = r / 255;
           g = g / 255;
-          b4 = b4 / 255;
-          var k = 1 - max$2(r, max$2(g, b4));
+          b3 = b3 / 255;
+          var k = 1 - max$2(r, max$2(g, b3));
           var f = k < 1 ? 1 / (1 - k) : 0;
           var c = (1 - r - k) * f;
           var m = (1 - g - k) * f;
-          var y = (1 - b4 - k) * f;
+          var y = (1 - b3 - k) * f;
           return [c, m, y, k];
         }, "rgb2cmyk$1");
         var rgb2cmyk_1 = rgb2cmyk$1;
@@ -252,8 +252,8 @@
         });
         var unpack$x = utils.unpack;
         var last$2 = utils.last;
-        var rnd = /* @__PURE__ */ __name(function(a4) {
-          return Math.round(a4 * 100) / 100;
+        var rnd = /* @__PURE__ */ __name(function(a3) {
+          return Math.round(a3 * 100) / 100;
         }, "rnd");
         var hsl2css$1 = /* @__PURE__ */ __name(function() {
           var args = [], len = arguments.length;
@@ -281,12 +281,12 @@
           args = unpack$w(args, "rgba");
           var r = args[0];
           var g = args[1];
-          var b4 = args[2];
+          var b3 = args[2];
           r /= 255;
           g /= 255;
-          b4 /= 255;
-          var min2 = Math.min(r, g, b4);
-          var max2 = Math.max(r, g, b4);
+          b3 /= 255;
+          var min2 = Math.min(r, g, b3);
+          var max2 = Math.max(r, g, b3);
           var l = (max2 + min2) / 2;
           var s, h;
           if (max2 === min2) {
@@ -296,10 +296,10 @@
             s = l < 0.5 ? (max2 - min2) / (max2 + min2) : (max2 - min2) / (2 - max2 - min2);
           }
           if (r == max2) {
-            h = (g - b4) / (max2 - min2);
+            h = (g - b3) / (max2 - min2);
           } else if (g == max2) {
-            h = 2 + (b4 - r) / (max2 - min2);
-          } else if (b4 == max2) {
+            h = 2 + (b3 - r) / (max2 - min2);
+          } else if (b3 == max2) {
             h = 4 + (r - g) / (max2 - min2);
           }
           h *= 60;
@@ -347,9 +347,9 @@
           var h = args[0];
           var s = args[1];
           var l = args[2];
-          var r, g, b4;
+          var r, g, b3;
           if (s === 0) {
-            r = g = b4 = l * 255;
+            r = g = b3 = l * 255;
           } else {
             var t3 = [0, 0, 0];
             var c = [0, 0, 0];
@@ -376,12 +376,12 @@
                 c[i2] = t1;
               }
             }
-            assign2 = [round$5(c[0] * 255), round$5(c[1] * 255), round$5(c[2] * 255)], r = assign2[0], g = assign2[1], b4 = assign2[2];
+            assign2 = [round$5(c[0] * 255), round$5(c[1] * 255), round$5(c[2] * 255)], r = assign2[0], g = assign2[1], b3 = assign2[2];
           }
           if (args.length > 3) {
-            return [r, g, b4, args[3]];
+            return [r, g, b3, args[3]];
           }
-          return [r, g, b4, 1];
+          return [r, g, b3, 1];
         }, "hsl2rgb$1");
         var hsl2rgb_1 = hsl2rgb$1;
         var hsl2rgb = hsl2rgb_1;
@@ -513,9 +513,9 @@
           var ref = unpack$s(args, "rgb");
           var r = ref[0];
           var g = ref[1];
-          var b4 = ref[2];
-          var min2 = Math.min(r, g, b4);
-          var max2 = Math.max(r, g, b4);
+          var b3 = ref[2];
+          var min2 = Math.min(r, g, b3);
+          var max2 = Math.max(r, g, b3);
           var delta = max2 - min2;
           var c = delta * 100 / 255;
           var _g = min2 / (255 - delta) * 100;
@@ -524,12 +524,12 @@
             h = Number.NaN;
           } else {
             if (r === max2) {
-              h = (g - b4) / delta;
+              h = (g - b3) / delta;
             }
             if (g === max2) {
-              h = 2 + (b4 - r) / delta;
+              h = 2 + (b3 - r) / delta;
             }
-            if (b4 === max2) {
+            if (b3 === max2) {
               h = 4 + (r - g) / delta;
             }
             h *= 60;
@@ -551,11 +551,11 @@
           var h = args[0];
           var c = args[1];
           var _g = args[2];
-          var r, g, b4;
+          var r, g, b3;
           _g = _g * 255;
           var _c = c * 255;
           if (c === 0) {
-            r = g = b4 = _g;
+            r = g = b3 = _g;
           } else {
             if (h === 360) {
               h = 0;
@@ -575,26 +575,26 @@
             var v = p + _c;
             switch (i2) {
               case 0:
-                assign2 = [v, t, p], r = assign2[0], g = assign2[1], b4 = assign2[2];
+                assign2 = [v, t, p], r = assign2[0], g = assign2[1], b3 = assign2[2];
                 break;
               case 1:
-                assign$1 = [q, v, p], r = assign$1[0], g = assign$1[1], b4 = assign$1[2];
+                assign$1 = [q, v, p], r = assign$1[0], g = assign$1[1], b3 = assign$1[2];
                 break;
               case 2:
-                assign$2 = [p, v, t], r = assign$2[0], g = assign$2[1], b4 = assign$2[2];
+                assign$2 = [p, v, t], r = assign$2[0], g = assign$2[1], b3 = assign$2[2];
                 break;
               case 3:
-                assign$3 = [p, q, v], r = assign$3[0], g = assign$3[1], b4 = assign$3[2];
+                assign$3 = [p, q, v], r = assign$3[0], g = assign$3[1], b3 = assign$3[2];
                 break;
               case 4:
-                assign$4 = [t, p, v], r = assign$4[0], g = assign$4[1], b4 = assign$4[2];
+                assign$4 = [t, p, v], r = assign$4[0], g = assign$4[1], b3 = assign$4[2];
                 break;
               case 5:
-                assign$5 = [v, p, q], r = assign$5[0], g = assign$5[1], b4 = assign$5[2];
+                assign$5 = [v, p, q], r = assign$5[0], g = assign$5[1], b3 = assign$5[2];
                 break;
             }
           }
-          return [r, g, b4, args.length > 3 ? args[3] : 1];
+          return [r, g, b3, args.length > 3 ? args[3] : 1];
         }, "hcg2rgb");
         var hcg2rgb_1 = hcg2rgb;
         var unpack$q = utils.unpack;
@@ -635,22 +635,22 @@
           var ref = unpack$p(args, "rgba");
           var r = ref[0];
           var g = ref[1];
-          var b4 = ref[2];
-          var a4 = ref[3];
+          var b3 = ref[2];
+          var a3 = ref[3];
           var mode = last(args) || "auto";
-          if (a4 === void 0) {
-            a4 = 1;
+          if (a3 === void 0) {
+            a3 = 1;
           }
           if (mode === "auto") {
-            mode = a4 < 1 ? "rgba" : "rgb";
+            mode = a3 < 1 ? "rgba" : "rgb";
           }
           r = round$3(r);
           g = round$3(g);
-          b4 = round$3(b4);
-          var u = r << 16 | g << 8 | b4;
+          b3 = round$3(b3);
+          var u = r << 16 | g << 8 | b3;
           var str = "000000" + u.toString(16);
           str = str.substr(str.length - 6);
-          var hxa = "0" + round$3(a4 * 255).toString(16);
+          var hxa = "0" + round$3(a3 * 255).toString(16);
           hxa = hxa.substr(hxa.length - 2);
           switch (mode.toLowerCase()) {
             case "rgba":
@@ -676,8 +676,8 @@
             var u = parseInt(hex, 16);
             var r = u >> 16;
             var g = u >> 8 & 255;
-            var b4 = u & 255;
-            return [r, g, b4, 1];
+            var b3 = u & 255;
+            return [r, g, b3, 1];
           }
           if (hex.match(RE_HEXA)) {
             if (hex.length === 5 || hex.length === 9) {
@@ -691,8 +691,8 @@
             var r$1 = u$1 >> 24 & 255;
             var g$1 = u$1 >> 16 & 255;
             var b$1 = u$1 >> 8 & 255;
-            var a4 = Math.round((u$1 & 255) / 255 * 100) / 100;
-            return [r$1, g$1, b$1, a4];
+            var a3 = Math.round((u$1 & 255) / 255 * 100) / 100;
+            return [r$1, g$1, b$1, a3];
           }
           throw new Error("unknown hex color: " + hex);
         }, "hex2rgb$1");
@@ -735,21 +735,21 @@
           var ref = unpack$o(args, "rgb");
           var r = ref[0];
           var g = ref[1];
-          var b4 = ref[2];
+          var b3 = ref[2];
           r /= 255;
           g /= 255;
-          b4 /= 255;
+          b3 /= 255;
           var h;
-          var min_ = min$2(r, g, b4);
-          var i2 = (r + g + b4) / 3;
+          var min_ = min$2(r, g, b3);
+          var i2 = (r + g + b3) / 3;
           var s = i2 > 0 ? 1 - min_ / i2 : 0;
           if (s === 0) {
             h = NaN;
           } else {
-            h = (r - g + (r - b4)) / 2;
-            h /= sqrt$4((r - g) * (r - g) + (r - b4) * (g - b4));
+            h = (r - g + (r - b3)) / 2;
+            h /= sqrt$4((r - g) * (r - g) + (r - b3) * (g - b3));
             h = acos(h);
-            if (b4 > g) {
+            if (b3 > g) {
               h = TWOPI$2 - h;
             }
             h /= TWOPI$2;
@@ -770,7 +770,7 @@
           var h = args[0];
           var s = args[1];
           var i2 = args[2];
-          var r, g, b4;
+          var r, g, b3;
           if (isNaN(h)) {
             h = 0;
           }
@@ -785,24 +785,24 @@
           }
           h /= 360;
           if (h < 1 / 3) {
-            b4 = (1 - s) / 3;
+            b3 = (1 - s) / 3;
             r = (1 + s * cos$4(TWOPI$1 * h) / cos$4(PITHIRD - TWOPI$1 * h)) / 3;
-            g = 1 - (b4 + r);
+            g = 1 - (b3 + r);
           } else if (h < 2 / 3) {
             h -= 1 / 3;
             r = (1 - s) / 3;
             g = (1 + s * cos$4(TWOPI$1 * h) / cos$4(PITHIRD - TWOPI$1 * h)) / 3;
-            b4 = 1 - (r + g);
+            b3 = 1 - (r + g);
           } else {
             h -= 2 / 3;
             g = (1 - s) / 3;
-            b4 = (1 + s * cos$4(TWOPI$1 * h) / cos$4(PITHIRD - TWOPI$1 * h)) / 3;
-            r = 1 - (g + b4);
+            b3 = (1 + s * cos$4(TWOPI$1 * h) / cos$4(PITHIRD - TWOPI$1 * h)) / 3;
+            r = 1 - (g + b3);
           }
           r = limit(i2 * r * 3);
           g = limit(i2 * g * 3);
-          b4 = limit(i2 * b4 * 3);
-          return [r * 255, g * 255, b4 * 255, args.length > 3 ? args[3] : 1];
+          b3 = limit(i2 * b3 * 3);
+          return [r * 255, g * 255, b3 * 255, args.length > 3 ? args[3] : 1];
         }, "hsi2rgb");
         var hsi2rgb_1 = hsi2rgb;
         var unpack$m = utils.unpack;
@@ -871,9 +871,9 @@
           args = unpack$k(args, "rgb");
           var r = args[0];
           var g = args[1];
-          var b4 = args[2];
-          var min_ = min$1(r, g, b4);
-          var max_ = max$1(r, g, b4);
+          var b3 = args[2];
+          var min_ = min$1(r, g, b3);
+          var max_ = max$1(r, g, b3);
           var delta = max_ - min_;
           var h, s, v;
           v = max_ / 255;
@@ -883,12 +883,12 @@
           } else {
             s = delta / max_;
             if (r === max_) {
-              h = (g - b4) / delta;
+              h = (g - b3) / delta;
             }
             if (g === max_) {
-              h = 2 + (b4 - r) / delta;
+              h = 2 + (b3 - r) / delta;
             }
-            if (b4 === max_) {
+            if (b3 === max_) {
               h = 4 + (r - g) / delta;
             }
             h *= 60;
@@ -910,10 +910,10 @@
           var h = args[0];
           var s = args[1];
           var v = args[2];
-          var r, g, b4;
+          var r, g, b3;
           v *= 255;
           if (s === 0) {
-            r = g = b4 = v;
+            r = g = b3 = v;
           } else {
             if (h === 360) {
               h = 0;
@@ -932,26 +932,26 @@
             var t = v * (1 - s * (1 - f));
             switch (i2) {
               case 0:
-                assign2 = [v, t, p], r = assign2[0], g = assign2[1], b4 = assign2[2];
+                assign2 = [v, t, p], r = assign2[0], g = assign2[1], b3 = assign2[2];
                 break;
               case 1:
-                assign$1 = [q, v, p], r = assign$1[0], g = assign$1[1], b4 = assign$1[2];
+                assign$1 = [q, v, p], r = assign$1[0], g = assign$1[1], b3 = assign$1[2];
                 break;
               case 2:
-                assign$2 = [p, v, t], r = assign$2[0], g = assign$2[1], b4 = assign$2[2];
+                assign$2 = [p, v, t], r = assign$2[0], g = assign$2[1], b3 = assign$2[2];
                 break;
               case 3:
-                assign$3 = [p, q, v], r = assign$3[0], g = assign$3[1], b4 = assign$3[2];
+                assign$3 = [p, q, v], r = assign$3[0], g = assign$3[1], b3 = assign$3[2];
                 break;
               case 4:
-                assign$4 = [t, p, v], r = assign$4[0], g = assign$4[1], b4 = assign$4[2];
+                assign$4 = [t, p, v], r = assign$4[0], g = assign$4[1], b3 = assign$4[2];
                 break;
               case 5:
-                assign$5 = [v, p, q], r = assign$5[0], g = assign$5[1], b4 = assign$5[2];
+                assign$5 = [v, p, q], r = assign$5[0], g = assign$5[1], b3 = assign$5[2];
                 break;
             }
           }
-          return [r, g, b4, args.length > 3 ? args[3] : 1];
+          return [r, g, b3, args.length > 3 ? args[3] : 1];
         }, "hsv2rgb");
         var hsv2rgb_1 = hsv2rgb;
         var unpack$i = utils.unpack;
@@ -1008,8 +1008,8 @@
           var ref = unpack$h(args, "rgb");
           var r = ref[0];
           var g = ref[1];
-          var b4 = ref[2];
-          var ref$1 = rgb2xyz(r, g, b4);
+          var b3 = ref[2];
+          var ref$1 = rgb2xyz(r, g, b3);
           var x = ref$1[0];
           var y = ref$1[1];
           var z = ref$1[2];
@@ -1028,13 +1028,13 @@
           }
           return t / LAB_CONSTANTS$3.t2 + LAB_CONSTANTS$3.t0;
         }, "xyz_lab");
-        var rgb2xyz = /* @__PURE__ */ __name(function(r, g, b4) {
+        var rgb2xyz = /* @__PURE__ */ __name(function(r, g, b3) {
           r = rgb_xyz(r);
           g = rgb_xyz(g);
-          b4 = rgb_xyz(b4);
-          var x = xyz_lab((0.4124564 * r + 0.3575761 * g + 0.1804375 * b4) / LAB_CONSTANTS$3.Xn);
-          var y = xyz_lab((0.2126729 * r + 0.7151522 * g + 0.072175 * b4) / LAB_CONSTANTS$3.Yn);
-          var z = xyz_lab((0.0193339 * r + 0.119192 * g + 0.9503041 * b4) / LAB_CONSTANTS$3.Zn);
+          b3 = rgb_xyz(b3);
+          var x = xyz_lab((0.4124564 * r + 0.3575761 * g + 0.1804375 * b3) / LAB_CONSTANTS$3.Xn);
+          var y = xyz_lab((0.2126729 * r + 0.7151522 * g + 0.072175 * b3) / LAB_CONSTANTS$3.Yn);
+          var z = xyz_lab((0.0193339 * r + 0.119192 * g + 0.9503041 * b3) / LAB_CONSTANTS$3.Zn);
           return [x, y, z];
         }, "rgb2xyz");
         var rgb2lab_1 = rgb2lab$2;
@@ -1047,12 +1047,12 @@
             args[len] = arguments[len];
           args = unpack$g(args, "lab");
           var l = args[0];
-          var a4 = args[1];
-          var b4 = args[2];
+          var a3 = args[1];
+          var b3 = args[2];
           var x, y, z, r, g, b_;
           y = (l + 16) / 116;
-          x = isNaN(a4) ? y : y + a4 / 500;
-          z = isNaN(b4) ? y : y - b4 / 200;
+          x = isNaN(a3) ? y : y + a3 / 500;
+          z = isNaN(b3) ? y : y - b3 / 200;
           y = LAB_CONSTANTS$2.Yn * lab_xyz(y);
           x = LAB_CONSTANTS$2.Xn * lab_xyz(x);
           z = LAB_CONSTANTS$2.Zn * lab_xyz(z);
@@ -1107,10 +1107,10 @@
             args[len] = arguments[len];
           var ref = unpack$e(args, "lab");
           var l = ref[0];
-          var a4 = ref[1];
-          var b4 = ref[2];
-          var c = sqrt$3(a4 * a4 + b4 * b4);
-          var h = (atan2$2(b4, a4) * RAD2DEG + 360) % 360;
+          var a3 = ref[1];
+          var b3 = ref[2];
+          var c = sqrt$3(a3 * a3 + b3 * b3);
+          var h = (atan2$2(b3, a3) * RAD2DEG + 360) % 360;
           if (round$2(c * 1e4) === 0) {
             h = Number.NaN;
           }
@@ -1127,12 +1127,12 @@
           var ref = unpack$d(args, "rgb");
           var r = ref[0];
           var g = ref[1];
-          var b4 = ref[2];
-          var ref$1 = rgb2lab(r, g, b4);
+          var b3 = ref[2];
+          var ref$1 = rgb2lab(r, g, b3);
           var l = ref$1[0];
-          var a4 = ref$1[1];
+          var a3 = ref$1[1];
           var b_ = ref$1[2];
-          return lab2lch$1(l, a4, b_);
+          return lab2lch$1(l, a3, b_);
         }, "rgb2lch$1");
         var rgb2lch_1 = rgb2lch$1;
         var unpack$c = utils.unpack;
@@ -1167,13 +1167,13 @@
           var h = args[2];
           var ref = lch2lab$1(l, c, h);
           var L = ref[0];
-          var a4 = ref[1];
+          var a3 = ref[1];
           var b_ = ref[2];
-          var ref$1 = lab2rgb(L, a4, b_);
+          var ref$1 = lab2rgb(L, a3, b_);
           var r = ref$1[0];
           var g = ref$1[1];
-          var b4 = ref$1[2];
-          return [r, g, b4, args.length > 3 ? args[3] : 1];
+          var b3 = ref$1[2];
+          return [r, g, b3, args.length > 3 ? args[3] : 1];
         }, "lch2rgb$1");
         var lch2rgb_1 = lch2rgb$1;
         var unpack$a = utils.unpack;
@@ -1426,8 +1426,8 @@
           var ref = unpack$8(args, "rgb");
           var r = ref[0];
           var g = ref[1];
-          var b4 = ref[2];
-          return (r << 16) + (g << 8) + b4;
+          var b3 = ref[2];
+          return (r << 16) + (g << 8) + b3;
         }, "rgb2num$1");
         var rgb2num_1 = rgb2num$1;
         var type$b = utils.type;
@@ -1435,8 +1435,8 @@
           if (type$b(num2) == "number" && num2 >= 0 && num2 <= 16777215) {
             var r = num2 >> 16;
             var g = num2 >> 8 & 255;
-            var b4 = num2 & 255;
-            return [r, g, b4, 1];
+            var b3 = num2 & 255;
+            return [r, g, b3, 1];
           }
           throw new Error("unknown num color: " + num2);
         }, "num2rgb");
@@ -1519,17 +1519,17 @@
         var log$1 = Math.log;
         var temperature2rgb$1 = /* @__PURE__ */ __name(function(kelvin) {
           var temp = kelvin / 100;
-          var r, g, b4;
+          var r, g, b3;
           if (temp < 66) {
             r = 255;
             g = temp < 6 ? 0 : -155.25485562709179 - 0.44596950469579133 * (g = temp - 2) + 104.49216199393888 * log$1(g);
-            b4 = temp < 20 ? 0 : -254.76935184120902 + 0.8274096064007395 * (b4 = temp - 10) + 115.67994401066147 * log$1(b4);
+            b3 = temp < 20 ? 0 : -254.76935184120902 + 0.8274096064007395 * (b3 = temp - 10) + 115.67994401066147 * log$1(b3);
           } else {
             r = 351.97690566805693 + 0.114206453784165 * (r = temp - 55) - 40.25366309332127 * log$1(r);
             g = 325.4494125711974 + 0.07943456536662342 * (g = temp - 50) - 28.0852963507957 * log$1(g);
-            b4 = 255;
+            b3 = 255;
           }
-          return [r, g, b4, 1];
+          return [r, g, b3, 1];
         }, "temperature2rgb$1");
         var temperature2rgb_1 = temperature2rgb$1;
         var temperature2rgb = temperature2rgb_1;
@@ -1540,7 +1540,7 @@
           while (len--)
             args[len] = arguments[len];
           var rgb2 = unpack$6(args, "rgb");
-          var r = rgb2[0], b4 = rgb2[2];
+          var r = rgb2[0], b3 = rgb2[2];
           var minTemp = 1e3;
           var maxTemp = 4e4;
           var eps = 0.4;
@@ -1548,7 +1548,7 @@
           while (maxTemp - minTemp > eps) {
             temp = (maxTemp + minTemp) * 0.5;
             var rgb$1 = temperature2rgb(temp);
-            if (rgb$1[2] / rgb$1[0] >= b4 / r) {
+            if (rgb$1[2] / rgb$1[0] >= b3 / r) {
               maxTemp = temp;
             } else {
               minTemp = temp;
@@ -1582,8 +1582,8 @@
           var ref = unpack$5(args, "rgb");
           var r = ref[0];
           var g = ref[1];
-          var b4 = ref[2];
-          var ref$1 = [rgb2lrgb(r / 255), rgb2lrgb(g / 255), rgb2lrgb(b4 / 255)];
+          var b3 = ref[2];
+          var ref$1 = [rgb2lrgb(r / 255), rgb2lrgb(g / 255), rgb2lrgb(b3 / 255)];
           var lr = ref$1[0];
           var lg = ref$1[1];
           var lb = ref$1[2];
@@ -1614,11 +1614,11 @@
             args[len] = arguments[len];
           args = unpack$4(args, "lab");
           var L = args[0];
-          var a4 = args[1];
-          var b4 = args[2];
-          var l = pow$7(L + 0.3963377774 * a4 + 0.2158037573 * b4, 3);
-          var m = pow$7(L - 0.1055613458 * a4 - 0.0638541728 * b4, 3);
-          var s = pow$7(L - 0.0894841775 * a4 - 1.291485548 * b4, 3);
+          var a3 = args[1];
+          var b3 = args[2];
+          var l = pow$7(L + 0.3963377774 * a3 + 0.2158037573 * b3, 3);
+          var m = pow$7(L - 0.1055613458 * a3 - 0.0638541728 * b3, 3);
+          var s = pow$7(L - 0.0894841775 * a3 - 1.291485548 * b3, 3);
           return [
             255 * lrgb2rgb(4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * s),
             255 * lrgb2rgb(-1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * s),
@@ -1673,12 +1673,12 @@
           var ref = unpack$2(args, "rgb");
           var r = ref[0];
           var g = ref[1];
-          var b4 = ref[2];
-          var ref$1 = rgb2oklab(r, g, b4);
+          var b3 = ref[2];
+          var ref$1 = rgb2oklab(r, g, b3);
           var l = ref$1[0];
-          var a4 = ref$1[1];
+          var a3 = ref$1[1];
           var b_ = ref$1[2];
-          return lab2lch(l, a4, b_);
+          return lab2lch(l, a3, b_);
         }, "rgb2oklch$1");
         var rgb2oklch_1 = rgb2oklch$1;
         var unpack$1 = utils.unpack;
@@ -1694,13 +1694,13 @@
           var h = args[2];
           var ref = lch2lab(l, c, h);
           var L = ref[0];
-          var a4 = ref[1];
+          var a3 = ref[1];
           var b_ = ref[2];
-          var ref$1 = oklab2rgb(L, a4, b_);
+          var ref$1 = oklab2rgb(L, a3, b_);
           var r = ref$1[0];
           var g = ref$1[1];
-          var b4 = ref$1[2];
-          return [r, g, b4, args.length > 3 ? args[3] : 1];
+          var b3 = ref$1[2];
+          return [r, g, b3, args.length > 3 ? args[3] : 1];
         }, "oklch2rgb");
         var oklch2rgb_1 = oklch2rgb;
         var unpack = utils.unpack;
@@ -1733,15 +1733,15 @@
         });
         var Color$m = Color_1;
         var type$6 = utils.type;
-        Color$m.prototype.alpha = function(a4, mutate) {
+        Color$m.prototype.alpha = function(a3, mutate) {
           if (mutate === void 0)
             mutate = false;
-          if (a4 !== void 0 && type$6(a4) === "number") {
+          if (a3 !== void 0 && type$6(a3) === "number") {
             if (mutate) {
-              this._rgb[3] = a4;
+              this._rgb[3] = a3;
               return this;
             }
-            return new Color$m([this._rgb[0], this._rgb[1], this._rgb[2], a4], "rgb");
+            return new Color$m([this._rgb[0], this._rgb[1], this._rgb[2], a3], "rgb");
           }
           return this._rgb[3];
         };
@@ -1811,11 +1811,11 @@
           }
           return rgb2luminance.apply(void 0, this._rgb.slice(0, 3));
         };
-        var rgb2luminance = /* @__PURE__ */ __name(function(r, g, b4) {
+        var rgb2luminance = /* @__PURE__ */ __name(function(r, g, b3) {
           r = luminance_x(r);
           g = luminance_x(g);
-          b4 = luminance_x(b4);
-          return 0.2126 * r + 0.7152 * g + 0.0722 * b4;
+          b3 = luminance_x(b3);
+          return 0.2126 * r + 0.7152 * g + 0.0722 * b3;
         }, "rgb2luminance");
         var luminance_x = /* @__PURE__ */ __name(function(x) {
           x /= 255;
@@ -1861,12 +1861,12 @@
           if (mutate === void 0)
             mutate = false;
           var rgb2 = this._rgb;
-          var a4 = rgb2[3];
+          var a3 = rgb2[3];
           if (mutate) {
-            this._rgb = [rgb2[0] * a4, rgb2[1] * a4, rgb2[2] * a4, a4];
+            this._rgb = [rgb2[0] * a3, rgb2[1] * a3, rgb2[2] * a3, a3];
             return this;
           } else {
-            return new Color$f([rgb2[0] * a4, rgb2[1] * a4, rgb2[2] * a4, a4], "rgb");
+            return new Color$f([rgb2[0] * a3, rgb2[1] * a3, rgb2[2] * a3, a3], "rgb");
           }
         };
         var Color$e = Color_1;
@@ -2104,8 +2104,8 @@
               return 1;
             });
           }
-          var k = l / weights.reduce(function(a4, b4) {
-            return a4 + b4;
+          var k = l / weights.reduce(function(a3, b3) {
+            return a3 + b3;
           });
           weights.forEach(function(w, i3) {
             weights[i3] *= k;
@@ -2623,33 +2623,33 @@
             return out;
           };
         }, "each");
-        var normal = /* @__PURE__ */ __name(function(a4) {
-          return a4;
+        var normal = /* @__PURE__ */ __name(function(a3) {
+          return a3;
         }, "normal");
-        var multiply = /* @__PURE__ */ __name(function(a4, b4) {
-          return a4 * b4 / 255;
+        var multiply = /* @__PURE__ */ __name(function(a3, b3) {
+          return a3 * b3 / 255;
         }, "multiply");
-        var darken = /* @__PURE__ */ __name(function(a4, b4) {
-          return a4 > b4 ? b4 : a4;
+        var darken = /* @__PURE__ */ __name(function(a3, b3) {
+          return a3 > b3 ? b3 : a3;
         }, "darken");
-        var lighten = /* @__PURE__ */ __name(function(a4, b4) {
-          return a4 > b4 ? a4 : b4;
+        var lighten = /* @__PURE__ */ __name(function(a3, b3) {
+          return a3 > b3 ? a3 : b3;
         }, "lighten");
-        var screen = /* @__PURE__ */ __name(function(a4, b4) {
-          return 255 * (1 - (1 - a4 / 255) * (1 - b4 / 255));
+        var screen = /* @__PURE__ */ __name(function(a3, b3) {
+          return 255 * (1 - (1 - a3 / 255) * (1 - b3 / 255));
         }, "screen");
-        var overlay = /* @__PURE__ */ __name(function(a4, b4) {
-          return b4 < 128 ? 2 * a4 * b4 / 255 : 255 * (1 - 2 * (1 - a4 / 255) * (1 - b4 / 255));
+        var overlay = /* @__PURE__ */ __name(function(a3, b3) {
+          return b3 < 128 ? 2 * a3 * b3 / 255 : 255 * (1 - 2 * (1 - a3 / 255) * (1 - b3 / 255));
         }, "overlay");
-        var burn = /* @__PURE__ */ __name(function(a4, b4) {
-          return 255 * (1 - (1 - b4 / 255) / (a4 / 255));
+        var burn = /* @__PURE__ */ __name(function(a3, b3) {
+          return 255 * (1 - (1 - b3 / 255) / (a3 / 255));
         }, "burn");
-        var dodge = /* @__PURE__ */ __name(function(a4, b4) {
-          if (a4 === 255) {
+        var dodge = /* @__PURE__ */ __name(function(a3, b3) {
+          if (a3 === 255) {
             return 255;
           }
-          a4 = 255 * (b4 / 255) / (1 - a4 / 255);
-          return a4 > 255 ? 255 : a4;
+          a3 = 255 * (b3 / 255) / (1 - a3 / 255);
+          return a3 > 255 ? 255 : a3;
         }, "dodge");
         blend.normal = blend_f(each(normal));
         blend.multiply = blend_f(each(multiply));
@@ -2686,16 +2686,16 @@
             lightness = [lightness, lightness];
           }
           var f = /* @__PURE__ */ __name(function(fract) {
-            var a4 = TWOPI * ((start + 120) / 360 + rotations * fract);
+            var a3 = TWOPI * ((start + 120) / 360 + rotations * fract);
             var l = pow$2(lightness[0] + dl * fract, gamma);
             var h = dh !== 0 ? hue[0] + fract * dh : hue;
             var amp = h * l * (1 - l) / 2;
-            var cos_a = cos$1(a4);
-            var sin_a = sin$1(a4);
+            var cos_a = cos$1(a3);
+            var sin_a = sin$1(a3);
             var r = l + amp * (-0.14861 * cos_a + 1.78277 * sin_a);
             var g = l + amp * (-0.29227 * cos_a - 0.90649 * sin_a);
-            var b4 = l + amp * (1.97294 * cos_a);
-            return chroma$2(clip_rgb([r * 255, g * 255, b4 * 255, 1]));
+            var b3 = l + amp * (1.97294 * cos_a);
+            return chroma$2(clip_rgb([r * 255, g * 255, b3 * 255, 1]));
           }, "f");
           f.start = function(s) {
             if (s == null) {
@@ -2813,8 +2813,8 @@
           }
           var min2 = data.min;
           var max2 = data.max;
-          var values = data.values.sort(function(a4, b4) {
-            return a4 - b4;
+          var values = data.values.sort(function(a3, b3) {
+            return a3 - b3;
           });
           if (num2 === 1) {
             return [min2, max2];
@@ -2927,8 +2927,8 @@
               tmpKMeansBreaks.push(kClusters[j$6][0]);
               tmpKMeansBreaks.push(kClusters[j$6][kClusters[j$6].length - 1]);
             }
-            tmpKMeansBreaks = tmpKMeansBreaks.sort(function(a4, b4) {
-              return a4 - b4;
+            tmpKMeansBreaks = tmpKMeansBreaks.sort(function(a3, b3) {
+              return a3 - b3;
             });
             limits2.push(tmpKMeansBreaks[0]);
             for (var i$7 = 1; i$7 < tmpKMeansBreaks.length; i$7 += 2) {
@@ -2942,11 +2942,11 @@
         }, "limits");
         var analyze_1 = { analyze, limits };
         var Color$3 = Color_1;
-        var contrast = /* @__PURE__ */ __name(function(a4, b4) {
-          a4 = new Color$3(a4);
-          b4 = new Color$3(b4);
-          var l1 = a4.luminance();
-          var l2 = b4.luminance();
+        var contrast = /* @__PURE__ */ __name(function(a3, b3) {
+          a3 = new Color$3(a3);
+          b3 = new Color$3(b3);
+          var l1 = a3.luminance();
+          var l2 = b3.luminance();
           return l1 > l2 ? (l1 + 0.05) / (l2 + 0.05) : (l2 + 0.05) / (l1 + 0.05);
         }, "contrast");
         var Color$2 = Color_1;
@@ -2960,7 +2960,7 @@
         var sin = Math.sin;
         var exp = Math.exp;
         var PI = Math.PI;
-        var deltaE = /* @__PURE__ */ __name(function(a4, b4, Kl, Kc, Kh) {
+        var deltaE = /* @__PURE__ */ __name(function(a3, b3, Kl, Kc, Kh) {
           if (Kl === void 0)
             Kl = 1;
           if (Kc === void 0)
@@ -2973,13 +2973,13 @@
           var deg2rad = /* @__PURE__ */ __name(function(deg) {
             return 2 * PI * deg / 360;
           }, "deg2rad");
-          a4 = new Color$2(a4);
-          b4 = new Color$2(b4);
-          var ref = Array.from(a4.lab());
+          a3 = new Color$2(a3);
+          b3 = new Color$2(b3);
+          var ref = Array.from(a3.lab());
           var L1 = ref[0];
           var a1 = ref[1];
           var b1 = ref[2];
-          var ref$1 = Array.from(b4.lab());
+          var ref$1 = Array.from(b3.lab());
           var L2 = ref$1[0];
           var a22 = ref$1[1];
           var b22 = ref$1[2];
@@ -3014,13 +3014,13 @@
           return max(0, min(100, result));
         }, "deltaE");
         var Color$1 = Color_1;
-        var distance = /* @__PURE__ */ __name(function(a4, b4, mode) {
+        var distance = /* @__PURE__ */ __name(function(a3, b3, mode) {
           if (mode === void 0)
             mode = "lab";
-          a4 = new Color$1(a4);
-          b4 = new Color$1(b4);
-          var l1 = a4.get(mode);
-          var l2 = b4.get(mode);
+          a3 = new Color$1(a3);
+          b3 = new Color$1(b3);
+          var l1 = a3.get(mode);
+          var l2 = b3.get(mode);
           var sum_sq = 0;
           for (var i2 in l1) {
             var d = (l1[i2] || 0) - (l2[i2] || 0);
@@ -3485,20 +3485,20 @@
             function(module2, exports2, __webpack_require__) {
               "use strict";
               var __extends = this && this.__extends || function() {
-                var extendStatics = Object.setPrototypeOf || { __proto__: [] } instanceof Array && function(d, b4) {
-                  d.__proto__ = b4;
-                } || function(d, b4) {
-                  for (var p in b4)
-                    if (b4.hasOwnProperty(p))
-                      d[p] = b4[p];
+                var extendStatics = Object.setPrototypeOf || { __proto__: [] } instanceof Array && function(d, b3) {
+                  d.__proto__ = b3;
+                } || function(d, b3) {
+                  for (var p in b3)
+                    if (b3.hasOwnProperty(p))
+                      d[p] = b3[p];
                 };
-                return function(d, b4) {
-                  extendStatics(d, b4);
+                return function(d, b3) {
+                  extendStatics(d, b3);
                   function __() {
                     this.constructor = d;
                   }
                   __name(__, "__");
-                  d.prototype = b4 === null ? Object.create(b4) : (__.prototype = b4.prototype, new __());
+                  d.prototype = b3 === null ? Object.create(b3) : (__.prototype = b3.prototype, new __());
                 };
               }();
               Object.defineProperty(exports2, "__esModule", { value: true });
@@ -9965,14 +9965,14 @@
         this.#observers[eventName].forEach((observerCallback) => observerCallback(eventData, ...extra));
       }
     }
-    notifyAll() {
-      if (Array.isArray(this.#observers[this.name])) {
-        console.log("XXX", this.#value);
-        if (this.#value !== void 0) {
-          this.#observers[this.name].forEach((observerCallback) => observerCallback(this.#value));
-        }
-      }
-    }
+    // notifyAll() {
+    //   if (Array.isArray(this.#observers[this.name])){
+    //     console.log('XXX', this.#value);
+    //     if(this.#value !== undefined){
+    //       this.#observers[this.name].forEach((observerCallback) => observerCallback(this.#value));
+    //     }
+    //   }
+    // }
     status() {
       return {
         observerCount: Object.values(this.#observers).flat().length
@@ -10187,19 +10187,19 @@
   __name(debounce_default, "default");
 
   // plug-ins/boolean/index.js
-  function intersection(a4, b4) {
+  function intersection(a3, b3) {
     const response = /* @__PURE__ */ new Set();
-    for (const item of a4) {
-      if (b4.has(item))
+    for (const item of a3) {
+      if (b3.has(item))
         response.add(item);
     }
     return response;
   }
   __name(intersection, "intersection");
-  function difference(a4, b4) {
+  function difference(a3, b3) {
     const response = /* @__PURE__ */ new Set();
-    for (const item of a4) {
-      if (!b4.has(item))
+    for (const item of a3) {
+      if (!b3.has(item))
         response.add(item);
     }
     return response;
@@ -10642,12 +10642,12 @@
       },
       getParentScale(component) {
         const list = this.getTransforms(component).slice(0, -1);
-        const scale = list.map((o) => o.zoom).reduce((a4, c) => a4 * c, 1);
+        const scale = list.map((o) => o.zoom).reduce((a3, c) => a3 * c, 1);
         return scale;
       },
       getScale(component) {
         const list = this.getTransforms(component);
-        const scale = list.map((o) => o.zoom).reduce((a4, c) => a4 * c, 1);
+        const scale = list.map((o) => o.zoom).reduce((a3, c) => a3 * c, 1);
         return scale;
       },
       getTransforms(element2, list = [], root = true) {
@@ -10682,7 +10682,7 @@
           node.on("h", (h) => this.h = h);
           node.on("H", (H) => this.H = H);
           node.on("r", (r) => this.r = r);
-          node.on("b", (b4) => this.b = b4);
+          node.on("b", (b3) => this.b = b3);
           node.on("p", (p) => this.p = p);
           node.on("s", (s) => this.s = s);
           node.on("data", (data) => this.data = data);
@@ -11809,7 +11809,7 @@
 
   // plug-ins/constants/index.js
   function constants_default(CONSTANTS) {
-    const constants = Object.fromEntries([...CONSTANTS.split(" ").map((o) => o.trim()).filter((o) => o).entries()].map((a4) => a4.reverse()));
+    const constants = Object.fromEntries([...CONSTANTS.split(" ").map((o) => o.trim()).filter((o) => o).entries()].map((a3) => a3.reverse()));
     return new Proxy(constants, {
       get(target, prop) {
         if (prop in target) {
@@ -11911,12 +11911,12 @@
   // plug-ins/priority-sort/index.js
   function prioritySort(list, priority, field) {
     const WILDCARD = priority.indexOf("*") == -1 ? priority.length - 1 : priority.indexOf("*");
-    const indexer = /* @__PURE__ */ __name(function(a4) {
-      const value = priority.indexOf(field(a4));
+    const indexer = /* @__PURE__ */ __name(function(a3) {
+      const value = priority.indexOf(field(a3));
       return value === -1 ? WILDCARD : value;
     }, "indexer");
-    const sorter = /* @__PURE__ */ __name(function(a4, b4) {
-      return indexer(a4) - indexer(b4);
+    const sorter = /* @__PURE__ */ __name(function(a3, b3) {
+      return indexer(a3) - indexer(b3);
     }, "sorter");
     return [...list].sort(sorter);
   }
@@ -12104,7 +12104,7 @@
     x1 = x1 - locationX;
     y1 = y1 - locationY;
     const self2 = localList[localList.length - 1];
-    const finalZoom = localList.map((o) => o.zoom).reduce((a4, c) => a4 * c, 1) / self2.zoom;
+    const finalZoom = localList.map((o) => o.zoom).reduce((a3, c) => a3 * c, 1) / self2.zoom;
     x1 = x1 / finalZoom;
     y1 = y1 / finalZoom;
     x1 = x1 / self2.zoom;
@@ -12434,6 +12434,15 @@
   }
   __name(noop, "noop");
   var identity = /* @__PURE__ */ __name((x) => x, "identity");
+  function assign(tar, src) {
+    for (const k in src)
+      tar[k] = src[k];
+    return (
+      /** @type {T & S} */
+      tar
+    );
+  }
+  __name(assign, "assign");
   function run(fn) {
     return fn();
   }
@@ -12450,8 +12459,8 @@
     return typeof thing === "function";
   }
   __name(is_function, "is_function");
-  function safe_not_equal(a4, b4) {
-    return a4 != a4 ? b4 == b4 : a4 !== b4 || a4 && typeof a4 === "object" || typeof a4 === "function";
+  function safe_not_equal(a3, b3) {
+    return a3 != a3 ? b3 == b3 : a3 !== b3 || a3 && typeof a3 === "object" || typeof a3 === "function";
   }
   __name(safe_not_equal, "safe_not_equal");
   function is_empty(obj2) {
@@ -12746,15 +12755,15 @@
     return info;
   }
   __name(create_style_information, "create_style_information");
-  function create_rule(node, a4, b4, duration, delay, ease, fn, uid = 0) {
+  function create_rule(node, a3, b3, duration, delay, ease, fn, uid = 0) {
     const step = 16.666 / duration;
     let keyframes = "{\n";
     for (let p = 0; p <= 1; p += step) {
-      const t = a4 + (b4 - a4) * ease(p);
+      const t = a3 + (b3 - a3) * ease(p);
       keyframes += p * 100 + `%{${fn(t, 1 - t)}}
 `;
     }
-    const rule = keyframes + `100% {${fn(b4, 1 - b4)}}
+    const rule = keyframes + `100% {${fn(b3, 1 - b3)}}
 }`;
     const name = `__svelte_${hash(rule)}_${uid}`;
     const doc = get_root_for_style(node);
@@ -12990,7 +12999,7 @@
       };
     }
     __name(init2, "init");
-    function go(b4) {
+    function go(b3) {
       const {
         delay = 0,
         duration = 300,
@@ -13000,14 +13009,14 @@
       } = config || null_transition;
       const program = {
         start: now() + delay,
-        b: b4
+        b: b3
       };
-      if (!b4) {
+      if (!b3) {
         program.group = outros;
         outros.r += 1;
       }
       if ("inert" in node) {
-        if (b4) {
+        if (b3) {
           if (original_inert_value !== void 0) {
             node.inert = original_inert_value;
           }
@@ -13022,12 +13031,12 @@
       } else {
         if (css) {
           clear_animation();
-          animation_name = create_rule(node, t, b4, duration, delay, easing, css);
+          animation_name = create_rule(node, t, b3, duration, delay, easing, css);
         }
-        if (b4)
+        if (b3)
           tick2(0, 1);
         running_program = init2(program, duration);
-        add_render_callback(() => dispatch(node, b4, "start"));
+        add_render_callback(() => dispatch(node, b3, "start"));
         loop((now2) => {
           if (pending_program && now2 > pending_program.start) {
             running_program = init2(pending_program, duration);
@@ -13071,15 +13080,15 @@
     }
     __name(go, "go");
     return {
-      run(b4) {
+      run(b3) {
         if (is_function(config)) {
           wait().then(() => {
-            const opts = { direction: b4 ? "in" : "out" };
+            const opts = { direction: b3 ? "in" : "out" };
             config = config(opts);
-            go(b4);
+            go(b3);
           });
         } else {
-          go(b4);
+          go(b3);
         }
       },
       end() {
@@ -13172,6 +13181,45 @@
     return new_blocks;
   }
   __name(update_keyed_each, "update_keyed_each");
+
+  // node_modules/svelte/src/runtime/internal/spread.js
+  function get_spread_update(levels, updates) {
+    const update3 = {};
+    const to_null_out = {};
+    const accounted_for = { $$scope: 1 };
+    let i = levels.length;
+    while (i--) {
+      const o = levels[i];
+      const n = updates[i];
+      if (n) {
+        for (const key in o) {
+          if (!(key in n))
+            to_null_out[key] = 1;
+        }
+        for (const key in n) {
+          if (!accounted_for[key]) {
+            update3[key] = n[key];
+            accounted_for[key] = 1;
+          }
+        }
+        levels[i] = n;
+      } else {
+        for (const key in o) {
+          accounted_for[key] = 1;
+        }
+      }
+    }
+    for (const key in to_null_out) {
+      if (!(key in update3))
+        update3[key] = void 0;
+    }
+    return update3;
+  }
+  __name(get_spread_update, "get_spread_update");
+  function get_spread_object(spread_props) {
+    return typeof spread_props === "object" && spread_props !== null ? spread_props : {};
+  }
+  __name(get_spread_object, "get_spread_object");
 
   // node_modules/svelte/src/shared/boolean_attributes.js
   var _boolean_attributes = (
@@ -14652,6 +14700,18 @@
       case "Viewport":
         response = "binoculars";
         break;
+      case "Gradients":
+        response = "palette2";
+        break;
+      case "Hello":
+        response = "telephone";
+        break;
+      case "Fetch":
+        response = "download";
+        break;
+      case "Alert":
+        response = "exclamation-diamond";
+        break;
       default:
         response = "list";
     }
@@ -15503,25 +15563,25 @@
     component_subscribe($$self, w, (value) => $$invalidate(7, $w = value));
     const h = api.signal("h");
     component_subscribe($$self, h, (value) => $$invalidate(8, $h = value));
-    let a4 = 1;
-    let b4 = 2;
+    let a3 = 1;
+    let b3 = 2;
     const x = api.signal("h");
     const selected = api.signal("selected");
     component_subscribe($$self, selected, (value) => $$invalidate(5, $selected = value));
     const click_handler = /* @__PURE__ */ __name(() => api.removeApplication(), "click_handler");
     function input4_change_input_handler() {
       c = to_number(this.value);
-      $$invalidate(3, c), $$invalidate(1, a4), $$invalidate(2, b4);
+      $$invalidate(3, c), $$invalidate(1, a3), $$invalidate(2, b3);
     }
     __name(input4_change_input_handler, "input4_change_input_handler");
     function input5_input_handler() {
-      a4 = to_number(this.value);
-      $$invalidate(1, a4);
+      a3 = to_number(this.value);
+      $$invalidate(1, a3);
     }
     __name(input5_input_handler, "input5_input_handler");
     function input6_input_handler() {
-      b4 = to_number(this.value);
-      $$invalidate(2, b4);
+      b3 = to_number(this.value);
+      $$invalidate(2, b3);
     }
     __name(input6_input_handler, "input6_input_handler");
     $$self.$$set = ($$props2) => {
@@ -15532,22 +15592,22 @@
       if ($$self.$$.dirty & /*a, b*/
       6) {
         $:
-          $$invalidate(3, c = a4 + b4);
+          $$invalidate(3, c = a3 + b3);
       }
       if ($$self.$$.dirty & /*api, a, b, c*/
       15) {
         $:
-          api.send("out", { a: a4, b: b4, c });
+          api.send("out", { a: a3, b: b3, c });
       }
       if ($$self.$$.dirty & /*api, a*/
       3) {
         $:
-          api.send("a", a4);
+          api.send("a", a3);
       }
       if ($$self.$$.dirty & /*api, b*/
       5) {
         $:
-          api.send("b", b4);
+          api.send("b", b3);
       }
       if ($$self.$$.dirty & /*api, c*/
       9) {
@@ -15557,8 +15617,8 @@
     };
     return [
       api,
-      a4,
-      b4,
+      a3,
+      b3,
       c,
       $context,
       $selected,
@@ -17093,77 +17153,122 @@
   // plug-ins/components/gradients/Preview.svelte
   function get_each_context5(ctx, list, i) {
     const child_ctx = ctx.slice();
-    child_ctx[2] = list[i];
-    child_ctx[6] = i;
+    child_ctx[5] = list[i].id;
+    child_ctx[6] = list[i].padding;
+    child_ctx[7] = list[i].angle;
+    child_ctx[19] = list[i].stops;
+    child_ctx[8] = list[i].levels;
     return child_ctx;
   }
   __name(get_each_context5, "get_each_context");
   function create_each_block5(ctx) {
-    let preview;
+    let preview_1;
     let updating_selection;
     let current;
-    function preview_selection_binding(value) {
-      ctx[3](value);
-    }
-    __name(preview_selection_binding, "preview_selection_binding");
-    let preview_props = {
-      api: (
+    const preview_1_spread_levels = [
+      { api: (
         /*api*/
         ctx[1]
-      ),
-      motif: (
-        /*motif*/
-        ctx[2]
-      )
-    };
+      ) },
+      { id: (
+        /*id*/
+        ctx[5]
+      ) },
+      { padding: (
+        /*padding*/
+        ctx[6]
+      ) },
+      { angle: (
+        /*angle*/
+        ctx[7]
+      ) },
+      /*stops*/
+      ctx[19],
+      { levels: (
+        /*levels*/
+        ctx[8]
+      ) }
+    ];
+    function preview_1_selection_binding(value) {
+      ctx[17](value);
+    }
+    __name(preview_1_selection_binding, "preview_1_selection_binding");
+    let preview_1_props = {};
+    for (let i = 0; i < preview_1_spread_levels.length; i += 1) {
+      preview_1_props = assign(preview_1_props, preview_1_spread_levels[i]);
+    }
     if (
       /*selection*/
       ctx[0] !== void 0
     ) {
-      preview_props.selection = /*selection*/
+      preview_1_props.selection = /*selection*/
       ctx[0];
     }
-    preview = new Preview({ props: preview_props });
-    binding_callbacks.push(() => bind(preview, "selection", preview_selection_binding));
+    preview_1 = new Preview({ props: preview_1_props });
+    binding_callbacks.push(() => bind(preview_1, "selection", preview_1_selection_binding));
     return {
       c() {
-        create_component(preview.$$.fragment);
+        create_component(preview_1.$$.fragment);
       },
       m(target, anchor) {
-        mount_component(preview, target, anchor);
+        mount_component(preview_1, target, anchor);
         current = true;
       },
       p(ctx2, dirty) {
-        const preview_changes = {};
-        if (dirty & /*api*/
-        2)
-          preview_changes.api = /*api*/
-          ctx2[1];
-        if (dirty & /*motif*/
-        4)
-          preview_changes.motif = /*motif*/
-          ctx2[2];
+        const preview_1_changes = dirty & /*api, $levels*/
+        4098 ? get_spread_update(preview_1_spread_levels, [
+          dirty & /*api*/
+          2 && { api: (
+            /*api*/
+            ctx2[1]
+          ) },
+          dirty & /*$levels*/
+          4096 && { id: (
+            /*id*/
+            ctx2[5]
+          ) },
+          dirty & /*$levels*/
+          4096 && { padding: (
+            /*padding*/
+            ctx2[6]
+          ) },
+          dirty & /*$levels*/
+          4096 && { angle: (
+            /*angle*/
+            ctx2[7]
+          ) },
+          dirty & /*$levels*/
+          4096 && get_spread_object(
+            /*stops*/
+            ctx2[19]
+          ),
+          dirty & /*$levels*/
+          4096 && { levels: (
+            /*levels*/
+            ctx2[8]
+          ) }
+        ]) : {};
         if (!updating_selection && dirty & /*selection*/
         1) {
           updating_selection = true;
-          preview_changes.selection = /*selection*/
+          preview_1_changes.selection = /*selection*/
           ctx2[0];
           add_flush_callback(() => updating_selection = false);
         }
-        preview.$set(preview_changes);
+        preview_1.$set(preview_1_changes);
       },
       i(local) {
         if (current)
           return;
-        transition_in(preview.$$.fragment, local);
+        transition_in(preview_1.$$.fragment, local);
         current = true;
       },
       o(local) {
-        transition_out(preview.$$.fragment, local);
+        transition_out(preview_1.$$.fragment, local);
         current = false;
       },
       d(detaching) {
-        destroy_component(preview, detaching);
+        destroy_component(preview_1, detaching);
       }
     };
   }
@@ -17174,8 +17279,8 @@
     let mounted;
     let dispose;
     let each_value = ensure_array_like(
-      /*motif*/
-      ctx[2].levels
+      /*$levels*/
+      ctx[12]
     );
     let each_blocks = [];
     for (let i = 0; i < each_value.length; i += 1) {
@@ -17195,14 +17300,14 @@
         set_style(
           div,
           "background",
-          /*motif*/
-          ctx[2].background
+          /*preview*/
+          ctx[9]
         );
         toggle_class(
           div,
           "m-3",
-          /*motif*/
-          ctx[2].padding
+          /*$padding*/
+          ctx[10]
         );
       },
       m(target, anchor) {
@@ -17216,17 +17321,17 @@
         if (!mounted) {
           dispose = listen(div, "click", stop_propagation(
             /*click_handler*/
-            ctx[4]
+            ctx[18]
           ));
           mounted = true;
         }
       },
       p(ctx2, [dirty]) {
-        if (dirty & /*api, motif, selection*/
-        7) {
+        if (dirty & /*api, $levels, selection*/
+        4099) {
           each_value = ensure_array_like(
-            /*motif*/
-            ctx2[2].levels
+            /*$levels*/
+            ctx2[12]
           );
           let i;
           for (i = 0; i < each_value.length; i += 1) {
@@ -17247,22 +17352,22 @@
           }
           check_outros();
         }
-        if (!current || dirty & /*motif*/
-        4) {
+        if (!current || dirty & /*preview*/
+        512) {
           set_style(
             div,
             "background",
-            /*motif*/
-            ctx2[2].background
+            /*preview*/
+            ctx2[9]
           );
         }
-        if (!current || dirty & /*motif*/
-        4) {
+        if (!current || dirty & /*$padding*/
+        1024) {
           toggle_class(
             div,
             "m-3",
-            /*motif*/
-            ctx2[2].padding
+            /*$padding*/
+            ctx2[10]
           );
         }
       },
@@ -17293,24 +17398,91 @@
   }
   __name(create_fragment11, "create_fragment");
   function instance11($$self, $$props, $$invalidate) {
+    let preview;
+    let $color1, $$unsubscribe_color1 = noop, $$subscribe_color1 = /* @__PURE__ */ __name(() => ($$unsubscribe_color1(), $$unsubscribe_color1 = subscribe(color1, ($$value) => $$invalidate(13, $color1 = $$value)), color1), "$$subscribe_color1");
+    let $color0, $$unsubscribe_color0 = noop, $$subscribe_color0 = /* @__PURE__ */ __name(() => ($$unsubscribe_color0(), $$unsubscribe_color0 = subscribe(color0, ($$value) => $$invalidate(14, $color0 = $$value)), color0), "$$subscribe_color0");
+    let $angle, $$unsubscribe_angle = noop, $$subscribe_angle = /* @__PURE__ */ __name(() => ($$unsubscribe_angle(), $$unsubscribe_angle = subscribe(angle, ($$value) => $$invalidate(15, $angle = $$value)), angle), "$$subscribe_angle");
+    let $color2, $$unsubscribe_color2 = noop, $$subscribe_color2 = /* @__PURE__ */ __name(() => ($$unsubscribe_color2(), $$unsubscribe_color2 = subscribe(color2, ($$value) => $$invalidate(16, $color2 = $$value)), color2), "$$subscribe_color2");
+    let $padding, $$unsubscribe_padding = noop, $$subscribe_padding = /* @__PURE__ */ __name(() => ($$unsubscribe_padding(), $$unsubscribe_padding = subscribe(padding, ($$value) => $$invalidate(10, $padding = $$value)), padding), "$$subscribe_padding");
+    let $id, $$unsubscribe_id = noop, $$subscribe_id = /* @__PURE__ */ __name(() => ($$unsubscribe_id(), $$unsubscribe_id = subscribe(id, ($$value) => $$invalidate(11, $id = $$value)), id), "$$subscribe_id");
+    let $levels, $$unsubscribe_levels = noop, $$subscribe_levels = /* @__PURE__ */ __name(() => ($$unsubscribe_levels(), $$unsubscribe_levels = subscribe(levels, ($$value) => $$invalidate(12, $levels = $$value)), levels), "$$subscribe_levels");
+    $$self.$$.on_destroy.push(() => $$unsubscribe_color1());
+    $$self.$$.on_destroy.push(() => $$unsubscribe_color0());
+    $$self.$$.on_destroy.push(() => $$unsubscribe_angle());
+    $$self.$$.on_destroy.push(() => $$unsubscribe_color2());
+    $$self.$$.on_destroy.push(() => $$unsubscribe_padding());
+    $$self.$$.on_destroy.push(() => $$unsubscribe_id());
+    $$self.$$.on_destroy.push(() => $$unsubscribe_levels());
     let { api } = $$props;
-    let { motif } = $$props;
+    let { id } = $$props;
+    $$subscribe_id();
+    let { padding } = $$props;
+    $$subscribe_padding();
+    let { angle } = $$props;
+    $$subscribe_angle();
+    let { levels } = $$props;
+    $$subscribe_levels();
     let { selection } = $$props;
-    function preview_selection_binding(value) {
+    let { color0 } = $$props;
+    $$subscribe_color0();
+    let { color1 } = $$props;
+    $$subscribe_color1();
+    let { color2 } = $$props;
+    $$subscribe_color2();
+    function preview_1_selection_binding(value) {
       selection = value;
       $$invalidate(0, selection);
     }
-    __name(preview_selection_binding, "preview_selection_binding");
-    const click_handler = /* @__PURE__ */ __name(() => $$invalidate(0, selection = motif), "click_handler");
+    __name(preview_1_selection_binding, "preview_1_selection_binding");
+    const click_handler = /* @__PURE__ */ __name(() => $$invalidate(0, selection = $id), "click_handler");
     $$self.$$set = ($$props2) => {
       if ("api" in $$props2)
         $$invalidate(1, api = $$props2.api);
-      if ("motif" in $$props2)
-        $$invalidate(2, motif = $$props2.motif);
+      if ("id" in $$props2)
+        $$subscribe_id($$invalidate(5, id = $$props2.id));
+      if ("padding" in $$props2)
+        $$subscribe_padding($$invalidate(6, padding = $$props2.padding));
+      if ("angle" in $$props2)
+        $$subscribe_angle($$invalidate(7, angle = $$props2.angle));
+      if ("levels" in $$props2)
+        $$subscribe_levels($$invalidate(8, levels = $$props2.levels));
       if ("selection" in $$props2)
         $$invalidate(0, selection = $$props2.selection);
+      if ("color0" in $$props2)
+        $$subscribe_color0($$invalidate(2, color0 = $$props2.color0));
+      if ("color1" in $$props2)
+        $$subscribe_color1($$invalidate(3, color1 = $$props2.color1));
+      if ("color2" in $$props2)
+        $$subscribe_color2($$invalidate(4, color2 = $$props2.color2));
     };
-    return [selection, api, motif, preview_selection_binding, click_handler];
+    $$self.$$.update = () => {
+      if ($$self.$$.dirty & /*color2, $angle, $color0, $color1, $color2*/
+      122896) {
+        $:
+          $$invalidate(9, preview = color2 ? `linear-gradient(${$angle}deg, ${$color0}, ${$color1}, ${$color2})` : `linear-gradient(${$angle}deg, ${$color0}, ${$color1})`);
+      }
+    };
+    return [
+      selection,
+      api,
+      color0,
+      color1,
+      color2,
+      id,
+      padding,
+      angle,
+      levels,
+      preview,
+      $padding,
+      $id,
+      $levels,
+      $color1,
+      $color0,
+      $angle,
+      $color2,
+      preview_1_selection_binding,
+      click_handler
+    ];
   }
   __name(instance11, "instance");
   var Preview = class extends SvelteComponent {
@@ -17319,7 +17491,17 @@
     }
     constructor(options) {
       super();
-      init(this, options, instance11, create_fragment11, safe_not_equal, { api: 1, motif: 2, selection: 0 });
+      init(this, options, instance11, create_fragment11, safe_not_equal, {
+        api: 1,
+        id: 5,
+        padding: 6,
+        angle: 7,
+        levels: 8,
+        selection: 0,
+        color0: 2,
+        color1: 3,
+        color2: 4
+      });
     }
   };
   var Preview_default = Preview;
@@ -17327,43 +17509,35 @@
   // plug-ins/components/gradients/Color.svelte
   var import_chroma_js = __toESM(require_chroma());
   function create_if_block2(ctx) {
-    let t0_value = (
-      /*stop*/
-      ctx[0].color + ""
-    );
-    let t0;
-    let t1;
     let div3;
     let div0;
     let input0;
-    let t2;
+    let t0;
     let input1;
-    let t3;
+    let t1;
     let input2;
-    let t4;
+    let t2;
     let input3;
-    let t5;
+    let t3;
     let div1;
-    let t6;
+    let t4;
     let div2;
     let mounted;
     let dispose;
     return {
       c() {
-        t0 = text2(t0_value);
-        t1 = space();
         div3 = element("div");
         div0 = element("div");
         input0 = element("input");
-        t2 = space();
+        t0 = space();
         input1 = element("input");
-        t3 = space();
+        t1 = space();
         input2 = element("input");
-        t4 = space();
+        t2 = space();
         input3 = element("input");
-        t5 = space();
+        t3 = space();
         div1 = element("div");
-        t6 = space();
+        t4 = space();
         div2 = element("div");
         attr(input0, "type", "range");
         attr(input0, "class", "form-range");
@@ -17387,8 +17561,8 @@
         set_style(
           div1,
           "background-color",
-          /*stop*/
-          ctx[0].color
+          /*$color*/
+          ctx[5]
         );
         attr(div2, "class", "col-2");
         set_style(div2, "background-color", "lch(" + /*l*/
@@ -17396,11 +17570,9 @@
         ctx[2] + " " + /*h*/
         ctx[3] + " / " + /*a*/
         ctx[4] + ")");
-        attr(div3, "class", "row");
+        attr(div3, "class", "row m-0");
       },
       m(target, anchor) {
-        insert(target, t0, anchor);
-        insert(target, t1, anchor);
         insert(target, div3, anchor);
         append(div3, div0);
         append(div0, input0);
@@ -17409,30 +17581,30 @@
           /*l*/
           ctx[1]
         );
-        append(div0, t2);
+        append(div0, t0);
         append(div0, input1);
         set_input_value(
           input1,
           /*c*/
           ctx[2]
         );
-        append(div0, t3);
+        append(div0, t1);
         append(div0, input2);
         set_input_value(
           input2,
           /*h*/
           ctx[3]
         );
-        append(div0, t4);
+        append(div0, t2);
         append(div0, input3);
         set_input_value(
           input3,
           /*a*/
           ctx[4]
         );
-        append(div3, t5);
+        append(div3, t3);
         append(div3, div1);
-        append(div3, t6);
+        append(div3, t4);
         append(div3, div2);
         if (!mounted) {
           dispose = [
@@ -17489,10 +17661,6 @@
         }
       },
       p(ctx2, dirty) {
-        if (dirty & /*stop*/
-        1 && t0_value !== (t0_value = /*stop*/
-        ctx2[0].color + ""))
-          set_data(t0, t0_value);
         if (dirty & /*l*/
         2) {
           set_input_value(
@@ -17525,13 +17693,13 @@
             ctx2[4]
           );
         }
-        if (dirty & /*stop*/
-        1) {
+        if (dirty & /*$color*/
+        32) {
           set_style(
             div1,
             "background-color",
-            /*stop*/
-            ctx2[0].color
+            /*$color*/
+            ctx2[5]
           );
         }
         if (dirty & /*l, c, h, a*/
@@ -17545,8 +17713,6 @@
       },
       d(detaching) {
         if (detaching) {
-          detach(t0);
-          detach(t1);
           detach(div3);
         }
         mounted = false;
@@ -17558,7 +17724,7 @@
   function create_fragment12(ctx) {
     let if_block_anchor;
     let if_block = (
-      /*stop*/
+      /*color*/
       ctx[0] && create_if_block2(ctx)
     );
     return {
@@ -17574,7 +17740,7 @@
       },
       p(ctx2, [dirty]) {
         if (
-          /*stop*/
+          /*color*/
           ctx2[0]
         ) {
           if (if_block) {
@@ -17602,74 +17768,81 @@
   }
   __name(create_fragment12, "create_fragment");
   function instance12($$self, $$props, $$invalidate) {
+    let $color, $$unsubscribe_color = noop, $$subscribe_color = /* @__PURE__ */ __name(() => ($$unsubscribe_color(), $$unsubscribe_color = subscribe(color, ($$value) => $$invalidate(5, $color = $$value)), color), "$$subscribe_color");
+    $$self.$$.on_destroy.push(() => $$unsubscribe_color());
     let { api } = $$props;
-    let { stop } = $$props;
-    let { refresh } = $$props;
+    let { color } = $$props;
+    $$subscribe_color();
+    let { length } = $$props;
     let l = 0;
     let c = 0;
     let h = 0;
-    let a4 = 1;
-    let mounted = false;
-    onMount(() => {
-      const converted = (0, import_chroma_js.default)(stop.color).lch();
-      const alpha = (0, import_chroma_js.default)(stop.color).alpha();
-      console.log("XXX, converted", converted);
-      $$invalidate(1, l = converted[0]);
-      $$invalidate(2, c = converted[1]);
-      $$invalidate(3, h = converted[2]);
-      $$invalidate(4, a4 = alpha);
-      $$invalidate(7, mounted = true);
-    });
+    let a3 = 1;
+    ;
+    ;
     function input0_change_input_handler() {
       l = to_number(this.value);
-      $$invalidate(1, l);
+      $$invalidate(1, l), $$invalidate(5, $color);
     }
     __name(input0_change_input_handler, "input0_change_input_handler");
     function input1_change_input_handler() {
       c = to_number(this.value);
-      $$invalidate(2, c);
+      $$invalidate(2, c), $$invalidate(5, $color);
     }
     __name(input1_change_input_handler, "input1_change_input_handler");
     function input2_change_input_handler() {
       h = to_number(this.value);
-      $$invalidate(3, h);
+      $$invalidate(3, h), $$invalidate(5, $color);
     }
     __name(input2_change_input_handler, "input2_change_input_handler");
     function input3_change_input_handler() {
-      a4 = to_number(this.value);
-      $$invalidate(4, a4);
+      a3 = to_number(this.value);
+      $$invalidate(4, a3), $$invalidate(5, $color);
     }
     __name(input3_change_input_handler, "input3_change_input_handler");
     $$self.$$set = ($$props2) => {
       if ("api" in $$props2)
-        $$invalidate(5, api = $$props2.api);
-      if ("stop" in $$props2)
-        $$invalidate(0, stop = $$props2.stop);
-      if ("refresh" in $$props2)
-        $$invalidate(6, refresh = $$props2.refresh);
+        $$invalidate(6, api = $$props2.api);
+      if ("color" in $$props2)
+        $$subscribe_color($$invalidate(0, color = $$props2.color));
+      if ("length" in $$props2)
+        $$invalidate(7, length = $$props2.length);
     };
     $$self.$$.update = () => {
-      if ($$self.$$.dirty & /*mounted, l, c, h, a, refresh*/
-      222) {
+      if ($$self.$$.dirty & /*$color*/
+      32) {
         $: {
-          if (mounted) {
-            const updated = import_chroma_js.default.lch(l, c, h).alpha(a4).hex();
-            console.log("XXX Update", l, c, h, updated);
-            $$invalidate(0, stop.color = updated, stop);
-            refresh();
+          const converted = (0, import_chroma_js.default)($color).lch();
+          const alpha = (0, import_chroma_js.default)($color).alpha();
+          console.log("XXX, converted", converted);
+          $$invalidate(1, l = converted[0]);
+          $$invalidate(2, c = converted[1]);
+          $$invalidate(3, h = converted[2]);
+          $$invalidate(4, a3 = alpha);
+        }
+      }
+      if ($$self.$$.dirty & /*l, c, h, a, $color, color*/
+      63) {
+        $: {
+          const updated = import_chroma_js.default.lch(l, c, h).alpha(a3).hex();
+          console.log({ updated });
+          if ($color != updated) {
+            color.set(updated);
+            color.notify();
           }
+          ;
         }
       }
     };
     return [
-      stop,
+      color,
       l,
       c,
       h,
-      a4,
+      a3,
+      $color,
       api,
-      refresh,
-      mounted,
+      length,
       input0_change_input_handler,
       input1_change_input_handler,
       input2_change_input_handler,
@@ -17683,7 +17856,7 @@
     }
     constructor(options) {
       super();
-      init(this, options, instance12, create_fragment12, safe_not_equal, { api: 5, stop: 0, refresh: 6 });
+      init(this, options, instance12, create_fragment12, safe_not_equal, { api: 6, color: 0, length: 7 });
     }
   };
   var Color_default = Color;
@@ -17691,15 +17864,19 @@
   // plug-ins/components/gradients/Gradients.svelte
   function get_each_context6(ctx, list, i) {
     const child_ctx = ctx.slice();
-    child_ctx[22] = list[i];
-    child_ctx[24] = i;
+    child_ctx[20] = list[i].color;
+    child_ctx[21] = list[i].length;
     return child_ctx;
   }
   __name(get_each_context6, "get_each_context");
   function get_each_context_1(ctx, list, i) {
     const child_ctx = ctx.slice();
-    child_ctx[16] = list[i];
-    child_ctx[24] = i;
+    child_ctx[24] = list[i].id;
+    child_ctx[25] = list[i].padding;
+    child_ctx[26] = list[i].angle;
+    child_ctx[27] = list[i].stops;
+    child_ctx[28] = list[i].levels;
+    child_ctx[30] = i;
     return child_ctx;
   }
   __name(get_each_context_1, "get_each_context_1");
@@ -17707,26 +17884,44 @@
     let preview;
     let updating_selection;
     let current;
-    function preview_selection_binding(value) {
-      ctx[19](value);
-    }
-    __name(preview_selection_binding, "preview_selection_binding");
-    let preview_props = {
-      api: (
+    const preview_spread_levels = [
+      { api: (
         /*api*/
         ctx[0]
-      ),
-      motif: (
-        /*motif*/
-        ctx[16]
-      )
-    };
+      ) },
+      { id: (
+        /*id*/
+        ctx[24]
+      ) },
+      { padding: (
+        /*padding*/
+        ctx[25]
+      ) },
+      { angle: (
+        /*angle*/
+        ctx[26]
+      ) },
+      /*stops*/
+      ctx[27],
+      { levels: (
+        /*levels*/
+        ctx[28]
+      ) }
+    ];
+    function preview_selection_binding(value) {
+      ctx[18](value);
+    }
+    __name(preview_selection_binding, "preview_selection_binding");
+    let preview_props = {};
+    for (let i = 0; i < preview_spread_levels.length; i += 1) {
+      preview_props = assign(preview_props, preview_spread_levels[i]);
+    }
     if (
       /*selection*/
-      ctx[2] !== void 0
+      ctx[1] !== void 0
     ) {
       preview_props.selection = /*selection*/
-      ctx[2];
+      ctx[1];
     }
     preview = new Preview_default({ props: preview_props });
     binding_callbacks.push(() => bind(preview, "selection", preview_selection_binding));
@@ -17739,20 +17934,44 @@
         current = true;
       },
       p(ctx2, dirty) {
-        const preview_changes = {};
-        if (dirty & /*api*/
-        1)
-          preview_changes.api = /*api*/
-          ctx2[0];
-        if (dirty & /*$motif*/
-        2)
-          preview_changes.motif = /*motif*/
-          ctx2[16];
+        const preview_changes = dirty & /*api, $motif*/
+        5 ? get_spread_update(preview_spread_levels, [
+          dirty & /*api*/
+          1 && { api: (
+            /*api*/
+            ctx2[0]
+          ) },
+          dirty & /*$motif*/
+          4 && { id: (
+            /*id*/
+            ctx2[24]
+          ) },
+          dirty & /*$motif*/
+          4 && { padding: (
+            /*padding*/
+            ctx2[25]
+          ) },
+          dirty & /*$motif*/
+          4 && { angle: (
+            /*angle*/
+            ctx2[26]
+          ) },
+          dirty & /*$motif*/
+          4 && get_spread_object(
+            /*stops*/
+            ctx2[27]
+          ),
+          dirty & /*$motif*/
+          4 && { levels: (
+            /*levels*/
+            ctx2[28]
+          ) }
+        ]) : {};
         if (!updating_selection && dirty & /*selection*/
-        4) {
+        2) {
           updating_selection = true;
           preview_changes.selection = /*selection*/
-          ctx2[2];
+          ctx2[1];
           add_flush_callback(() => updating_selection = false);
         }
         preview.$set(preview_changes);
@@ -17774,134 +17993,11 @@
   }
   __name(create_each_block_1, "create_each_block_1");
   function create_if_block3(ctx) {
-    let t0_value = (
-      /*selection*/
-      ctx[2].id + ""
-    );
-    let t0;
-    let t1;
-    let previous_key = (
-      /*selection*/
-      ctx[2]
-    );
-    let key_block_anchor;
-    let current;
-    let key_block = create_key_block(ctx);
-    return {
-      c() {
-        t0 = text2(t0_value);
-        t1 = space();
-        key_block.c();
-        key_block_anchor = empty();
-      },
-      m(target, anchor) {
-        insert(target, t0, anchor);
-        insert(target, t1, anchor);
-        key_block.m(target, anchor);
-        insert(target, key_block_anchor, anchor);
-        current = true;
-      },
-      p(ctx2, dirty) {
-        if ((!current || dirty & /*selection*/
-        4) && t0_value !== (t0_value = /*selection*/
-        ctx2[2].id + ""))
-          set_data(t0, t0_value);
-        if (dirty & /*selection*/
-        4 && safe_not_equal(previous_key, previous_key = /*selection*/
-        ctx2[2])) {
-          group_outros();
-          transition_out(key_block, 1, 1, noop);
-          check_outros();
-          key_block = create_key_block(ctx2);
-          key_block.c();
-          transition_in(key_block, 1);
-          key_block.m(key_block_anchor.parentNode, key_block_anchor);
-        } else {
-          key_block.p(ctx2, dirty);
-        }
-      },
-      i(local) {
-        if (current)
-          return;
-        transition_in(key_block);
-        current = true;
-      },
-      o(local) {
-        transition_out(key_block);
-        current = false;
-      },
-      d(detaching) {
-        if (detaching) {
-          detach(t0);
-          detach(t1);
-          detach(key_block_anchor);
-        }
-        key_block.d(detaching);
-      }
-    };
-  }
-  __name(create_if_block3, "create_if_block");
-  function create_each_block6(ctx) {
-    let color;
-    let current;
-    color = new Color_default({
-      props: {
-        api: (
-          /*api*/
-          ctx[0]
-        ),
-        stop: (
-          /*stop*/
-          ctx[22]
-        ),
-        refresh: (
-          /*refresh*/
-          ctx[15]
-        )
-      }
-    });
-    return {
-      c() {
-        create_component(color.$$.fragment);
-      },
-      m(target, anchor) {
-        mount_component(color, target, anchor);
-        current = true;
-      },
-      p(ctx2, dirty) {
-        const color_changes = {};
-        if (dirty & /*api*/
-        1)
-          color_changes.api = /*api*/
-          ctx2[0];
-        if (dirty & /*selection*/
-        4)
-          color_changes.stop = /*stop*/
-          ctx2[22];
-        color.$set(color_changes);
-      },
-      i(local) {
-        if (current)
-          return;
-        transition_in(color.$$.fragment, local);
-        current = true;
-      },
-      o(local) {
-        transition_out(color.$$.fragment, local);
-        current = false;
-      },
-      d(detaching) {
-        destroy_component(color, detaching);
-      }
-    };
-  }
-  __name(create_each_block6, "create_each_block");
-  function create_key_block(ctx) {
     let each_1_anchor;
     let current;
     let each_value = ensure_array_like(
-      /*selection*/
-      ctx[2].colors
+      /*colors*/
+      ctx[3]
     );
     let each_blocks = [];
     for (let i = 0; i < each_value.length; i += 1) {
@@ -17927,11 +18023,11 @@
         current = true;
       },
       p(ctx2, dirty) {
-        if (dirty & /*api, selection, refresh*/
-        32773) {
+        if (dirty & /*api, colors*/
+        9) {
           each_value = ensure_array_like(
-            /*selection*/
-            ctx2[2].colors
+            /*colors*/
+            ctx2[3]
           );
           let i;
           for (i = 0; i < each_value.length; i += 1) {
@@ -17976,7 +18072,66 @@
       }
     };
   }
-  __name(create_key_block, "create_key_block");
+  __name(create_if_block3, "create_if_block");
+  function create_each_block6(ctx) {
+    let color_1;
+    let current;
+    color_1 = new Color_default({
+      props: {
+        api: (
+          /*api*/
+          ctx[0]
+        ),
+        color: (
+          /*color*/
+          ctx[20]
+        ),
+        length: (
+          /*length*/
+          ctx[21]
+        )
+      }
+    });
+    return {
+      c() {
+        create_component(color_1.$$.fragment);
+      },
+      m(target, anchor) {
+        mount_component(color_1, target, anchor);
+        current = true;
+      },
+      p(ctx2, dirty) {
+        const color_1_changes = {};
+        if (dirty & /*api*/
+        1)
+          color_1_changes.api = /*api*/
+          ctx2[0];
+        if (dirty & /*colors*/
+        8)
+          color_1_changes.color = /*color*/
+          ctx2[20];
+        if (dirty & /*colors*/
+        8)
+          color_1_changes.length = /*length*/
+          ctx2[21];
+        color_1.$set(color_1_changes);
+      },
+      i(local) {
+        if (current)
+          return;
+        transition_in(color_1.$$.fragment, local);
+        current = true;
+      },
+      o(local) {
+        transition_out(color_1.$$.fragment, local);
+        current = false;
+      },
+      d(detaching) {
+        destroy_component(color_1, detaching);
+      }
+    };
+  }
+  __name(create_each_block6, "create_each_block");
   function create_fragment13(ctx) {
     let div3;
     let div0;
@@ -17984,13 +18139,13 @@
     let t1;
     let t2_value = parseInt(
       /*$w*/
-      ctx[6]
+      ctx[7]
     ) + "";
     let t2;
     let t3;
     let t4_value = parseInt(
       /*$h*/
-      ctx[7]
+      ctx[8]
     ) + "";
     let t4;
     let t5;
@@ -17998,8 +18153,8 @@
     let api_makeMovable_action;
     let t6;
     let div1;
-    let api_stopWheel_action;
     let t7;
+    let api_stopWheel_action;
     let t8;
     let div2;
     let t9;
@@ -18012,7 +18167,7 @@
     let dispose;
     let each_value_1 = ensure_array_like([
       /*$motif*/
-      ctx[1]
+      ctx[2]
     ]);
     let each_blocks = [];
     for (let i = 0; i < 1; i += 1) {
@@ -18023,7 +18178,7 @@
     }), "out");
     let if_block = (
       /*selection*/
-      ctx[2] && create_if_block3(ctx)
+      ctx[1] && create_if_block3(ctx)
     );
     return {
       c() {
@@ -18031,7 +18186,7 @@
         div0 = element("div");
         t0 = text2(
           /*$caption*/
-          ctx[5]
+          ctx[6]
         );
         t1 = text2(" (");
         t2 = text2(t2_value);
@@ -18052,7 +18207,7 @@
         div2 = element("div");
         t9 = text2(
           /*$status*/
-          ctx[8]
+          ctx[9]
         );
         t10 = space();
         button1 = element("button");
@@ -18069,21 +18224,20 @@
           div0,
           "text-warning",
           /*$selected*/
-          ctx[4]
+          ctx[5]
         );
-        attr(div1, "class", "card-body overflow-auto m-0 p-0");
-        set_style(div1, "background-color", "black");
+        attr(div1, "class", "card-body overflow-auto m-0 p-0 tx-lo");
         attr(button1, "type", "button");
         attr(button1, "class", "btn opacity-50 outline-none float-end p-0");
         attr(button1, "aria-label", "Resize");
         attr(div2, "class", "card-footer text-body-secondary tx-hi py-0 px-1");
         attr(div3, "class", div3_class_value = "card alert-" + /*$context*/
-        ctx[3] + " h-100 m-0 tx-bg");
+        ctx[4] + " h-100 m-0 tx-bg");
         toggle_class(
           div3,
           "active",
           /*$selected*/
-          ctx[4]
+          ctx[5]
         );
       },
       m(target, anchor) {
@@ -18103,9 +18257,9 @@
             each_blocks[i].m(div1, null);
           }
         }
-        append(div3, t7);
+        append(div1, t7);
         if (if_block)
-          if_block.m(div3, null);
+          if_block.m(div1, null);
         append(div3, t8);
         append(div3, div2);
         append(div2, t9);
@@ -18118,7 +18272,7 @@
               button0,
               "click",
               /*click_handler*/
-              ctx[18]
+              ctx[17]
             ),
             action_destroyer(api_makeMovable_action = /*api*/
             ctx[0].makeMovable(div0)),
@@ -18132,38 +18286,38 @@
       },
       p(ctx2, [dirty]) {
         if (!current || dirty & /*$caption*/
-        32)
+        64)
           set_data(
             t0,
             /*$caption*/
-            ctx2[5]
+            ctx2[6]
           );
         if ((!current || dirty & /*$w*/
-        64) && t2_value !== (t2_value = parseInt(
+        128) && t2_value !== (t2_value = parseInt(
           /*$w*/
-          ctx2[6]
+          ctx2[7]
         ) + ""))
           set_data(t2, t2_value);
         if ((!current || dirty & /*$h*/
-        128) && t4_value !== (t4_value = parseInt(
+        256) && t4_value !== (t4_value = parseInt(
           /*$h*/
-          ctx2[7]
+          ctx2[8]
         ) + ""))
           set_data(t4, t4_value);
         if (!current || dirty & /*$selected*/
-        16) {
+        32) {
           toggle_class(
             div0,
             "text-warning",
             /*$selected*/
-            ctx2[4]
+            ctx2[5]
           );
         }
         if (dirty & /*api, $motif, selection*/
         7) {
           each_value_1 = ensure_array_like([
             /*$motif*/
-            ctx2[1]
+            ctx2[2]
           ]);
           let i;
           for (i = 0; i < 1; i += 1) {
@@ -18175,7 +18329,7 @@
               each_blocks[i] = create_each_block_1(child_ctx);
               each_blocks[i].c();
               transition_in(each_blocks[i], 1);
-              each_blocks[i].m(div1, null);
+              each_blocks[i].m(div1, t7);
             }
           }
           group_outros();
@@ -18186,19 +18340,19 @@
         }
         if (
           /*selection*/
-          ctx2[2]
+          ctx2[1]
         ) {
           if (if_block) {
             if_block.p(ctx2, dirty);
             if (dirty & /*selection*/
-            4) {
+            2) {
               transition_in(if_block, 1);
             }
           } else {
             if_block = create_if_block3(ctx2);
             if_block.c();
             transition_in(if_block, 1);
-            if_block.m(div3, t8);
+            if_block.m(div1, null);
           }
         } else if (if_block) {
           group_outros();
@@ -18208,24 +18362,24 @@
           check_outros();
         }
         if (!current || dirty & /*$status*/
-        256)
+        512)
           set_data(
             t9,
             /*$status*/
-            ctx2[8]
+            ctx2[9]
           );
         if (!current || dirty & /*$context*/
-        8 && div3_class_value !== (div3_class_value = "card alert-" + /*$context*/
-        ctx2[3] + " h-100 m-0 tx-bg")) {
+        16 && div3_class_value !== (div3_class_value = "card alert-" + /*$context*/
+        ctx2[4] + " h-100 m-0 tx-bg")) {
           attr(div3, "class", div3_class_value);
         }
         if (!current || dirty & /*$context, $selected*/
-        24) {
+        48) {
           toggle_class(
             div3,
             "active",
             /*$selected*/
-            ctx2[4]
+            ctx2[5]
           );
         }
       },
@@ -18259,10 +18413,8 @@
     };
   }
   __name(create_fragment13, "create_fragment");
-  var a2 = 1;
-  var b2 = 2;
   function instance13($$self, $$props, $$invalidate) {
-    let c;
+    let colors;
     let $motif;
     let $context;
     let $selected;
@@ -18271,34 +18423,28 @@
     let $h;
     let $status;
     let { api } = $$props;
+    const selected = api.signal("selected");
+    component_subscribe($$self, selected, (value) => $$invalidate(5, $selected = value));
     const context = api.signal("context");
-    component_subscribe($$self, context, (value) => $$invalidate(3, $context = value));
+    component_subscribe($$self, context, (value) => $$invalidate(4, $context = value));
     const caption = api.signal("caption");
-    component_subscribe($$self, caption, (value) => $$invalidate(5, $caption = value));
+    component_subscribe($$self, caption, (value) => $$invalidate(6, $caption = value));
     const text3 = api.signal("text");
     const status = api.signal("status");
-    component_subscribe($$self, status, (value) => $$invalidate(8, $status = value));
-    const motif = api.signal("motif");
-    component_subscribe($$self, motif, (value) => $$invalidate(1, $motif = value));
+    component_subscribe($$self, status, (value) => $$invalidate(9, $status = value));
     const w = api.signal("w");
-    component_subscribe($$self, w, (value) => $$invalidate(6, $w = value));
+    component_subscribe($$self, w, (value) => $$invalidate(7, $w = value));
     const h = api.signal("h");
-    component_subscribe($$self, h, (value) => $$invalidate(7, $h = value));
+    component_subscribe($$self, h, (value) => $$invalidate(8, $h = value));
+    const motif = api.signal("motif");
+    component_subscribe($$self, motif, (value) => $$invalidate(2, $motif = value));
     let selection = null;
-    const x = api.signal("h");
-    const selected = api.signal("selected");
-    component_subscribe($$self, selected, (value) => $$invalidate(4, $selected = value));
     onMount(() => {
-      console.log("XXX the component has mounted", $motif);
     });
-    function refresh() {
-      motif.notify();
-    }
-    __name(refresh, "refresh");
     const click_handler = /* @__PURE__ */ __name(() => api.removeApplication(), "click_handler");
     function preview_selection_binding(value) {
       selection = value;
-      $$invalidate(2, selection);
+      $$invalidate(1, selection);
     }
     __name(preview_selection_binding, "preview_selection_binding");
     $$self.$$set = ($$props2) => {
@@ -18306,40 +18452,30 @@
         $$invalidate(0, api = $$props2.api);
     };
     $$self.$$.update = () => {
-      if ($$self.$$.dirty & /*api, c*/
-      131073) {
+      if ($$self.$$.dirty & /*selection, $motif*/
+      6) {
         $:
-          api.send("out", { a: a2, b: b2, c });
-      }
-      if ($$self.$$.dirty & /*$motif*/
-      2) {
-        $: {
-          console.log("XXX", $motif);
-          console.log("XXX", motif);
-        }
+          $$invalidate(3, colors = selection ? $motif.get(selection).colors.get() : []);
       }
     };
-    $:
-      $$invalidate(17, c = a2 + b2);
     return [
       api,
-      $motif,
       selection,
+      $motif,
+      colors,
       $context,
       $selected,
       $caption,
       $w,
       $h,
       $status,
+      selected,
       context,
       caption,
       status,
       w,
       h,
-      selected,
-      refresh,
       motif,
-      c,
       click_handler,
       preview_selection_binding
     ];
@@ -18361,52 +18497,62 @@
     static {
       __name(this, "Motif");
     }
-    id;
+    padding;
     direction;
-    padding = false;
-    angle = 180;
-    colors = [];
-    levels = [];
+    angle;
+    colors;
+    levels;
     constructor(id, direction, padding) {
-      this.id = id;
-      this.direction = direction;
-      this.padding = padding;
+      this.id = new Signal(id);
+      this.direction = new Signal(direction);
+      this.padding = new Signal(padding);
+      this.angle = new Signal(180);
+      this.colors = new Signal([]);
+      this.levels = new Signal([]);
     }
     get(id) {
-      let response = null;
-      console.log("XXX", this.id, id);
-      if (this.id === id)
+      console.log(`Seeking ${id}`);
+      let response = {};
+      if (this.id.get() === id)
         return this;
-      for (const level of this.levels) {
+      for (const level of this.levels.get()) {
         response = level.get(id);
-        if (response)
+        if (response) {
+          console.log(`Found`, response);
           return response;
+        }
       }
     }
-    get background() {
-      const colors = this.colors.map((o) => `${o.color} ${o.length}`).join(", ");
-      const response = `linear-gradient(${this.angle}deg, ${colors})`;
-      console.log(response);
-      return response;
+    get stops() {
+      const entries = [];
+      for (const [index, { color, length }] of this.colors.get().entries()) {
+        entries.push(["color" + index, color]);
+        entries.push(["length" + index, length]);
+      }
+      return Object.fromEntries(entries);
     }
     addColor(color, length) {
       const stop = new Stop(color, length);
-      this.colors.push(stop);
+      this.colors.get().push(stop);
+      this.levels.notify();
       return this;
     }
     hi(id) {
       const level = new _Motif(id, "hi");
-      this.levels.push(level);
+      this.levels.get().push(level);
+      this.levels.notify();
       return level;
     }
     lo(id) {
       const level = new _Motif(id, "lo");
-      this.levels.push(level);
+      this.levels.get().push(level);
+      this.levels.notify();
       return level;
     }
     bt(id) {
       const level = new _Motif(id, "lo", true);
-      this.levels.push(level);
+      this.levels.get().push(level);
+      this.levels.notify();
       return level;
     }
   };
@@ -18414,11 +18560,45 @@
     static {
       __name(this, "Stop");
     }
-    color;
-    length;
+    #color;
+    #length;
     constructor(color, length) {
-      this.color = color;
-      this.length = length;
+      this.#color = color;
+      this.#length = length;
+      this.color = new Signal(this.#color);
+      this.length = new Signal(this.#length);
+    }
+  };
+  var Signal = class {
+    static {
+      __name(this, "Signal");
+    }
+    constructor(initialValue = null) {
+      this.value = initialValue;
+      this.subscribers = [];
+    }
+    subscribe(subscriber) {
+      if (typeof subscriber !== "function") {
+        throw new Error("Subscriber must be a function");
+      }
+      this.subscribers.push(subscriber);
+      subscriber(this.value);
+      return () => this.unsubscribe(subscriber);
+    }
+    unsubscribe(subscriber) {
+      this.subscribers = this.subscribers.filter((sub) => sub !== subscriber);
+    }
+    set(value) {
+      if (this.value !== value) {
+        this.value = value;
+        this.notify();
+      }
+    }
+    get() {
+      return this.value;
+    }
+    notify() {
+      this.subscribers.forEach((subscriber) => subscriber(this.value));
     }
   };
 
@@ -18444,12 +18624,12 @@
     };
     methods = {
       initialize() {
-        this.w = 800;
-        this.h = 400;
         this.createSocket("out", 1);
       },
       mount() {
-        const motif = new Motif("bg");
+        this.w = 400;
+        this.h = 700;
+        const motif = new Motif("background");
         motif.addColor("#2e3743", "0%").addColor("#343a49", "20%").addColor("#141d25", "100%");
         motif.hi("caption").addColor("#3b4650", "0%").addColor("#1a1e29", "100%");
         motif.lo("body").addColor("#0f141d", "0%").addColor("#2c3645", "45%").addColor("#131821", "100%");
@@ -18457,7 +18637,6 @@
         motif.get("body").bt("btn-1").addColor("#ecb349", "0%").addColor("#da5a03", "100%");
         motif.get("body").bt("btn-2").addColor("#d443f1", "0%").addColor("#3c1968", "100%");
         this.motif = motif;
-        console.log("XXX", this.motif);
         this.foreign = new Instance(Foreign);
         this.createWindowComponent(this.foreign);
         this.component = new Gradients_default({
@@ -19283,8 +19462,8 @@
     };
   }
   __name(create_fragment15, "create_fragment");
-  var a3 = 1;
-  var b3 = 2;
+  var a2 = 1;
+  var b2 = 2;
   function instance15($$self, $$props, $$invalidate) {
     let c;
     let $context;
@@ -19324,17 +19503,17 @@
       if ($$self.$$.dirty & /*api, c*/
       32770) {
         $:
-          api.send("out", { a: a3, b: b3, c });
+          api.send("out", { a: a2, b: b2, c });
       }
       if ($$self.$$.dirty & /*api*/
       2) {
         $:
-          api.send("a", a3);
+          api.send("a", a2);
       }
       if ($$self.$$.dirty & /*api*/
       2) {
         $:
-          api.send("b", b3);
+          api.send("b", b2);
       }
       if ($$self.$$.dirty & /*api, c*/
       32770) {
@@ -19343,7 +19522,7 @@
       }
     };
     $:
-      $$invalidate(15, c = a3 + b3);
+      $$invalidate(15, c = a2 + b2);
     return [
       tree,
       api,
