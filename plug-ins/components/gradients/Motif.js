@@ -45,7 +45,7 @@ export default class Motif {
   addColor(color, length){
     const stop = new Stop(color, length);
     this.colors.get().push(stop);
-    this.levels.notify()
+    this.colors.notify()
     return this;
   }
 
@@ -71,6 +71,7 @@ export default class Motif {
 }
 
 class Stop {
+  id = uuid();
   #color;
   #length;
 

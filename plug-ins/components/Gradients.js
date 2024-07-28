@@ -43,8 +43,8 @@ export default class Gradients {
 
     mount(){
 
-      this.w = 400;
-      this.h = 700;
+      // this.w = 400;
+      // this.h = 700;
 
       const motif = new Motif('background');
       motif.addColor('#2e3743', 0).addColor('#343a49', 20).addColor('#141d25', 100);

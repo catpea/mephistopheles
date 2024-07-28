@@ -3,6 +3,21 @@ A Visual Programming Language
 
 ## TODO
 
+Once a derrived is configured to listen to all existing colors,
+when newly added colors change it no longer reacts
+
+```
+  $: preview1 = derived(
+        [angle, colors, ...colors.get().map(o => o.color), ...colors.get().map(o => o.length)],
+        () => {
+            const pairs = get(colors).map( o => [get(o.color), get(o.length)]);
+            const stops = pairs.map(o=>`${o[0]} ${o[1]}%`).join(', ');
+            return `linear-gradient(${$angle}deg, ${stops})`;
+        }
+    );
+
+```
+
 - [ ] unzoom panning should center on cener of screen
 - [ ] promote ```const serializables =  'id x y w h'.split(' ');``` to object-oriented...
 - [ ] serializables should indicate type! {id:'string', showCaption:'Boolean'}
