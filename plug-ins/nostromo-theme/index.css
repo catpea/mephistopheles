@@ -1,3 +1,41 @@
+.outline-none {
+  &:focus, &:focus-visible, &:active {
+    outline-color: transparent !important;
+    outline: none !important;
+
+    -webkit-box-shadow: none;
+    box-shadow: none;
+    border-color: transparent  !important;
+  }
+}
+
+
+
+.tx-bg {
+  background: linear-gradient(0deg, #141519 0%, #656877 100%) !important;
+  border-color: #363740;
+  .tx-hi {
+    background: linear-gradient(0deg, #24252d 0%, #41434e 100%) !important;
+    border-color: #363740 !important;
+  }
+  .tx-lo {
+    background: linear-gradient(0deg, #24272e 0%, #2a2d34 10%, #212228 100%);
+    border-color: #363740 !important;
+    .tx-hi {
+      background: linear-gradient(0deg, var(--bs-primary) 0%, color-mix(in srgb, var(--bs-primary) 60%, black) 100%) !important;
+      border-color: #363740 !important;
+    }
+  }
+}
+
+
+
+
+
+
+
+
+
 :root, [data-ui-theme=nostromo] {
 
   --editor-primary: #58934c;
@@ -190,8 +228,8 @@ svg.editor-interface {
 
 
 .editor-connector {
-    stroke: var(--editor-primary);
-  stroke-width: 2;
+  stroke: var(--editor-primary);
+  stroke-width: 3;
   &.selected {
     stroke: var(--editor-warning);
   }

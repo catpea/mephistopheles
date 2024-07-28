@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Workspace name="mephistopheles" description="User Friendly Visual Programming Language" version="1.0.3" zoom="0.5" panX="128" panY="32">
+<Workspace name="mephistopheles" description="User Friendly Visual Programming Language" version="1.0.3" zoom="0.52" panX="128" panY="32">
   <Alert id="note-1" x="100" y="100" w="300" h="300" context="info" text="This is a visual programming environment with a zooming user interface." note="Use scrollwheel to zoom. Drag desktop to pan. Right click for memu of operations. Press (1) to unzoom." caption="Welcome to Mephistopheles"/>
   <Group id="dd06e583-95f3-4eab-aa7a-f1414bb4b69e" x="964" y="116" w="2182.145404663922" h="1499.4101508916324" zoom="1.7261356071965501" panX="-130.12852624512337" panY="-178.9546017172071">
     <Architecture id="cd73e139-6702-49b1-a603-83acd334304a" x="110" y="110" w="496.71503450147327" h="817.6140691386283"/>

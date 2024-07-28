@@ -48,6 +48,7 @@ export default class Connector {
         name: this.name,
         class: 'editor-connector',
         'vector-effect': 'non-scaling-stroke',
+        'stroke-linecap': 'round',
         style:{'pointer-events': 'none'},
       });
 
@@ -119,8 +120,8 @@ export default class Connector {
       this.any(['x1','y1','x2','y2'], packet=> update(this.el.Midpoint, midpoint(packet)));
 
       this.any(['x1','y1','x2','y2'], ({x1, y1, x2, y2}) => {
-        const [x3,y3] = edgepoint(x1, y1, 12, x1, y1, x2, y2);
-        const [x4,y4] = edgepoint(x2, y2, -12, x1, y1, x2, y2);
+        const [x3,y3] = edgepoint(x1, y1, 20, x1, y1, x2, y2);
+        const [x4,y4] = edgepoint(x2, y2, -20, x1, y1, x2, y2);
         update(this.el.PrimaryBg, {x1:x3, y1:y3, x2:x4, y2:y4})
         update(this.el.Primary, {x1:x3, y1:y3, x2:x4, y2:y4})
       });

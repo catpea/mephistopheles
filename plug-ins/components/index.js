@@ -5,6 +5,7 @@ import Fetch from './Fetch.js';
 import Terminal from './Terminal.js';
 import Editor from './Editor.js';
 import Pipe from './Pipe.js';
+import Gradients from './Gradients.js';
 
 import Architecture from './Architecture.js';
 import Analysis from './Analysis.js';
@@ -19,6 +20,9 @@ const components = {
   Workspace,
   Group,
   Pipe,
+
+  // Configuration
+  Gradients,
 
   // UI
   Alert,

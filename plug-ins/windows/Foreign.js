@@ -40,6 +40,7 @@ export default class Foreign {
 
       this.body = html.div({
         style: {
+          'will-change': 'transform',
           width: this.w,
           height: this.h,
         }

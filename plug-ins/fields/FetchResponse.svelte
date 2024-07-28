@@ -10,6 +10,6 @@
 <div class="btn-group mb-3" role="group" aria-label="Http Methods">
   {#each fetchResponse as response, index}
     <input type="radio" class="btn-check" name="fetchResponse" id="fetchResponse{response.id}" autocomplete="off" value={response.id} bind:group={$value}>
-    <label class="btn btn-outline-secondary" for="fetchResponse{response.id}">{response.name}  {$value==response.id} {$value}/{response.id}</label>
+    <label class="btn btn-outline-secondary" for="fetchResponse{response.id}">{response.name}</label>
   {/each}
 </div>

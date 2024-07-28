@@ -386,6 +386,12 @@ export class Instance {
         subscribe: (subscriber) => {
           return this.on(name, subscriber, {manual:true});
         },
+        notify: () => {
+          console.log( observableData[name] );
+
+          observableData[name].notifyAll();
+
+        },
       }
 
     }
@@ -594,6 +600,15 @@ export class Primitive {
   notify(eventName, eventData, ...extra) {
     if (Array.isArray(this.#observers[eventName])){
       this.#observers[eventName].forEach((observerCallback) => observerCallback(eventData, ...extra));
+    }
+  }
+
+  notifyAll() {
+    if (Array.isArray(this.#observers[this.name])){
+      console.log('XXX', this.#value);
+      if(this.#value !== undefined){
+        this.#observers[this.name].forEach((observerCallback) => observerCallback(this.#value));
+      }
     }
   }
 

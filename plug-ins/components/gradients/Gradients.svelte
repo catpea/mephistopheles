@@ -1,16 +1,9 @@
 <script>
   import { onMount } from 'svelte';
   import classIcons from '/plug-ins/class-icons/index.js';
+  import Preview from '/plug-ins/components/gradients/Preview.svelte';
+  import Color from '/plug-ins/components/gradients/Color.svelte';
 
-  import WebUrl from '/plug-ins/fields/WebUrl.svelte';
-  import HttpMethod from '/plug-ins/fields/HttpMethod.svelte';
-  import FetchResponse from '/plug-ins/fields/FetchResponse.svelte';
-
-  const components = {
-    WebUrl,
-    HttpMethod,
-    FetchResponse,
-  };
 
   export let api;
 
@@ -19,7 +12,7 @@
   const text = api.signal('text');
   const status = api.signal('status');
 
-  const fields = api.signal('fields');
+  const motif = api.signal('motif');
 
   const w = api.signal('w');
   const h = api.signal('h');
@@ -29,22 +22,24 @@
   $: c = a + b;
 
   $: api.send('out', {a,b,c})
-  $: api.send('a', a)
-  $: api.send('b', b)
-  $: api.send('c', c)
 
+  let selection = null;
 
   const x = api.signal('h');
   const selected = api.signal('selected');
 
   $:{
-    console.log('FFF', $fields);
-
+    console.log('XXX', $motif);
+    console.log('XXX', motif );
   }
 
   onMount(() => {
-		console.log('the component has mounted', $fields);
+		console.log('XXX the component has mounted', $motif);
 	});
+
+  function refresh(){
+    motif.notify()
+  }
 
 </script>
 
@@ -55,15 +50,25 @@
     <button type="button" class="btn opacity-50" style="position: absolute; right:0; top:0; padding: .5rem;" aria-label="Close" on:click={()=>api.removeApplication()}><i class="bi bi-x"></i></button>
   </div>
 
-  <div class="card-body overflow-auto tx-lo" use:api.stopWheel>
-    <p>{$text}</p>
-    {#each $fields as field, index}
-      <svelte:component this={components[field.type]} {field} {api}/>
+  <div class="card-body overflow-auto m-0 p-0" style="background-color: black;" use:api.stopWheel>
+    <!-- <p>{$text}</p> -->
+    {#each [$motif] as motif, index}
+      <Preview {api} {motif} bind:selection/>
     {/each}
-    <div class="mb-3">
-      <input class="btn btn-primary tx-hi" type="button" value="Run" on:click={api.execute()}>
-    </div>
+    <!-- <input class="btn btn-primary tx-hi" type="button" value="Export" on:click={api.execute()}> -->
   </div>
+
+  {#if selection}
+
+    {selection.id}
+
+    {#key selection}
+    {#each selection.colors as stop, index}
+        <Color {api} {stop} {refresh}/>
+    {/each}
+    {/key}
+
+  {/if}
 
   <div class="card-footer text-body-secondary tx-hi py-0 px-1">
     {$status}
