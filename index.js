@@ -9524,8 +9524,8 @@
     }
     instance;
     root;
-    constructor({ Class, instance: instance18, specification }) {
-      this.instance = instance18;
+    constructor({ Class, instance: instance19, specification }) {
+      this.instance = instance19;
       this.instance.oo.extends.push(Class);
       this.collectClasses(Class.extends);
       this.instantiateSuperclasses();
@@ -9543,15 +9543,15 @@
     instantiateSuperclasses() {
       let parent;
       for (const Class of this.instance.oo.extends) {
-        const instance18 = new Class();
-        instance18.name = Class.name;
-        if (!instance18.traits)
-          instance18.traits = [];
-        if (!instance18.methods)
-          instance18.methods = [];
-        this.instance.oo.specifications.push(instance18);
-        instance18.parent = parent;
-        parent = instance18;
+        const instance19 = new Class();
+        instance19.name = Class.name;
+        if (!instance19.traits)
+          instance19.traits = [];
+        if (!instance19.methods)
+          instance19.methods = [];
+        this.instance.oo.specifications.push(instance19);
+        instance19.parent = parent;
+        parent = instance19;
       }
     }
   };
@@ -11445,10 +11445,10 @@
     if (!Type)
       return;
     const { Object: attr2, Array: children2, Function: init2 } = byType(input);
-    const instance18 = new Instance(Type, attr2);
+    const instance19 = new Instance(Type, attr2);
     if (init2)
-      init2(instance18, this ? this.parent : null);
-    return [instance18, children2?.map((child) => nest.bind({ parent: instance18 })(...child)).map(([ins, chi]) => chi ? [ins, chi] : ins)];
+      init2(instance19, this ? this.parent : null);
+    return [instance19, children2?.map((child) => nest.bind({ parent: instance19 })(...child)).map(([ins, chi]) => chi ? [ins, chi] : ins)];
   }
   __name(nest, "nest");
 
@@ -12478,6 +12478,12 @@
     return unsub.unsubscribe ? () => unsub.unsubscribe() : unsub;
   }
   __name(subscribe, "subscribe");
+  function get_store_value(store) {
+    let value;
+    subscribe(store, (_) => value = _)();
+    return value;
+  }
+  __name(get_store_value, "get_store_value");
   function component_subscribe(component, store, callback) {
     component.$$.on_destroy.push(subscribe(store, callback));
   }
@@ -13302,7 +13308,7 @@
     component.$$.dirty[i / 31 | 0] |= 1 << i % 31;
   }
   __name(make_dirty, "make_dirty");
-  function init(component, options, instance18, create_fragment18, not_equal, props, append_styles = null, dirty = [-1]) {
+  function init(component, options, instance19, create_fragment19, not_equal, props, append_styles = null, dirty = [-1]) {
     const parent_component = current_component;
     set_current_component(component);
     const $$ = component.$$ = {
@@ -13328,7 +13334,7 @@
     };
     append_styles && append_styles($$.root);
     let ready = false;
-    $$.ctx = instance18 ? instance18(component, options.props || {}, (i, ret, ...rest) => {
+    $$.ctx = instance19 ? instance19(component, options.props || {}, (i, ret, ...rest) => {
       const value = rest.length ? rest[0] : ret;
       if ($$.ctx && not_equal($$.ctx[i], $$.ctx[i] = value)) {
         if (!$$.skip_bound && $$.bound[i])
@@ -13341,7 +13347,7 @@
     $$.update();
     ready = true;
     run_all($$.before_update);
-    $$.fragment = create_fragment18 ? create_fragment18($$.ctx) : false;
+    $$.fragment = create_fragment19 ? create_fragment19($$.ctx) : false;
     if (options.target) {
       if (options.hydrate) {
         start_hydrating();
@@ -17150,14 +17156,118 @@
     };
   };
 
+  // node_modules/svelte/src/runtime/store/index.js
+  var subscriber_queue = [];
+  function readable(value, start) {
+    return {
+      subscribe: writable(value, start).subscribe
+    };
+  }
+  __name(readable, "readable");
+  function writable(value, start = noop) {
+    let stop;
+    const subscribers = /* @__PURE__ */ new Set();
+    function set(new_value) {
+      if (safe_not_equal(value, new_value)) {
+        value = new_value;
+        if (stop) {
+          const run_queue = !subscriber_queue.length;
+          for (const subscriber of subscribers) {
+            subscriber[1]();
+            subscriber_queue.push(subscriber, value);
+          }
+          if (run_queue) {
+            for (let i = 0; i < subscriber_queue.length; i += 2) {
+              subscriber_queue[i][0](subscriber_queue[i + 1]);
+            }
+            subscriber_queue.length = 0;
+          }
+        }
+      }
+    }
+    __name(set, "set");
+    function update3(fn) {
+      set(fn(value));
+    }
+    __name(update3, "update");
+    function subscribe2(run2, invalidate = noop) {
+      const subscriber = [run2, invalidate];
+      subscribers.add(subscriber);
+      if (subscribers.size === 1) {
+        stop = start(set, update3) || noop;
+      }
+      run2(value);
+      return () => {
+        subscribers.delete(subscriber);
+        if (subscribers.size === 0 && stop) {
+          stop();
+          stop = null;
+        }
+      };
+    }
+    __name(subscribe2, "subscribe");
+    return { set, update: update3, subscribe: subscribe2 };
+  }
+  __name(writable, "writable");
+  function derived(stores, fn, initial_value) {
+    const single = !Array.isArray(stores);
+    const stores_array = single ? [stores] : stores;
+    if (!stores_array.every(Boolean)) {
+      throw new Error("derived() expects stores as input, got a falsy value");
+    }
+    const auto = fn.length < 2;
+    return readable(initial_value, (set, update3) => {
+      let started = false;
+      const values = [];
+      let pending = 0;
+      let cleanup = noop;
+      const sync = /* @__PURE__ */ __name(() => {
+        if (pending) {
+          return;
+        }
+        cleanup();
+        const result = fn(single ? values[0] : values, set, update3);
+        if (auto) {
+          set(result);
+        } else {
+          cleanup = is_function(result) ? result : noop;
+        }
+      }, "sync");
+      const unsubscribers = stores_array.map(
+        (store, i) => subscribe(
+          store,
+          (value) => {
+            values[i] = value;
+            pending &= ~(1 << i);
+            if (started) {
+              sync();
+            }
+          },
+          () => {
+            pending |= 1 << i;
+          }
+        )
+      );
+      started = true;
+      sync();
+      return /* @__PURE__ */ __name(function stop() {
+        run_all(unsubscribers);
+        cleanup();
+        started = false;
+      }, "stop");
+    });
+  }
+  __name(derived, "derived");
+
   // plug-ins/components/gradients/Preview.svelte
   function get_each_context5(ctx, list, i) {
     const child_ctx = ctx.slice();
-    child_ctx[5] = list[i].id;
-    child_ctx[6] = list[i].padding;
-    child_ctx[7] = list[i].angle;
-    child_ctx[19] = list[i].stops;
-    child_ctx[8] = list[i].levels;
+    child_ctx[8] = list[i].id;
+    child_ctx[9] = list[i].padding;
+    child_ctx[10] = list[i].angle;
+    child_ctx[12] = list[i].colors;
+    child_ctx[28] = list[i].stops;
+    child_ctx[11] = list[i].levels;
     return child_ctx;
   }
   __name(get_each_context5, "get_each_context");
@@ -17172,25 +17282,29 @@
       ) },
       { id: (
         /*id*/
-        ctx[5]
+        ctx[8]
       ) },
       { padding: (
         /*padding*/
-        ctx[6]
+        ctx[9]
       ) },
       { angle: (
         /*angle*/
-        ctx[7]
+        ctx[10]
+      ) },
+      { colors: (
+        /*colors*/
+        ctx[12]
       ) },
       /*stops*/
-      ctx[19],
+      ctx[28],
       { levels: (
         /*levels*/
-        ctx[8]
+        ctx[11]
       ) }
     ];
     function preview_1_selection_binding(value) {
-      ctx[17](value);
+      ctx[25](value);
     }
     __name(preview_1_selection_binding, "preview_1_selection_binding");
     let preview_1_props = {};
@@ -17216,36 +17330,41 @@
       },
       p(ctx2, dirty) {
         const preview_1_changes = dirty & /*api, $levels*/
-        4098 ? get_spread_update(preview_1_spread_levels, [
+        131074 ? get_spread_update(preview_1_spread_levels, [
           dirty & /*api*/
           2 && { api: (
             /*api*/
             ctx2[1]
           ) },
           dirty & /*$levels*/
-          4096 && { id: (
+          131072 && { id: (
             /*id*/
-            ctx2[5]
+            ctx2[8]
           ) },
           dirty & /*$levels*/
-          4096 && { padding: (
+          131072 && { padding: (
             /*padding*/
-            ctx2[6]
+            ctx2[9]
           ) },
           dirty & /*$levels*/
-          4096 && { angle: (
+          131072 && { angle: (
             /*angle*/
-            ctx2[7]
+            ctx2[10]
           ) },
           dirty & /*$levels*/
-          4096 && get_spread_object(
+          131072 && { colors: (
+            /*colors*/
+            ctx2[12]
+          ) },
+          dirty & /*$levels*/
+          131072 && get_spread_object(
             /*stops*/
-            ctx2[19]
+            ctx2[28]
           ),
           dirty & /*$levels*/
-          4096 && { levels: (
+          131072 && { levels: (
             /*levels*/
-            ctx2[8]
+            ctx2[11]
           ) }
         ]) : {};
         if (!updating_selection && dirty & /*selection*/
@@ -17280,7 +17399,7 @@
     let dispose;
     let each_value = ensure_array_like(
       /*$levels*/
-      ctx[12]
+      ctx[17]
     );
     let each_blocks = [];
     for (let i = 0; i < each_value.length; i += 1) {
@@ -17300,14 +17419,14 @@
         set_style(
           div,
           "background",
-          /*preview*/
-          ctx[9]
+          /*$preview1*/
+          ctx[15]
         );
         toggle_class(
           div,
           "m-3",
           /*$padding*/
-          ctx[10]
+          ctx[14]
         );
       },
       m(target, anchor) {
@@ -17321,17 +17440,17 @@
         if (!mounted) {
           dispose = listen(div, "click", stop_propagation(
             /*click_handler*/
-            ctx[18]
+            ctx[26]
           ));
           mounted = true;
         }
       },
       p(ctx2, [dirty]) {
         if (dirty & /*api, $levels, selection*/
-        4099) {
+        131075) {
           each_value = ensure_array_like(
             /*$levels*/
-            ctx2[12]
+            ctx2[17]
           );
           let i;
           for (i = 0; i < each_value.length; i += 1) {
@@ -17352,22 +17471,22 @@
           }
           check_outros();
         }
-        if (!current || dirty & /*preview*/
-        512) {
+        if (!current || dirty & /*$preview1*/
+        32768) {
           set_style(
             div,
             "background",
-            /*preview*/
-            ctx2[9]
+            /*$preview1*/
+            ctx2[15]
           );
         }
         if (!current || dirty & /*$padding*/
-        1024) {
+        16384) {
           toggle_class(
             div,
             "m-3",
             /*$padding*/
-            ctx2[10]
+            ctx2[14]
           );
         }
       },
@@ -17399,18 +17518,27 @@
   __name(create_fragment11, "create_fragment");
   function instance11($$self, $$props, $$invalidate) {
     let preview;
-    let $color1, $$unsubscribe_color1 = noop, $$subscribe_color1 = /* @__PURE__ */ __name(() => ($$unsubscribe_color1(), $$unsubscribe_color1 = subscribe(color1, ($$value) => $$invalidate(13, $color1 = $$value)), color1), "$$subscribe_color1");
-    let $color0, $$unsubscribe_color0 = noop, $$subscribe_color0 = /* @__PURE__ */ __name(() => ($$unsubscribe_color0(), $$unsubscribe_color0 = subscribe(color0, ($$value) => $$invalidate(14, $color0 = $$value)), color0), "$$subscribe_color0");
-    let $angle, $$unsubscribe_angle = noop, $$subscribe_angle = /* @__PURE__ */ __name(() => ($$unsubscribe_angle(), $$unsubscribe_angle = subscribe(angle, ($$value) => $$invalidate(15, $angle = $$value)), angle), "$$subscribe_angle");
-    let $color2, $$unsubscribe_color2 = noop, $$subscribe_color2 = /* @__PURE__ */ __name(() => ($$unsubscribe_color2(), $$unsubscribe_color2 = subscribe(color2, ($$value) => $$invalidate(16, $color2 = $$value)), color2), "$$subscribe_color2");
-    let $padding, $$unsubscribe_padding = noop, $$subscribe_padding = /* @__PURE__ */ __name(() => ($$unsubscribe_padding(), $$unsubscribe_padding = subscribe(padding, ($$value) => $$invalidate(10, $padding = $$value)), padding), "$$subscribe_padding");
-    let $id, $$unsubscribe_id = noop, $$subscribe_id = /* @__PURE__ */ __name(() => ($$unsubscribe_id(), $$unsubscribe_id = subscribe(id, ($$value) => $$invalidate(11, $id = $$value)), id), "$$subscribe_id");
-    let $levels, $$unsubscribe_levels = noop, $$subscribe_levels = /* @__PURE__ */ __name(() => ($$unsubscribe_levels(), $$unsubscribe_levels = subscribe(levels, ($$value) => $$invalidate(12, $levels = $$value)), levels), "$$subscribe_levels");
+    let preview1;
+    let $angle, $$unsubscribe_angle = noop, $$subscribe_angle = /* @__PURE__ */ __name(() => ($$unsubscribe_angle(), $$unsubscribe_angle = subscribe(angle, ($$value) => $$invalidate(18, $angle = $$value)), angle), "$$subscribe_angle");
+    let $color1, $$unsubscribe_color1 = noop, $$subscribe_color1 = /* @__PURE__ */ __name(() => ($$unsubscribe_color1(), $$unsubscribe_color1 = subscribe(color1, ($$value) => $$invalidate(19, $color1 = $$value)), color1), "$$subscribe_color1");
+    let $color0, $$unsubscribe_color0 = noop, $$subscribe_color0 = /* @__PURE__ */ __name(() => ($$unsubscribe_color0(), $$unsubscribe_color0 = subscribe(color0, ($$value) => $$invalidate(20, $color0 = $$value)), color0), "$$subscribe_color0");
+    let $length2, $$unsubscribe_length2 = noop, $$subscribe_length2 = /* @__PURE__ */ __name(() => ($$unsubscribe_length2(), $$unsubscribe_length2 = subscribe(length2, ($$value) => $$invalidate(21, $length2 = $$value)), length2), "$$subscribe_length2");
+    let $color2, $$unsubscribe_color2 = noop, $$subscribe_color2 = /* @__PURE__ */ __name(() => ($$unsubscribe_color2(), $$unsubscribe_color2 = subscribe(color2, ($$value) => $$invalidate(22, $color2 = $$value)), color2), "$$subscribe_color2");
+    let $length1, $$unsubscribe_length1 = noop, $$subscribe_length1 = /* @__PURE__ */ __name(() => ($$unsubscribe_length1(), $$unsubscribe_length1 = subscribe(length1, ($$value) => $$invalidate(23, $length1 = $$value)), length1), "$$subscribe_length1");
+    let $length0, $$unsubscribe_length0 = noop, $$subscribe_length0 = /* @__PURE__ */ __name(() => ($$unsubscribe_length0(), $$unsubscribe_length0 = subscribe(length0, ($$value) => $$invalidate(24, $length0 = $$value)), length0), "$$subscribe_length0");
+    let $padding, $$unsubscribe_padding = noop, $$subscribe_padding = /* @__PURE__ */ __name(() => ($$unsubscribe_padding(), $$unsubscribe_padding = subscribe(padding, ($$value) => $$invalidate(14, $padding = $$value)), padding), "$$subscribe_padding");
+    let $preview1, $$unsubscribe_preview1 = noop, $$subscribe_preview1 = /* @__PURE__ */ __name(() => ($$unsubscribe_preview1(), $$unsubscribe_preview1 = subscribe(preview1, ($$value) => $$invalidate(15, $preview1 = $$value)), preview1), "$$subscribe_preview1");
+    let $id, $$unsubscribe_id = noop, $$subscribe_id = /* @__PURE__ */ __name(() => ($$unsubscribe_id(), $$unsubscribe_id = subscribe(id, ($$value) => $$invalidate(16, $id = $$value)), id), "$$subscribe_id");
+    let $levels, $$unsubscribe_levels = noop, $$subscribe_levels = /* @__PURE__ */ __name(() => ($$unsubscribe_levels(), $$unsubscribe_levels = subscribe(levels, ($$value) => $$invalidate(17, $levels = $$value)), levels), "$$subscribe_levels");
+    $$self.$$.on_destroy.push(() => $$unsubscribe_angle());
     $$self.$$.on_destroy.push(() => $$unsubscribe_color1());
     $$self.$$.on_destroy.push(() => $$unsubscribe_color0());
-    $$self.$$.on_destroy.push(() => $$unsubscribe_angle());
+    $$self.$$.on_destroy.push(() => $$unsubscribe_length2());
     $$self.$$.on_destroy.push(() => $$unsubscribe_color2());
+    $$self.$$.on_destroy.push(() => $$unsubscribe_length1());
+    $$self.$$.on_destroy.push(() => $$unsubscribe_length0());
     $$self.$$.on_destroy.push(() => $$unsubscribe_padding());
+    $$self.$$.on_destroy.push(() => $$unsubscribe_preview1());
     $$self.$$.on_destroy.push(() => $$unsubscribe_id());
     $$self.$$.on_destroy.push(() => $$unsubscribe_levels());
     let { api } = $$props;
@@ -17423,12 +17551,19 @@
     let { levels } = $$props;
     $$subscribe_levels();
     let { selection } = $$props;
+    let { colors } = $$props;
     let { color0 } = $$props;
     $$subscribe_color0();
     let { color1 } = $$props;
     $$subscribe_color1();
     let { color2 } = $$props;
     $$subscribe_color2();
+    let { length0 } = $$props;
+    $$subscribe_length0();
+    let { length1 } = $$props;
+    $$subscribe_length1();
+    let { length2 } = $$props;
+    $$subscribe_length2();
     function preview_1_selection_binding(value) {
       selection = value;
       $$invalidate(0, selection);
@@ -17439,27 +17574,49 @@
       if ("api" in $$props2)
         $$invalidate(1, api = $$props2.api);
       if ("id" in $$props2)
-        $$subscribe_id($$invalidate(5, id = $$props2.id));
+        $$subscribe_id($$invalidate(8, id = $$props2.id));
       if ("padding" in $$props2)
-        $$subscribe_padding($$invalidate(6, padding = $$props2.padding));
+        $$subscribe_padding($$invalidate(9, padding = $$props2.padding));
       if ("angle" in $$props2)
-        $$subscribe_angle($$invalidate(7, angle = $$props2.angle));
+        $$subscribe_angle($$invalidate(10, angle = $$props2.angle));
       if ("levels" in $$props2)
-        $$subscribe_levels($$invalidate(8, levels = $$props2.levels));
+        $$subscribe_levels($$invalidate(11, levels = $$props2.levels));
       if ("selection" in $$props2)
         $$invalidate(0, selection = $$props2.selection);
+      if ("colors" in $$props2)
+        $$invalidate(12, colors = $$props2.colors);
       if ("color0" in $$props2)
         $$subscribe_color0($$invalidate(2, color0 = $$props2.color0));
       if ("color1" in $$props2)
         $$subscribe_color1($$invalidate(3, color1 = $$props2.color1));
       if ("color2" in $$props2)
         $$subscribe_color2($$invalidate(4, color2 = $$props2.color2));
+      if ("length0" in $$props2)
+        $$subscribe_length0($$invalidate(5, length0 = $$props2.length0));
+      if ("length1" in $$props2)
+        $$subscribe_length1($$invalidate(6, length1 = $$props2.length1));
+      if ("length2" in $$props2)
+        $$subscribe_length2($$invalidate(7, length2 = $$props2.length2));
     };
     $$self.$$.update = () => {
-      if ($$self.$$.dirty & /*color2, $angle, $color0, $color1, $color2*/
-      122896) {
+      if ($$self.$$.dirty & /*color2, $angle, $color0, $length0, $color1, $length1, $color2, $length2*/
+      33292304) {
         $:
-          $$invalidate(9, preview = color2 ? `linear-gradient(${$angle}deg, ${$color0}, ${$color1}, ${$color2})` : `linear-gradient(${$angle}deg, ${$color0}, ${$color1})`);
+          preview = color2 ? `linear-gradient(${$angle}deg, ${$color0} ${$length0}, ${$color1} ${$length1}, ${$color2} ${$length2})` : `linear-gradient(${$angle}deg, ${$color0}, ${$color1})`;
+      }
+      if ($$self.$$.dirty & /*angle, colors, $angle*/
+      267264) {
+        $:
+          $$subscribe_preview1($$invalidate(13, preview1 = derived(
+            [
+              angle,
+              colors,
+              ...colors.get().map((o) => o.color),
+              ...colors.get().map((o) => o.length)
+            ],
+            // `get` is not reactive, but `derived` is
+            () => `linear-gradient(${$angle}deg, ` + get_store_value(colors).map((o) => [get_store_value(o.color), get_store_value(o.length)]).map((o) => `${o[0]} ${o[1]}%`).join(", ") + ")"
+          )));
       }
     };
     return [
@@ -17468,18 +17625,26 @@
       color0,
       color1,
       color2,
+      length0,
+      length1,
+      length2,
       id,
       padding,
       angle,
       levels,
-      preview,
+      colors,
+      preview1,
       $padding,
+      $preview1,
       $id,
       $levels,
+      $angle,
       $color1,
       $color0,
-      $angle,
+      $length2,
       $color2,
+      $length1,
+      $length0,
       preview_1_selection_binding,
       click_handler
     ];
@@ -17493,14 +17658,18 @@
       super();
       init(this, options, instance11, create_fragment11, safe_not_equal, {
         api: 1,
-        id: 5,
-        padding: 6,
-        angle: 7,
-        levels: 8,
+        id: 8,
+        padding: 9,
+        angle: 10,
+        levels: 11,
         selection: 0,
+        colors: 12,
         color0: 2,
         color1: 3,
-        color2: 4
+        color2: 4,
+        length0: 5,
+        length1: 6,
+        length2: 7
       });
     }
   };
@@ -17509,211 +17678,334 @@
   // plug-ins/components/gradients/Color.svelte
   var import_chroma_js = __toESM(require_chroma());
   function create_if_block2(ctx) {
-    let div3;
     let div0;
-    let input0;
     let t0;
-    let input1;
-    let t1;
-    let input2;
-    let t2;
-    let input3;
-    let t3;
-    let div1;
-    let t4;
     let div2;
+    let label0;
+    let t1;
+    let t2;
+    let t3;
+    let t4;
+    let div1;
+    let input0;
+    let t5;
+    let div4;
+    let label1;
+    let t7;
+    let div3;
+    let input1;
+    let t8;
+    let div6;
+    let label2;
+    let t10;
+    let div5;
+    let input2;
+    let t11;
+    let div8;
+    let label3;
+    let t13;
+    let div7;
+    let input3;
+    let t14;
+    let div10;
+    let label4;
+    let t16;
+    let div9;
+    let input4;
     let mounted;
     let dispose;
     return {
       c() {
-        div3 = element("div");
         div0 = element("div");
-        input0 = element("input");
         t0 = space();
-        input1 = element("input");
-        t1 = space();
-        input2 = element("input");
-        t2 = space();
-        input3 = element("input");
-        t3 = space();
-        div1 = element("div");
-        t4 = space();
         div2 = element("div");
+        label0 = element("label");
+        t1 = text2("length ");
+        t2 = text2(
+          /*$length*/
+          ctx[6]
+        );
+        t3 = text2("%");
+        t4 = space();
+        div1 = element("div");
+        input0 = element("input");
+        t5 = space();
+        div4 = element("div");
+        label1 = element("label");
+        label1.textContent = "perceived lightness";
+        t7 = space();
+        div3 = element("div");
+        input1 = element("input");
+        t8 = space();
+        div6 = element("div");
+        label2 = element("label");
+        label2.textContent = "amount of color";
+        t10 = space();
+        div5 = element("div");
+        input2 = element("input");
+        t11 = space();
+        div8 = element("div");
+        label3 = element("label");
+        label3.textContent = "hue angle";
+        t13 = space();
+        div7 = element("div");
+        input3 = element("input");
+        t14 = space();
+        div10 = element("div");
+        label4 = element("label");
+        label4.textContent = "alpha";
+        t16 = space();
+        div9 = element("div");
+        input4 = element("input");
+        attr(div0, "class", "mb-3 row p-2");
+        set_style(div0, "background-color", "lch(" + /*l*/
+        ctx[2] + " " + /*c*/
+        ctx[3] + " " + /*h*/
+        ctx[4] + " / " + /*a*/
+        ctx[5] + ")");
+        attr(label0, "for", "inputLength");
+        attr(label0, "class", "col-sm-4 col-form-label text-muted");
+        attr(input0, "id", "inputLength");
         attr(input0, "type", "range");
         attr(input0, "class", "form-range");
         attr(input0, "min", "0");
         attr(input0, "max", "100");
+        attr(div1, "class", "col-sm-8");
+        attr(div2, "class", "mb-3 row");
+        attr(label1, "for", "inputPerceivedLightness");
+        attr(label1, "class", "col-sm-4 col-form-label text-muted");
+        attr(input1, "id", "inputPerceivedLightness");
         attr(input1, "type", "range");
         attr(input1, "class", "form-range");
         attr(input1, "min", "0");
-        attr(input1, "max", "132");
+        attr(input1, "max", "100");
+        attr(div3, "class", "col-sm-8");
+        attr(div4, "class", "mb-3 row");
+        attr(label2, "for", "inputAmountOfColor");
+        attr(label2, "class", "col-sm-4 col-form-label text-muted");
+        attr(input2, "id", "inputAmountOfColor");
         attr(input2, "type", "range");
         attr(input2, "class", "form-range");
         attr(input2, "min", "0");
-        attr(input2, "max", "360");
+        attr(input2, "max", "132");
+        attr(div5, "class", "col-sm-8");
+        attr(div6, "class", "mb-3 row");
+        attr(label3, "for", "inputHueAngle");
+        attr(label3, "class", "col-sm-4 col-form-label text-muted");
+        attr(input3, "id", "inputHueAngle");
         attr(input3, "type", "range");
         attr(input3, "class", "form-range");
         attr(input3, "min", "0");
-        attr(input3, "max", "1");
-        attr(input3, "step", "0.1");
-        attr(div0, "class", "col-8");
-        attr(div1, "class", "col-2");
-        set_style(
-          div1,
-          "background-color",
-          /*$color*/
-          ctx[5]
-        );
-        attr(div2, "class", "col-2");
-        set_style(div2, "background-color", "lch(" + /*l*/
-        ctx[1] + " " + /*c*/
-        ctx[2] + " " + /*h*/
-        ctx[3] + " / " + /*a*/
-        ctx[4] + ")");
-        attr(div3, "class", "row m-0");
+        attr(input3, "max", "360");
+        attr(div7, "class", "col-sm-8");
+        attr(div8, "class", "mb-3 row");
+        attr(label4, "for", "inputAlpha");
+        attr(label4, "class", "col-sm-4 col-form-label text-muted");
+        attr(input4, "id", "inputAlpha");
+        attr(input4, "type", "range");
+        attr(input4, "class", "form-range");
+        attr(input4, "min", "0");
+        attr(input4, "max", "1");
+        attr(input4, "step", "0.01");
+        attr(div9, "class", "col-sm-8");
+        attr(div10, "class", "mb-3 row");
       },
       m(target, anchor) {
-        insert(target, div3, anchor);
-        append(div3, div0);
-        append(div0, input0);
+        insert(target, div0, anchor);
+        insert(target, t0, anchor);
+        insert(target, div2, anchor);
+        append(div2, label0);
+        append(label0, t1);
+        append(label0, t2);
+        append(label0, t3);
+        append(div2, t4);
+        append(div2, div1);
+        append(div1, input0);
         set_input_value(
           input0,
-          /*l*/
-          ctx[1]
+          /*$length*/
+          ctx[6]
         );
-        append(div0, t0);
-        append(div0, input1);
+        insert(target, t5, anchor);
+        insert(target, div4, anchor);
+        append(div4, label1);
+        append(div4, t7);
+        append(div4, div3);
+        append(div3, input1);
         set_input_value(
           input1,
-          /*c*/
+          /*l*/
           ctx[2]
         );
-        append(div0, t1);
-        append(div0, input2);
+        insert(target, t8, anchor);
+        insert(target, div6, anchor);
+        append(div6, label2);
+        append(div6, t10);
+        append(div6, div5);
+        append(div5, input2);
         set_input_value(
           input2,
-          /*h*/
+          /*c*/
           ctx[3]
         );
-        append(div0, t2);
-        append(div0, input3);
+        insert(target, t11, anchor);
+        insert(target, div8, anchor);
+        append(div8, label3);
+        append(div8, t13);
+        append(div8, div7);
+        append(div7, input3);
         set_input_value(
           input3,
-          /*a*/
+          /*h*/
           ctx[4]
         );
-        append(div3, t3);
-        append(div3, div1);
-        append(div3, t4);
-        append(div3, div2);
+        insert(target, t14, anchor);
+        insert(target, div10, anchor);
+        append(div10, label4);
+        append(div10, t16);
+        append(div10, div9);
+        append(div9, input4);
+        set_input_value(
+          input4,
+          /*a*/
+          ctx[5]
+        );
         if (!mounted) {
           dispose = [
             listen(
               input0,
               "change",
               /*input0_change_input_handler*/
-              ctx[8]
+              ctx[9]
             ),
             listen(
               input0,
               "input",
               /*input0_change_input_handler*/
-              ctx[8]
+              ctx[9]
             ),
             listen(
               input1,
               "change",
               /*input1_change_input_handler*/
-              ctx[9]
+              ctx[10]
             ),
             listen(
               input1,
               "input",
               /*input1_change_input_handler*/
-              ctx[9]
+              ctx[10]
             ),
             listen(
               input2,
               "change",
               /*input2_change_input_handler*/
-              ctx[10]
+              ctx[11]
             ),
             listen(
               input2,
               "input",
               /*input2_change_input_handler*/
-              ctx[10]
+              ctx[11]
             ),
             listen(
               input3,
               "change",
               /*input3_change_input_handler*/
-              ctx[11]
+              ctx[12]
             ),
             listen(
               input3,
               "input",
               /*input3_change_input_handler*/
-              ctx[11]
+              ctx[12]
+            ),
+            listen(
+              input4,
+              "change",
+              /*input4_change_input_handler*/
+              ctx[13]
+            ),
+            listen(
+              input4,
+              "input",
+              /*input4_change_input_handler*/
+              ctx[13]
             )
           ];
           mounted = true;
         }
       },
       p(ctx2, dirty) {
-        if (dirty & /*l*/
-        2) {
+        if (dirty & /*l, c, h, a*/
+        60) {
+          set_style(div0, "background-color", "lch(" + /*l*/
+          ctx2[2] + " " + /*c*/
+          ctx2[3] + " " + /*h*/
+          ctx2[4] + " / " + /*a*/
+          ctx2[5] + ")");
+        }
+        if (dirty & /*$length*/
+        64)
+          set_data(
+            t2,
+            /*$length*/
+            ctx2[6]
+          );
+        if (dirty & /*$length*/
+        64) {
           set_input_value(
             input0,
-            /*l*/
-            ctx2[1]
+            /*$length*/
+            ctx2[6]
           );
         }
-        if (dirty & /*c*/
+        if (dirty & /*l*/
         4) {
           set_input_value(
             input1,
-            /*c*/
+            /*l*/
             ctx2[2]
           );
         }
-        if (dirty & /*h*/
+        if (dirty & /*c*/
         8) {
           set_input_value(
             input2,
-            /*h*/
+            /*c*/
             ctx2[3]
           );
         }
-        if (dirty & /*a*/
+        if (dirty & /*h*/
         16) {
           set_input_value(
             input3,
-            /*a*/
+            /*h*/
             ctx2[4]
           );
         }
-        if (dirty & /*$color*/
+        if (dirty & /*a*/
         32) {
-          set_style(
-            div1,
-            "background-color",
-            /*$color*/
+          set_input_value(
+            input4,
+            /*a*/
             ctx2[5]
           );
-        }
-        if (dirty & /*l, c, h, a*/
-        30) {
-          set_style(div2, "background-color", "lch(" + /*l*/
-          ctx2[1] + " " + /*c*/
-          ctx2[2] + " " + /*h*/
-          ctx2[3] + " / " + /*a*/
-          ctx2[4] + ")");
         }
       },
       d(detaching) {
         if (detaching) {
-          detach(div3);
+          detach(div0);
+          detach(t0);
+          detach(div2);
+          detach(t5);
+          detach(div4);
+          detach(t8);
+          detach(div6);
+          detach(t11);
+          detach(div8);
+          detach(t14);
+          detach(div10);
         }
         mounted = false;
         run_all(dispose);
@@ -17768,12 +18060,15 @@
   }
   __name(create_fragment12, "create_fragment");
   function instance12($$self, $$props, $$invalidate) {
-    let $color, $$unsubscribe_color = noop, $$subscribe_color = /* @__PURE__ */ __name(() => ($$unsubscribe_color(), $$unsubscribe_color = subscribe(color, ($$value) => $$invalidate(5, $color = $$value)), color), "$$subscribe_color");
+    let $color, $$unsubscribe_color = noop, $$subscribe_color = /* @__PURE__ */ __name(() => ($$unsubscribe_color(), $$unsubscribe_color = subscribe(color, ($$value) => $$invalidate(8, $color = $$value)), color), "$$subscribe_color");
+    let $length, $$unsubscribe_length = noop, $$subscribe_length = /* @__PURE__ */ __name(() => ($$unsubscribe_length(), $$unsubscribe_length = subscribe(length, ($$value) => $$invalidate(6, $length = $$value)), length), "$$subscribe_length");
     $$self.$$.on_destroy.push(() => $$unsubscribe_color());
+    $$self.$$.on_destroy.push(() => $$unsubscribe_length());
     let { api } = $$props;
     let { color } = $$props;
     $$subscribe_color();
     let { length } = $$props;
+    $$subscribe_length();
     let l = 0;
     let c = 0;
     let h = 0;
@@ -17781,48 +18076,53 @@
     ;
     ;
     function input0_change_input_handler() {
-      l = to_number(this.value);
-      $$invalidate(1, l), $$invalidate(5, $color);
+      $length = to_number(this.value);
+      length.set($length);
     }
     __name(input0_change_input_handler, "input0_change_input_handler");
     function input1_change_input_handler() {
-      c = to_number(this.value);
-      $$invalidate(2, c), $$invalidate(5, $color);
+      l = to_number(this.value);
+      $$invalidate(2, l), $$invalidate(8, $color);
     }
     __name(input1_change_input_handler, "input1_change_input_handler");
     function input2_change_input_handler() {
-      h = to_number(this.value);
-      $$invalidate(3, h), $$invalidate(5, $color);
+      c = to_number(this.value);
+      $$invalidate(3, c), $$invalidate(8, $color);
     }
     __name(input2_change_input_handler, "input2_change_input_handler");
     function input3_change_input_handler() {
-      a3 = to_number(this.value);
-      $$invalidate(4, a3), $$invalidate(5, $color);
+      h = to_number(this.value);
+      $$invalidate(4, h), $$invalidate(8, $color);
     }
     __name(input3_change_input_handler, "input3_change_input_handler");
+    function input4_change_input_handler() {
+      a3 = to_number(this.value);
+      $$invalidate(5, a3), $$invalidate(8, $color);
+    }
+    __name(input4_change_input_handler, "input4_change_input_handler");
     $$self.$$set = ($$props2) => {
       if ("api" in $$props2)
-        $$invalidate(6, api = $$props2.api);
+        $$invalidate(7, api = $$props2.api);
       if ("color" in $$props2)
         $$subscribe_color($$invalidate(0, color = $$props2.color));
       if ("length" in $$props2)
-        $$invalidate(7, length = $$props2.length);
+        $$subscribe_length($$invalidate(1, length = $$props2.length));
     };
     $$self.$$.update = () => {
       if ($$self.$$.dirty & /*$color*/
-      32) {
+      256) {
         $: {
           const converted = (0, import_chroma_js.default)($color).lch();
           const alpha = (0, import_chroma_js.default)($color).alpha();
           console.log("XXX, converted", converted);
-          $$invalidate(1, l = converted[0]);
-          $$invalidate(2, c = converted[1]);
-          $$invalidate(3, h = converted[2]);
-          $$invalidate(4, a3 = alpha);
+          $$invalidate(2, l = converted[0]);
+          $$invalidate(3, c = converted[1]);
+          $$invalidate(4, h = converted[2]);
+          $$invalidate(5, a3 = alpha);
         }
       }
       if ($$self.$$.dirty & /*l, c, h, a, $color, color*/
-      63) {
+      317) {
         $: {
           const updated = import_chroma_js.default.lch(l, c, h).alpha(a3).hex();
           console.log({ updated });
@@ -17836,17 +18136,19 @@
     };
     return [
       color,
+      length,
       l,
       c,
       h,
       a3,
-      $color,
+      $length,
       api,
-      length,
+      $color,
       input0_change_input_handler,
       input1_change_input_handler,
       input2_change_input_handler,
-      input3_change_input_handler
+      input3_change_input_handler,
+      input4_change_input_handler
     ];
   }
   __name(instance12, "instance");
@@ -17856,24 +18158,149 @@
     }
     constructor(options) {
       super();
-      init(this, options, instance12, create_fragment12, safe_not_equal, { api: 6, color: 0, length: 7 });
+      init(this, options, instance12, create_fragment12, safe_not_equal, { api: 7, color: 0, length: 1 });
     }
   };
   var Color_default = Color;
 
+  // plug-ins/components/gradients/Shared.svelte
+  function create_fragment13(ctx) {
+    let div1;
+    let label;
+    let t0;
+    let t1;
+    let t2;
+    let div0;
+    let input;
+    let mounted;
+    let dispose;
+    return {
+      c() {
+        div1 = element("div");
+        label = element("label");
+        t0 = text2("angle ");
+        t1 = text2(
+          /*$angle*/
+          ctx[1]
+        );
+        t2 = space();
+        div0 = element("div");
+        input = element("input");
+        attr(label, "for", "inputAngle");
+        attr(label, "class", "col-sm-4 col-form-label");
+        attr(input, "id", "inputAngle");
+        attr(input, "type", "range");
+        attr(input, "class", "form-range");
+        attr(input, "min", "0");
+        attr(input, "max", "360");
+        attr(div0, "class", "col-sm-8");
+        attr(div1, "class", "mb-3 row");
+      },
+      m(target, anchor) {
+        insert(target, div1, anchor);
+        append(div1, label);
+        append(label, t0);
+        append(label, t1);
+        append(div1, t2);
+        append(div1, div0);
+        append(div0, input);
+        set_input_value(
+          input,
+          /*$angle*/
+          ctx[1]
+        );
+        if (!mounted) {
+          dispose = [
+            listen(
+              input,
+              "change",
+              /*input_change_input_handler*/
+              ctx[3]
+            ),
+            listen(
+              input,
+              "input",
+              /*input_change_input_handler*/
+              ctx[3]
+            )
+          ];
+          mounted = true;
+        }
+      },
+      p(ctx2, [dirty]) {
+        if (dirty & /*$angle*/
+        2)
+          set_data(
+            t1,
+            /*$angle*/
+            ctx2[1]
+          );
+        if (dirty & /*$angle*/
+        2) {
+          set_input_value(
+            input,
+            /*$angle*/
+            ctx2[1]
+          );
+        }
+      },
+      i: noop,
+      o: noop,
+      d(detaching) {
+        if (detaching) {
+          detach(div1);
+        }
+        mounted = false;
+        run_all(dispose);
+      }
+    };
+  }
+  __name(create_fragment13, "create_fragment");
+  function instance13($$self, $$props, $$invalidate) {
+    let $angle, $$unsubscribe_angle = noop, $$subscribe_angle = /* @__PURE__ */ __name(() => ($$unsubscribe_angle(), $$unsubscribe_angle = subscribe(angle, ($$value) => $$invalidate(1, $angle = $$value)), angle), "$$subscribe_angle");
+    $$self.$$.on_destroy.push(() => $$unsubscribe_angle());
+    let { api } = $$props;
+    let { angle } = $$props;
+    $$subscribe_angle();
+    function input_change_input_handler() {
+      $angle = to_number(this.value);
+      angle.set($angle);
+    }
+    __name(input_change_input_handler, "input_change_input_handler");
+    $$self.$$set = ($$props2) => {
+      if ("api" in $$props2)
+        $$invalidate(2, api = $$props2.api);
+      if ("angle" in $$props2)
+        $$subscribe_angle($$invalidate(0, angle = $$props2.angle));
+    };
+    return [angle, $angle, api, input_change_input_handler];
+  }
+  __name(instance13, "instance");
+  var Shared = class extends SvelteComponent {
+    static {
+      __name(this, "Shared");
+    }
+    constructor(options) {
+      super();
+      init(this, options, instance13, create_fragment13, safe_not_equal, { api: 2, angle: 0 });
+    }
+  };
+  var Shared_default = Shared;
+
   // plug-ins/components/gradients/Gradients.svelte
   function get_each_context6(ctx, list, i) {
     const child_ctx = ctx.slice();
-    child_ctx[20] = list[i].color;
-    child_ctx[21] = list[i].length;
+    child_ctx[21] = list[i].color;
+    child_ctx[22] = list[i].length;
     return child_ctx;
   }
   __name(get_each_context6, "get_each_context");
   function get_each_context_1(ctx, list, i) {
     const child_ctx = ctx.slice();
-    child_ctx[24] = list[i].id;
-    child_ctx[25] = list[i].padding;
-    child_ctx[26] = list[i].angle;
+    child_ctx[25] = list[i].id;
+    child_ctx[26] = list[i].padding;
+    child_ctx[10] = list[i].angle;
+    child_ctx[9] = list[i].colors;
     child_ctx[27] = list[i].stops;
     child_ctx[28] = list[i].levels;
     child_ctx[30] = i;
@@ -17891,15 +18318,19 @@
       ) },
       { id: (
         /*id*/
-        ctx[24]
+        ctx[25]
       ) },
       { padding: (
         /*padding*/
-        ctx[25]
+        ctx[26]
       ) },
       { angle: (
         /*angle*/
-        ctx[26]
+        ctx[10]
+      ) },
+      { colors: (
+        /*colors*/
+        ctx[9]
       ) },
       /*stops*/
       ctx[27],
@@ -17909,7 +18340,7 @@
       ) }
     ];
     function preview_selection_binding(value) {
-      ctx[18](value);
+      ctx[19](value);
     }
     __name(preview_selection_binding, "preview_selection_binding");
     let preview_props = {};
@@ -17944,17 +18375,22 @@
           dirty & /*$motif*/
           4 && { id: (
             /*id*/
-            ctx2[24]
+            ctx2[25]
           ) },
           dirty & /*$motif*/
           4 && { padding: (
             /*padding*/
-            ctx2[25]
+            ctx2[26]
           ) },
           dirty & /*$motif*/
           4 && { angle: (
             /*angle*/
-            ctx2[26]
+            ctx2[10]
+          ) },
+          dirty & /*$motif*/
+          4 && { colors: (
+            /*colors*/
+            ctx2[9]
           ) },
           dirty & /*$motif*/
           4 && get_spread_object(
@@ -17993,11 +18429,26 @@
   }
   __name(create_each_block_1, "create_each_block_1");
   function create_if_block3(ctx) {
-    let each_1_anchor;
+    let div1;
+    let div0;
+    let shared;
+    let t;
     let current;
+    shared = new Shared_default({
+      props: {
+        api: (
+          /*api*/
+          ctx[0]
+        ),
+        angle: (
+          /*angle*/
+          ctx[10]
+        )
+      }
+    });
     let each_value = ensure_array_like(
       /*colors*/
-      ctx[3]
+      ctx[9]
     );
     let each_blocks = [];
     for (let i = 0; i < each_value.length; i += 1) {
@@ -18008,26 +18459,44 @@
     }), "out");
     return {
       c() {
+        div1 = element("div");
+        div0 = element("div");
+        create_component(shared.$$.fragment);
+        t = space();
         for (let i = 0; i < each_blocks.length; i += 1) {
           each_blocks[i].c();
         }
-        each_1_anchor = empty();
+        attr(div0, "class", "col-12");
+        attr(div1, "class", "row m-0");
       },
       m(target, anchor) {
+        insert(target, div1, anchor);
+        append(div1, div0);
+        mount_component(shared, div0, null);
+        append(div0, t);
         for (let i = 0; i < each_blocks.length; i += 1) {
           if (each_blocks[i]) {
-            each_blocks[i].m(target, anchor);
+            each_blocks[i].m(div0, null);
           }
         }
-        insert(target, each_1_anchor, anchor);
         current = true;
       },
       p(ctx2, dirty) {
-        if (dirty & /*api, colors*/
-        9) {
+        const shared_changes = {};
+        if (dirty & /*api*/
+        1)
+          shared_changes.api = /*api*/
+          ctx2[0];
+        if (dirty & /*angle*/
+        1024)
+          shared_changes.angle = /*angle*/
+          ctx2[10];
+        shared.$set(shared_changes);
+        if (dirty & /*api, angle, colors*/
+        1537) {
           each_value = ensure_array_like(
             /*colors*/
-            ctx2[3]
+            ctx2[9]
           );
           let i;
           for (i = 0; i < each_value.length; i += 1) {
@@ -18039,7 +18508,7 @@
               each_blocks[i] = create_each_block6(child_ctx);
               each_blocks[i].c();
               transition_in(each_blocks[i], 1);
-              each_blocks[i].m(each_1_anchor.parentNode, each_1_anchor);
+              each_blocks[i].m(div0, null);
             }
           }
           group_outros();
@@ -18052,12 +18521,14 @@
       i(local) {
         if (current)
           return;
+        transition_in(shared.$$.fragment, local);
         for (let i = 0; i < each_value.length; i += 1) {
           transition_in(each_blocks[i]);
         }
         current = true;
       },
       o(local) {
+        transition_out(shared.$$.fragment, local);
         each_blocks = each_blocks.filter(Boolean);
         for (let i = 0; i < each_blocks.length; i += 1) {
           transition_out(each_blocks[i]);
@@ -18066,8 +18537,9 @@
       },
       d(detaching) {
         if (detaching) {
-          detach(each_1_anchor);
+          detach(div1);
         }
+        destroy_component(shared);
         destroy_each(each_blocks, detaching);
       }
     };
@@ -18082,13 +18554,17 @@
           /*api*/
           ctx[0]
         ),
+        angle: (
+          /*angle*/
+          ctx[10]
+        ),
         color: (
           /*color*/
-          ctx[20]
+          ctx[21]
         ),
         length: (
           /*length*/
-          ctx[21]
+          ctx[22]
         )
       }
     });
@@ -18106,14 +18582,18 @@
         1)
           color_1_changes.api = /*api*/
           ctx2[0];
+        if (dirty & /*angle*/
+        1024)
+          color_1_changes.angle = /*angle*/
+          ctx2[10];
         if (dirty & /*colors*/
-        8)
+        512)
           color_1_changes.color = /*color*/
-          ctx2[20];
-        if (dirty & /*colors*/
-        8)
-          color_1_changes.length = /*length*/
           ctx2[21];
+        if (dirty & /*colors*/
+        512)
+          color_1_changes.length = /*length*/
+          ctx2[22];
         color_1.$set(color_1_changes);
       },
       i(local) {
@@ -18132,20 +18612,20 @@
     };
   }
   __name(create_each_block6, "create_each_block");
-  function create_fragment13(ctx) {
+  function create_fragment14(ctx) {
     let div3;
     let div0;
     let t0;
     let t1;
     let t2_value = parseInt(
       /*$w*/
-      ctx[7]
+      ctx[6]
     ) + "";
     let t2;
     let t3;
     let t4_value = parseInt(
       /*$h*/
-      ctx[8]
+      ctx[7]
     ) + "";
     let t4;
     let t5;
@@ -18186,7 +18666,7 @@
         div0 = element("div");
         t0 = text2(
           /*$caption*/
-          ctx[6]
+          ctx[5]
         );
         t1 = text2(" (");
         t2 = text2(t2_value);
@@ -18207,7 +18687,7 @@
         div2 = element("div");
         t9 = text2(
           /*$status*/
-          ctx[9]
+          ctx[8]
         );
         t10 = space();
         button1 = element("button");
@@ -18224,7 +18704,7 @@
           div0,
           "text-warning",
           /*$selected*/
-          ctx[5]
+          ctx[4]
         );
         attr(div1, "class", "card-body overflow-auto m-0 p-0 tx-lo");
         attr(button1, "type", "button");
@@ -18232,12 +18712,12 @@
         attr(button1, "aria-label", "Resize");
         attr(div2, "class", "card-footer text-body-secondary tx-hi py-0 px-1");
         attr(div3, "class", div3_class_value = "card alert-" + /*$context*/
-        ctx[4] + " h-100 m-0 tx-bg");
+        ctx[3] + " h-100 m-0 tx-bg");
         toggle_class(
           div3,
           "active",
           /*$selected*/
-          ctx[5]
+          ctx[4]
         );
       },
       m(target, anchor) {
@@ -18272,7 +18752,7 @@
               button0,
               "click",
               /*click_handler*/
-              ctx[17]
+              ctx[18]
             ),
             action_destroyer(api_makeMovable_action = /*api*/
             ctx[0].makeMovable(div0)),
@@ -18286,31 +18766,31 @@
       },
       p(ctx2, [dirty]) {
         if (!current || dirty & /*$caption*/
-        64)
+        32)
           set_data(
             t0,
             /*$caption*/
-            ctx2[6]
+            ctx2[5]
           );
         if ((!current || dirty & /*$w*/
-        128) && t2_value !== (t2_value = parseInt(
+        64) && t2_value !== (t2_value = parseInt(
           /*$w*/
-          ctx2[7]
+          ctx2[6]
         ) + ""))
           set_data(t2, t2_value);
         if ((!current || dirty & /*$h*/
-        256) && t4_value !== (t4_value = parseInt(
+        128) && t4_value !== (t4_value = parseInt(
           /*$h*/
-          ctx2[8]
+          ctx2[7]
         ) + ""))
           set_data(t4, t4_value);
         if (!current || dirty & /*$selected*/
-        32) {
+        16) {
           toggle_class(
             div0,
             "text-warning",
             /*$selected*/
-            ctx2[5]
+            ctx2[4]
           );
         }
         if (dirty & /*api, $motif, selection*/
@@ -18362,24 +18842,24 @@
           check_outros();
         }
         if (!current || dirty & /*$status*/
-        512)
+        256)
           set_data(
             t9,
             /*$status*/
-            ctx2[9]
+            ctx2[8]
           );
         if (!current || dirty & /*$context*/
-        16 && div3_class_value !== (div3_class_value = "card alert-" + /*$context*/
-        ctx2[4] + " h-100 m-0 tx-bg")) {
+        8 && div3_class_value !== (div3_class_value = "card alert-" + /*$context*/
+        ctx2[3] + " h-100 m-0 tx-bg")) {
           attr(div3, "class", div3_class_value);
         }
         if (!current || dirty & /*$context, $selected*/
-        48) {
+        24) {
           toggle_class(
             div3,
             "active",
             /*$selected*/
-            ctx2[5]
+            ctx2[4]
           );
         }
       },
@@ -18412,8 +18892,9 @@
       }
     };
   }
-  __name(create_fragment13, "create_fragment");
-  function instance13($$self, $$props, $$invalidate) {
+  __name(create_fragment14, "create_fragment");
+  function instance14($$self, $$props, $$invalidate) {
+    let angle;
     let colors;
     let $motif;
     let $context;
@@ -18424,18 +18905,18 @@
     let $status;
     let { api } = $$props;
     const selected = api.signal("selected");
-    component_subscribe($$self, selected, (value) => $$invalidate(5, $selected = value));
+    component_subscribe($$self, selected, (value) => $$invalidate(4, $selected = value));
     const context = api.signal("context");
-    component_subscribe($$self, context, (value) => $$invalidate(4, $context = value));
+    component_subscribe($$self, context, (value) => $$invalidate(3, $context = value));
     const caption = api.signal("caption");
-    component_subscribe($$self, caption, (value) => $$invalidate(6, $caption = value));
+    component_subscribe($$self, caption, (value) => $$invalidate(5, $caption = value));
     const text3 = api.signal("text");
     const status = api.signal("status");
-    component_subscribe($$self, status, (value) => $$invalidate(9, $status = value));
+    component_subscribe($$self, status, (value) => $$invalidate(8, $status = value));
     const w = api.signal("w");
-    component_subscribe($$self, w, (value) => $$invalidate(7, $w = value));
+    component_subscribe($$self, w, (value) => $$invalidate(6, $w = value));
     const h = api.signal("h");
-    component_subscribe($$self, h, (value) => $$invalidate(8, $h = value));
+    component_subscribe($$self, h, (value) => $$invalidate(7, $h = value));
     const motif = api.signal("motif");
     component_subscribe($$self, motif, (value) => $$invalidate(2, $motif = value));
     let selection = null;
@@ -18455,20 +18936,26 @@
       if ($$self.$$.dirty & /*selection, $motif*/
       6) {
         $:
-          $$invalidate(3, colors = selection ? $motif.get(selection).colors.get() : []);
+          $$invalidate(10, angle = selection ? $motif.get(selection).angle : 0);
+      }
+      if ($$self.$$.dirty & /*selection, $motif*/
+      6) {
+        $:
+          $$invalidate(9, colors = selection ? $motif.get(selection).colors.get() : []);
       }
     };
     return [
       api,
       selection,
       $motif,
-      colors,
       $context,
       $selected,
       $caption,
       $w,
       $h,
       $status,
+      colors,
+      angle,
       selected,
       context,
       caption,
@@ -18480,14 +18967,14 @@
       preview_selection_binding
     ];
   }
-  __name(instance13, "instance");
+  __name(instance14, "instance");
   var Gradients = class extends SvelteComponent {
     static {
       __name(this, "Gradients");
     }
     constructor(options) {
       super();
-      init(this, options, instance13, create_fragment13, safe_not_equal, { api: 0 });
+      init(this, options, instance14, create_fragment14, safe_not_equal, { api: 0 });
     }
   };
   var Gradients_default = Gradients;
@@ -18630,12 +19117,12 @@
         this.w = 400;
         this.h = 700;
         const motif = new Motif("background");
-        motif.addColor("#2e3743", "0%").addColor("#343a49", "20%").addColor("#141d25", "100%");
-        motif.hi("caption").addColor("#3b4650", "0%").addColor("#1a1e29", "100%");
-        motif.lo("body").addColor("#0f141d", "0%").addColor("#2c3645", "45%").addColor("#131821", "100%");
-        motif.hi("footer").addColor("#3b4650", "0%").addColor("#1a1e29", "100%");
-        motif.get("body").bt("btn-1").addColor("#ecb349", "0%").addColor("#da5a03", "100%");
-        motif.get("body").bt("btn-2").addColor("#d443f1", "0%").addColor("#3c1968", "100%");
+        motif.addColor("#2e3743", 0).addColor("#343a49", 20).addColor("#141d25", 100);
+        motif.hi("caption").addColor("#3b4650", 0).addColor("#1a1e29", 100);
+        motif.lo("body").addColor("#0f141d", 0).addColor("#2c3645", 45).addColor("#131821", 100);
+        motif.hi("footer").addColor("#3b4650", 0).addColor("#1a1e29", 100);
+        motif.get("body").bt("btn-1").addColor("#ecb349", 0).addColor("#da5a03", 100);
+        motif.get("body").bt("btn-2").addColor("#d443f1", 0).addColor("#3c1968", 100);
         this.motif = motif;
         this.foreign = new Instance(Foreign);
         this.createWindowComponent(this.foreign);
@@ -18983,7 +19470,7 @@
     };
   }
   __name(create_each_block7, "create_each_block");
-  function create_fragment14(ctx) {
+  function create_fragment15(ctx) {
     let li;
     let div;
     let t0;
@@ -19154,8 +19641,8 @@
       }
     };
   }
-  __name(create_fragment14, "create_fragment");
-  function instance14($$self, $$props, $$invalidate) {
+  __name(create_fragment15, "create_fragment");
+  function instance15($$self, $$props, $$invalidate) {
     let { item } = $$props;
     let { api } = $$props;
     let { controller } = $$props;
@@ -19173,20 +19660,20 @@
     };
     return [api, controller, item, open, click_handler, click_handler_1, click_handler_2];
   }
-  __name(instance14, "instance");
+  __name(instance15, "instance");
   var Entry = class extends SvelteComponent {
     static {
       __name(this, "Entry");
     }
     constructor(options) {
       super();
-      init(this, options, instance14, create_fragment14, safe_not_equal, { item: 2, api: 0, controller: 1 });
+      init(this, options, instance15, create_fragment15, safe_not_equal, { item: 2, api: 0, controller: 1 });
     }
   };
   var Entry_default = Entry;
 
   // plug-ins/components/architecture/Interface.svelte
-  function create_fragment15(ctx) {
+  function create_fragment16(ctx) {
     let div9;
     let div0;
     let t0;
@@ -19461,10 +19948,10 @@
       }
     };
   }
-  __name(create_fragment15, "create_fragment");
+  __name(create_fragment16, "create_fragment");
   var a2 = 1;
   var b2 = 2;
-  function instance15($$self, $$props, $$invalidate) {
+  function instance16($$self, $$props, $$invalidate) {
     let c;
     let $context;
     let $selected;
@@ -19544,65 +20031,17 @@
       click_handler_1
     ];
   }
-  __name(instance15, "instance");
+  __name(instance16, "instance");
   var Interface2 = class extends SvelteComponent {
     static {
       __name(this, "Interface");
     }
     constructor(options) {
       super();
-      init(this, options, instance15, create_fragment15, safe_not_equal, { tree: 0, api: 1 });
+      init(this, options, instance16, create_fragment16, safe_not_equal, { tree: 0, api: 1 });
     }
   };
   var Interface_default2 = Interface2;
-
-  // node_modules/svelte/src/runtime/store/index.js
-  var subscriber_queue = [];
-  function writable(value, start = noop) {
-    let stop;
-    const subscribers = /* @__PURE__ */ new Set();
-    function set(new_value) {
-      if (safe_not_equal(value, new_value)) {
-        value = new_value;
-        if (stop) {
-          const run_queue = !subscriber_queue.length;
-          for (const subscriber of subscribers) {
-            subscriber[1]();
-            subscriber_queue.push(subscriber, value);
-          }
-          if (run_queue) {
-            for (let i = 0; i < subscriber_queue.length; i += 2) {
-              subscriber_queue[i][0](subscriber_queue[i + 1]);
-            }
-            subscriber_queue.length = 0;
-          }
-        }
-      }
-    }
-    __name(set, "set");
-    function update3(fn) {
-      set(fn(value));
-    }
-    __name(update3, "update");
-    function subscribe2(run2, invalidate = noop) {
-      const subscriber = [run2, invalidate];
-      subscribers.add(subscriber);
-      if (subscribers.size === 1) {
-        stop = start(set, update3) || noop;
-      }
-      run2(value);
-      return () => {
-        subscribers.delete(subscriber);
-        if (subscribers.size === 0 && stop) {
-          stop();
-          stop = null;
-        }
-      };
-    }
-    __name(subscribe2, "subscribe");
-    return { set, update: update3, subscribe: subscribe2 };
-  }
-  __name(writable, "writable");
 
   // plug-ins/components/architecture/stores.js
   function getApplicationTree(component) {
@@ -21634,7 +22073,7 @@
     };
   }
   __name(create_each_block8, "create_each_block");
-  function create_fragment16(ctx) {
+  function create_fragment17(ctx) {
     let div3;
     let div0;
     let t0;
@@ -21845,8 +22284,8 @@
       }
     };
   }
-  __name(create_fragment16, "create_fragment");
-  function instance16($$self, $$props, $$invalidate) {
+  __name(create_fragment17, "create_fragment");
+  function instance17($$self, $$props, $$invalidate) {
     let $context;
     let $selected;
     let $caption;
@@ -21916,7 +22355,7 @@
       click_handler_4
     ];
   }
-  __name(instance16, "instance");
+  __name(instance17, "instance");
   var Interface3 = class extends SvelteComponent {
     static {
       __name(this, "Interface");
@@ -21926,8 +22365,8 @@
       init(
         this,
         options,
-        instance16,
-        create_fragment16,
+        instance17,
+        create_fragment17,
         safe_not_equal,
         {
           stores: 15,
@@ -21998,7 +22437,7 @@
   };
 
   // plug-ins/components/alert/Interface.svelte
-  function create_fragment17(ctx) {
+  function create_fragment18(ctx) {
     let div;
     let button0;
     let t0;
@@ -22167,8 +22606,8 @@
       }
     };
   }
-  __name(create_fragment17, "create_fragment");
-  function instance17($$self, $$props, $$invalidate) {
+  __name(create_fragment18, "create_fragment");
+  function instance18($$self, $$props, $$invalidate) {
     let $context;
     let $selected;
     let $caption;
@@ -22205,14 +22644,14 @@
       click_handler
     ];
   }
-  __name(instance17, "instance");
+  __name(instance18, "instance");
   var Interface4 = class extends SvelteComponent {
     static {
       __name(this, "Interface");
     }
     constructor(options) {
       super();
-      init(this, options, instance17, create_fragment17, safe_not_equal, { api: 0 });
+      init(this, options, instance18, create_fragment18, safe_not_equal, { api: 0 });
     }
   };
   var Interface_default4 = Interface4;

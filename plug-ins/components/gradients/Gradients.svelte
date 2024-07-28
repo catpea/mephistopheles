@@ -3,6 +3,7 @@
   import classIcons from '/plug-ins/class-icons/index.js';
   import Preview from '/plug-ins/components/gradients/Preview.svelte';
   import Color from '/plug-ins/components/gradients/Color.svelte';
+  import Shared from '/plug-ins/components/gradients/Shared.svelte';
 
 
   export let api;
@@ -24,6 +25,7 @@
 
   const motif = api.signal('motif');
   let selection = null;
+  $: angle = selection?$motif.get(selection).angle:0;
   $: colors = selection?$motif.get(selection).colors.get():[];
 
   onMount(() => {
@@ -39,14 +41,22 @@
   </div>
 
   <div class="card-body overflow-auto m-0 p-0 tx-lo" use:api.stopWheel>
-    {#each [$motif] as {id, padding, angle, stops, levels}, index}
-      <Preview {api} {id} {padding} {angle} {...stops} {levels} bind:selection/>
+
+    {#each [$motif] as {id, padding, angle, colors, stops, levels}, index}
+      <Preview {api} {id} {padding} {angle} {colors} {...stops} {levels} bind:selection/>
     {/each}
+
     {#if selection}
-      {#each colors as {color, length}}
-         <Color {api} {color} {length} />
-      {/each}
+      <div class="row m-0">
+        <div class="col-12">
+          <Shared {api} {angle} />
+          {#each colors as {color, length}}
+             <Color {api} {angle} {color} {length} />
+          {/each}
+        </div>
+      </div>
     {/if}
+
     <!-- <input class="btn btn-primary tx-hi" type="button" value="Export" on:click={api.execute()}> -->
   </div>
 
