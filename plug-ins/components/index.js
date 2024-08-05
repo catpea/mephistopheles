@@ -5,12 +5,14 @@ import Fetch from './Fetch.js';
 import Terminal from './Terminal.js';
 import Editor from './Editor.js';
 import Pipe from './Pipe.js';
-import Gradients from './Gradients.js';
 
 import Architecture from './Architecture.js';
 import Analysis from './Analysis.js';
 
 import Alert from './Alert.js';
+
+import Gradients from './Gradients.js';
+import Rolodex from './Rolodex.js';
 
 // Dependency Injection Pattern
 
@@ -33,6 +35,7 @@ const components = {
 
   // Tests
   Hello,
+  Rolodex,
 
   // Data Services
   Fetch,

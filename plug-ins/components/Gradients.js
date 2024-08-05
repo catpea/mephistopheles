@@ -16,7 +16,7 @@ export default class Gradients {
   };
 
   serializables = {
-    motif: 'object',
+    // motif: 'object',
   };
 
   traits = {
