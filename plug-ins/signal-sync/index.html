@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Bootstrap demo</title>
+  </head>
+  <style>
+    signal-sync {display: none;}
+  </style>
+  <script type="module">
+
+    import SignalSync from "./SignalSync.js";
+    import Signal from "./Signal.js";
+
+
+
+
+
+    // globalThis.listExample = new Signal([
+    //   new Signal( {key:0, name:"Alice"} ),
+    //   new Signal( {key:1, name:"Bob"} ),
+    //   new Signal( {key:2, name:"Carol"} ),
+    // ]);
+
+    globalThis.listExample = new Signal([
+      {key:0, name:"Alice"},
+      {key:1, name:"Bob"},
+      {key:2, name:"Carol"},
+    ]);
+
+    customElements.define("signal-sync", SignalSync);
+
+    let nameCounter = 1;
+    setInterval(()=>{
+      globalThis.listExample.get().push({key:nameCounter, name:`Random Name #${nameCounter}`});
+      globalThis.listExample.notify();
+      nameCounter++;
+    },555555_000);
+
+  </script>
+
+  <body>
+
+    <signal-sync signal="/listExample">
+      <h1>Hello, {{name}}</h1>
+    </signal-sync>
+
+  </body>
+</html>

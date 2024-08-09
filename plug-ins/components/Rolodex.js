@@ -47,17 +47,11 @@ export default class Rolodex {
 
 
       const root = new Component('application', 'Container', 'Application');
-
       const window = root.component({id:'window', type:'Container', name:'Window'});
-
       const container = window.component({id:'hbox', type:'Row', name:'Horizontal Box'});
-
       const menu = container.component({id:'side', type:'Column', name:'Side Menu'});
-
       const main = container.component({id:'main', type:'Column', name:'Main Content'});
-
       const list = main.component({id:'list', type:'List', name:'List Of Users'});
-
       const users = list.table({id:'users', columns:['id', 'first','last','age']});
       users.data(
         [0, 'Alice', 'Smith', 101],
