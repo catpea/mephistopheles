@@ -1,50 +1,98 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-bs-theme="dark">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Bootstrap demo</title>
+    <!-- <link href="bootstrap.min.css" rel="stylesheet"> -->
+    <style>
+    body {
+      background-color: #212529;
+    }
+    </style>
   </head>
   <style>
-    signal-sync {display: none;}
+    /* signal-sync {display: none;} */
   </style>
   <script type="module">
 
-    import SignalSync from "./SignalSync.js";
-    import Signal from "./Signal.js";
+    import {SignalSync, Signal} from "./SignalSync.js";
+
+    const url = 'bootstrap.min.css';
+    const response = await fetch(url);
+    const str = await response.text();
+    // console.log(str);
+    const css = new CSSStyleSheet();
+    css.replaceSync(str)
+    document.adoptedStyleSheets = [css];
+
+    function rng(min, max) {
+      const minCeiled = Math.ceil(min);
+      const maxFloored = Math.floor(max);
+      return Math.floor(Math.random() * (maxFloored - minCeiled + 1) + minCeiled); // The maximum is inclusive and the minimum is inclusive
+    };
 
 
 
 
 
-    // globalThis.listExample = new Signal([
-    //   new Signal( {key:0, name:"Alice"} ),
-    //   new Signal( {key:1, name:"Bob"} ),
-    //   new Signal( {key:2, name:"Carol"} ),
-    // ]);
 
-    globalThis.listExample = new Signal([
-      {key:0, name:"Alice"},
-      {key:1, name:"Bob"},
-      {key:2, name:"Carol"},
+
+    globalThis.signalArray = new Signal([
+      new Signal( {key:0, color:new Signal('primary'), name:new Signal('Alice')} ),
+      new Signal( {key:1, color:new Signal('secondary'), name:new Signal('Bob')} ),
+      new Signal( {key:2, color:new Signal('success'), name:new Signal('Carol')} ),
+    ]);
+
+    globalThis.signalArray2 = new Signal([
+      new Signal( {key:0, color:new Signal('info'), name:new Signal('Alice')} ),
+      new Signal( {key:1, color:new Signal('warning'), name:new Signal('Bob')} ),
+      new Signal( {key:2, color:new Signal('danger'), name:new Signal('Carol')} ),
     ]);
 
     customElements.define("signal-sync", SignalSync);
 
-    let nameCounter = 1;
     setInterval(()=>{
-      globalThis.listExample.get().push({key:nameCounter, name:`Random Name #${nameCounter}`});
-      globalThis.listExample.notify();
-      nameCounter++;
-    },555555_000);
+      const chosen1 = globalThis.signalArray.get()[rng(0,signalArray.get().length-1)];
+      const chosen = chosen1.get();
+
+      chosen.name.set(  rng(0,1)==1?chosen.name.get().toUpperCase():chosen.name.get().toLowerCase() );
+      // globalThis.signalArray.notify()
+    },100);
 
   </script>
 
   <body>
-
-    <signal-sync signal="/listExample">
-      <h1>Hello, {{name}}</h1>
-    </signal-sync>
-
+    <div class="container my-5">
+      <div class="row">
+        <div class="col-6">
+          <signal-sync context="signalArray">
+              <div class="card text-bg-primary mb-3">
+                <div class="card-body">
+                  <h5 class="card-title">Hello, <signal-sync property="name"></signal-sync></h5>
+                  <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                  <a href="#" class="btn btn-primary">Go somewhere</a>
+                </div>
+              </div>
+          </signal-sync>
+        </div>
+        <div class="col-6">
+          <signal-sync context="signalArray">
+              <div class="card text-bg-primary mb-3">
+                <ul class="list-group list-group-flush">
+                  <signal-sync context="signalArray2">
+                    <li class="list-group-item"><signal-sync property="color"></signal-sync></li>
+                  </signal-sync>
+                </ul>
+                <div class="card-body">
+                  <h5 class="card-title">Hello, <signal-sync property="name"></signal-sync></h5>
+                  <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                  <a href="#" class="btn btn-primary">Go somewhere</a>
+                </div>
+              </div>
+          </signal-sync>
+        </div>
+      </div>
+    </div>
   </body>
 </html>
