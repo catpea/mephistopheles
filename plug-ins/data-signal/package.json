@@ -1,0 +1,12 @@
+{
+  "name": "data-signal",
+  "version": "1.0.2",
+  "description": "ensure context is assigned to outer sync only",
+  "main": "DataSignal.js",
+  "scripts": {
+    "save": "git add .; git commit -m 'Updated Release'; git push; npm version patch; npm publish; git push;"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

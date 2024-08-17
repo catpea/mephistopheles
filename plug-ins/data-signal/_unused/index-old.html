@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en" data-bs-theme="dark">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Data Signal Demo</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧠</text></svg>">
+    <style>
+    body {
+      background-color: #212529;
+    }
+    </style>
+  </head>
+  <style>
+    /* data-signal {display: none;} */
+  </style>
+  <script type="module">
+
+    import {DataSignal, Signal} from "./DataSignal.js";
+
+    const url = 'bootstrap.min.css';
+    const response = await fetch(url);
+    const str = await response.text();
+    // console.log(str);
+    const css = new CSSStyleSheet();
+    css.replaceSync(str)
+    document.adoptedStyleSheets = [css];
+
+    function rng(min, max) {
+      const minCeiled = Math.ceil(min);
+      const maxFloored = Math.floor(max);
+      return Math.floor(Math.random() * (maxFloored - minCeiled + 1) + minCeiled); // The maximum is inclusive and the minimum is inclusive
+    };
+
+
+    globalThis.signalArray = new Signal([
+      new Signal( {key:0, color:new Signal('primary'), name:new Signal('Alice')} ),
+      new Signal( {key:1, color:new Signal('secondary'), name:new Signal('Bob')} ),
+      new Signal( {key:2, color:new Signal('success'), name:new Signal('Carol')} ),
+    ]);
+
+    globalThis.signalArray2 = new Signal([
+      new Signal( {key:0, color:new Signal('info'), name:new Signal('Alice')} ),
+      new Signal( {key:1, color:new Signal('warning'), name:new Signal('Bob')} ),
+      new Signal( {key:2, color:new Signal('danger'), name:new Signal('Carol')} ),
+    ]);
+
+    customElements.define("data-signal", DataSignal(x));
+
+    setInterval(()=>{
+      const chosen1 = globalThis.signalArray.get()[rng(0,signalArray.get().length-1)];
+      const chosen = chosen1.get();
+      chosen.name.set(  rng(0,1)==1?chosen.name.get().toUpperCase():chosen.name.get().toLowerCase() );
+    },100);
+
+    setInterval(()=>{
+      const colors = [ 'primary', 'secondary', 'success', 'info', 'warning', 'danger' ];
+      const chosen1 = globalThis.signalArray2.get()[rng(0,signalArray2.get().length-1)];
+      const chosen = chosen1.get();
+      chosen.color.set( colors[ rng(0, colors.length-1) ]  );
+    },100);
+
+  </script>
+
+  <body>
+
+    <x-application root="signalArray">
+
+      <x-component name="data-card" >
+
+      </x-component>
+
+      <x-card>
+      </x-card>
+
+   <x-application/>
+
+
+      <div class="container my-5">
+        <div class="row">
+          <div class="col-6">
+            <data-signal name="left-signal-array" context="signalArray">
+                <div class="card text-bg-primary mb-3">
+                  <div class="card-body">
+                    <h5 class="card-title">Hello, <data-print name="left-cards-title" property="name"></data-print></h5>
+                    <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                    <a href="#" class="btn btn-primary">Go somewhere</a>
+                  </div>
+                </div>
+            </data-signal>
+          </div>
+          <div class="col-6">
+            <data-signal name="right-signal-array" context="signalArray">
+                <div class="card text-bg-primary mb-3">
+                  <ul class="list-group list-group-flush">
+                    <data-signal name="colorful-listgroup" context="signalArray2">
+                      <li class="list-group-item"><data-signal name="list-group-item" property="color"></data-signal></li>
+                    </data-signal>
+                  </ul>
+                  <div class="card-body">
+                    <h5 class="card-title">Hello, <data-signal name="card-title" property="name"></data-signal></h5>
+                    <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                    <a href="#" class="btn btn-primary">Go somewhere</a>
+                  </div>
+                </div>
+            </data-signal>
+          </div>
+        </div>
+      </div>
+
+
+  </body>
+</html>

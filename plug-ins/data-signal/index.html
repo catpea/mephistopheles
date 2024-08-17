@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en" data-bs-theme="dark">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Data Signal Demo</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧠</text></svg>">
+    <style>
+    body {
+      background-color: #212529;
+    }
+    </style>
+  </head>
+  <style>
+    /* data-signal {display: none;} */
+  </style>
+
+  <script type="module">
+    import {Signal, install} from "./src/index.js";
+    install();
+
+    globalThis.root = new Signal([
+      new Signal( {key:0, color:new Signal('primary'), name:new Signal('Alice')} ),
+      // new Signal( {key:1, color:new Signal('secondary'), name:new Signal('Bob')} ),
+      // new Signal( {key:2, color:new Signal('success'), name:new Signal('Carol')} ),
+    ]);
+
+  </script>
+
+  <body>
+
+    <data-application context="root">
+
+      <loop>
+        <print name="color"/>
+      </loop>
+
+    </data-application>
+
+  </body>
+</html>
