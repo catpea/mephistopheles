@@ -1,6 +1,6 @@
 import Operations from '../Operations.js';
 
-export default class Application extends HTMLElement {
+export default class Print extends HTMLElement {
   #op;
 
   constructor() {
@@ -8,19 +8,17 @@ export default class Application extends HTMLElement {
     this.#op = new Operations(this);
   }
 
-  async connectedCallback() {
-
-    await this.#op.fetchTemplate();
-
+  connectedCallback() {
     this.#op
       .setContextFromString()
+
       .attachShadow()
+
       .adoptCss()
+      .consumeTemplate()
       .unfurlTemplate()
       .clearContent()
-      .renderDelegate() // root subscription in application does not change
-      // .log('Context loaded!')
-
+      .renderDebug()
   }
 
   disconnectedCallback() {
@@ -28,6 +26,12 @@ export default class Application extends HTMLElement {
       .removeSubscription();
   }
 
+  get context(){
+    return this.#op.retrieveContext()
+  }
 
+  set context(v){
+    this.#op.updateContext(v);
+  }
 
 }

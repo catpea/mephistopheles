@@ -7,7 +7,7 @@ export default class Operations {
   #subscriptions = []; // {type:'list/item/value', id:'', run}
 
 
-  #tags = ['loop','print','component'];
+  #tags = ['bug', 'loop','print','component'];
 
   constructor(host) {
     this.#host = host;
@@ -45,6 +45,34 @@ export default class Operations {
     return this;
   };
 
+  async fetchTemplate(){
+    const url = this.#host.getAttribute('url');
+    const response = await fetch(url);
+    const html = await response.text();
+    const div = document.createElement('div');
+    div.innerHTML = html;
+
+    let template;
+
+    const templateCandidates = [...div.children].filter(node => node.nodeType === Node.ELEMENT_NODE);
+
+    if (templateCandidates.length === 0){
+      // /////console.warn('No template content found'); //result: template remains undefined
+    } else if (templateCandidates.length > 0){
+      // /////console.warn('One root per template please due to key/reconciler optimizations, wrapping in div');
+      template = document.createElement('div');
+      template.append(...div.children)
+    }else{
+      template = templateCandidates[0]; // correct selection
+    }
+
+    this.#template = template;
+
+    console.log(html, templateCandidates);
+    return this;
+
+  }
+
   consumeTemplate(){
 
     let template;
@@ -67,6 +95,52 @@ export default class Operations {
   unfurlTemplate(){
     if(!this.#template) return this; // no template
 
+    // The void elements in HTML are as follows:
+    // <area>
+    // <base>
+    // <br>
+    // <col>
+    // <embed>
+    // <hr>
+    // <img>
+    // <input>
+    // <link>
+    // <meta>
+    // <param> Deprecated
+    // <source>
+    // <track>
+    // <wbr>
+
+
+    this.#template.querySelectorAll('embed').forEach(directive => {
+      const attributes = [...directive.attributes];
+      const {name} = attributes.shift();
+      const replacement = document.createElement(`data-${name}`);
+      attributes.forEach(attr => {
+            replacement.setAttribute(attr.name, attr.value);
+      });
+      directive.replaceWith(replacement);
+    });
+
+    this.#template.querySelectorAll('link').forEach(directive => {
+      const attributes = [...directive.attributes];
+      const {name} = attributes.shift();
+      const replacement = document.createElement(`data-print`);
+      replacement.setAttribute('signal', name);
+      attributes.forEach(attr => {
+            replacement.setAttribute(attr.name, attr.value);
+      });
+      directive.replaceWith(replacement);
+    });
+
+
+    //
+    // html = html.replace(/\{\{(\w+)\}\}/g, (_, propName) => `<data-print property="${propName}"></data-print>`);
+    // html = html.replace(/<bug\/>/g, (_, propName) => `<data-bug></data-bug>`);
+    //
+    // this.#template.innerText = html;
+
+    // Tag Rendering
     for (const tag of this.#tags) {
       this.#template.querySelectorAll(tag).forEach(furled => {
         const unfurled = document.createElement(`data-${tag}`);
@@ -139,13 +213,33 @@ export default class Operations {
   }
 
 
-  renderValue(){
+  renderDebug(){
     const propertyName = this.#host.getAttribute('name');
     console.log('renderValue', propertyName);
     if(!this.#context) return this;
     if(!this.#context[propertyName]) return this;
     if(!this.#context[propertyName].subscribe) return this;
-    const subscription = this.#context[propertyName].subscribe(attributeValue=>this.#host.shadowRoot.innerHTML=attributeValue);
+
+    const subscription = this.#context[propertyName].subscribe(attributeValue=>this.#host.shadowRoot.innerHTML='<i class="bi bi-bug"></i>');
+
+    this.#subscriptions.push( {type:'debug', id:`${this.#context.key}.${propertyName}`, subscription} );
+  }
+
+  renderValue(){
+    const propertyName = this.#host.getAttribute('signal');
+    const withFunction = this.#host.getAttribute('with');
+    console.log('renderValue', propertyName);
+    if(!this.#context) return this;
+    if(!this.#context[propertyName]) return this;
+    if(!this.#context[propertyName].subscribe) return this;
+
+    // with="(this, value)=>this.innerHTML = value')"
+    // ( new Function(withFunction) )(this.#host, attributeValue)
+
+    const defaultFunction = (el, value) => el.innerHTML = value;
+    const electedFunction = withFunction?new Function('('+ withFunction+')(...arguments)'):defaultFunction;
+    console.log('DDD', electedFunction.toString());
+    const subscription = this.#context[propertyName].subscribe(attributeValue=>electedFunction(this.#host.shadowRoot, attributeValue));
     this.#subscriptions.push( {type:'value', id:`${this.#context.key}.${propertyName}`, subscription} );
   }
 

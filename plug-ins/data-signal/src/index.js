@@ -1,6 +1,7 @@
 import Application from './language/Application.js';
 import Loop        from './language/Loop.js';
 import Print       from './language/Print.js';
+import Bug        from './language/Bug.js';
 // import Template    from 'src/language/Template';
 // import Component   from 'src/language/Component';
 import Signal      from './variables/Signal.js';
@@ -16,6 +17,7 @@ async function install(prefix='data', url='./bootstrap.min.css'){
 
   customElements.define(`${prefix}-loop`, Loop);
   customElements.define(`${prefix}-print`, Print);
+  customElements.define(`${prefix}-bug`, Bug);
   customElements.define(`${prefix}-application`, Application);
   // customElements.define(`${prefix}-template`, Template());
   // customElements.define(`${prefix}-component`, Component());

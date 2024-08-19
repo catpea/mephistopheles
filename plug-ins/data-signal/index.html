@@ -19,23 +19,32 @@
     import {Signal, install} from "./src/index.js";
     install();
 
+    function rng(min=0, max=1) {
+      const minCeiled = Math.ceil(min);
+      const maxFloored = Math.floor(max);
+      const response = Math.floor(Math.random() * (maxFloored - minCeiled + 1) + minCeiled); // The maximum is inclusive and the minimum is inclusive
+      console.log(response);
+      return response;
+    };
+
     globalThis.root = new Signal([
-      new Signal( {key:0, color:new Signal('primary'), name:new Signal('Alice')} ),
-      // new Signal( {key:1, color:new Signal('secondary'), name:new Signal('Bob')} ),
-      // new Signal( {key:2, color:new Signal('success'), name:new Signal('Carol')} ),
+      new Signal( {key:0, mode:new Signal('primary'), name:new Signal('Alice')} ),
+      new Signal( {key:1, mode:new Signal('secondary'), name:new Signal('Bobby')} ),
+      new Signal( {key:2, mode:new Signal('success'), name:new Signal('Carol')} ),
     ]);
+
+    setInterval(()=>{
+      console.log(rng()?'danger':'warning');
+      globalThis.root.get()[1].get().mode.set(rng()?'danger':'warning')
+    },500);
 
   </script>
 
   <body>
-
-    <data-application context="root">
-
-      <loop>
-        <print name="color"/>
-      </loop>
-
-    </data-application>
-
+    <div class="container my-5">
+      <div class="row">
+        <data-application context="root" url="./application.html"></data-application>
+      </div>
+    </div>
   </body>
 </html>
