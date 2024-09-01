@@ -6,17 +6,17 @@ export default class Loop extends HTMLElement {
   constructor() {
     super();
     this.#op = new Operations(this);
+
   }
 
   connectedCallback() {
+    console.debug(`connectedCallback: ORDER ${this.tagName}/${this.getAttribute('name')} running...`);
+
     this.#op
-      .setContextFromString()
-
-      .attachShadow()
-
+    .attachShadow()
+    .consumeTemplate()
+      .setContextFromProperty()
       .adoptCss()
-      .consumeTemplate()
-      .unfurlTemplate()
       .clearContent()
       .renderContext()
   }
@@ -30,7 +30,7 @@ export default class Loop extends HTMLElement {
     return this.#op.retrieveContext()
   }
   set context(v){
-    console.log('YAH', this.tagName, ' got context ', v);
+    // console.log('YAH', this.tagName, ' got context ', v);
     this.#op.updateContext(v);
   }
 

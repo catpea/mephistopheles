@@ -1,4 +1,22 @@
+class UI {
+
+  alert(message="", title='Danger'){
+    const alert = document.createElement('div');
+    alert.classList.add('alert', 'alert-danger', 'm-2');
+    const icon = document.createElement('i');
+    icon.classList.add('bi', 'bi-exclamation-triangle', 'text-warning', 'p-1');
+
+    alert.append(icon, message);
+    return alert;
+  }
+
+}
+
+
+
 export default class Operations {
+
+  #ui = new UI();
 
   #host;
   #context;
@@ -7,7 +25,7 @@ export default class Operations {
   #subscriptions = []; // {type:'list/item/value', id:'', run}
 
 
-  #tags = ['bug', 'loop','print','component'];
+  #tags = ['bug', 'loop','print','component',  'bind'];
 
   constructor(host) {
     this.#host = host;
@@ -25,6 +43,23 @@ export default class Operations {
     if(!code) return this;
     let program = new Function(`return ${code};`).bind(globalThis);
     this.#context = program();
+    return this;
+  }
+
+  setContextFromProperty(){
+
+    ////console.log('setContextFromProperty', this.#context);
+
+    if(!this.#context) return this;
+
+    const positionalArguments = this.#host.getAttribute('arguments');
+    if(!positionalArguments) return this;
+    const [propertyName] = positionalArguments.split(' ');
+
+    if(!this.#context[propertyName]) return this;
+    // if(!this.#context[propertyName].subscribe) return this;
+
+    this.#context = this.#context[propertyName]
     return this;
   }
 
@@ -48,7 +83,12 @@ export default class Operations {
   async fetchTemplate(){
     const url = this.#host.getAttribute('url');
     const response = await fetch(url);
-    const html = await response.text();
+    let html = await response.text();
+
+    html = html.replace(/<print /g, '<embed print ');
+    html = html.replace(/<bind /g, '<embed bind ');
+
+
     const div = document.createElement('div');
     div.innerHTML = html;
 
@@ -57,9 +97,9 @@ export default class Operations {
     const templateCandidates = [...div.children].filter(node => node.nodeType === Node.ELEMENT_NODE);
 
     if (templateCandidates.length === 0){
-      // /////console.warn('No template content found'); //result: template remains undefined
+      // /////////console.warn('No template content found'); //result: template remains undefined
     } else if (templateCandidates.length > 0){
-      // /////console.warn('One root per template please due to key/reconciler optimizations, wrapping in div');
+      // /////////console.warn('One root per template please due to key/reconciler optimizations, wrapping in div');
       template = document.createElement('div');
       template.append(...div.children)
     }else{
@@ -68,26 +108,52 @@ export default class Operations {
 
     this.#template = template;
 
-    console.log(html, templateCandidates);
+    ////console.log(html, templateCandidates);
     return this;
 
   }
 
+  debugTemplate(){
+    //console.debug(`debugTemplate: BBB ${this.#host.tagName} TEMPLATE!`, this.#template?.outerHTML, this.#host.shadowRoot.querySelector('slot').assignedNodes());
+
+    return this;
+  }
+
   consumeTemplate(){
+    if(!this.getApplication()) return this;
+
+    let clsid = this.#host.getAttribute('clsid');
+
+    if( this.getApplication().templates.has(clsid) ){
+      this.#template = this.getApplication().templates.get(clsid);
+      return this;
+    }
+
+
+
 
     let template;
     const templateCandidates = this.#host.shadowRoot.querySelector('slot').assignedNodes().filter(node => node.nodeType === Node.ELEMENT_NODE);
 
+    ////console.log(`BBB consumeTemplate ${this.#host.tagName}`, this.#template, this.#host.shadowRoot.querySelector('slot').assignedNodes(), [...this.#host.attributes]);
+
+
     if (templateCandidates.length === 0){
-      // /////console.warn('No template content found'); //result: template remains undefined
+      ////console.log(`ZZZ ${this.#host.tagName} HAS NO TEMPLATE!`, this.#host.shadowRoot, templateCandidates);
+      ////console.warn('No template content found'); //result: template remains undefined
     } else if (templateCandidates.length > 0){
-      // /////console.warn('One root per template please due to key/reconciler optimizations, wrapping in div');
+      // /////////console.warn('One root per template please due to key/reconciler optimizations, wrapping in div');
       template = document.createElement('div');
       template.append(...this.#host.shadowRoot.querySelector('slot').assignedNodes())
     }else{
       template = templateCandidates[0]; // correct selection
     }
     this.#template = template;
+
+    // //console.debug(`consumeTemplate: DDD ${this.#host.tagName}/${this.#host.getAttribute('name')} TEMPLATE!`, this.#template?.outerHTML, this.#host.shadowRoot.querySelector('slot').assignedNodes());
+
+    //console.debug(`consumeTemplate: OOO ${this.#host.tagName}/${this.#host.getAttribute('name')} consumed its template`, this.#template?.outerHTML);
+    //console.debug(`consumeTemplate: ORDER ${this.#host.tagName}/${this.#host.getAttribute('name')} running...`);
 
     return this;
   }
@@ -111,27 +177,34 @@ export default class Operations {
     // <track>
     // <wbr>
 
-
+    // VOID TAG PROCESSING!
     this.#template.querySelectorAll('embed').forEach(directive => {
       const attributes = [...directive.attributes];
-      const {name} = attributes.shift();
+      const {name} = attributes.shift(); // the first argument is the tag kind
       const replacement = document.createElement(`data-${name}`);
-      attributes.forEach(attr => {
-            replacement.setAttribute(attr.name, attr.value);
+      const positionalArguments = [];
+      attributes.forEach((attr, index) => {
+        const isArgument = attr.value.length == 0;
+        if(isArgument){
+          positionalArguments.push(attr.name)
+        }else{
+          replacement.setAttribute(attr.name, attr.value);
+        }
       });
+      if(positionalArguments.length) replacement.setAttribute(`arguments`, positionalArguments.join(' '));
       directive.replaceWith(replacement);
     });
 
-    this.#template.querySelectorAll('link').forEach(directive => {
-      const attributes = [...directive.attributes];
-      const {name} = attributes.shift();
-      const replacement = document.createElement(`data-print`);
-      replacement.setAttribute('signal', name);
-      attributes.forEach(attr => {
-            replacement.setAttribute(attr.name, attr.value);
-      });
-      directive.replaceWith(replacement);
-    });
+    // this.#template.querySelectorAll('link').forEach(directive => {
+    //   const attributes = [...directive.attributes];
+    //   const {name} = attributes.shift();
+    //   const replacement = document.createElement(`data-print`);
+    //   replacement.setAttribute('signal', name);
+    //   attributes.forEach(attr => {
+    //         replacement.setAttribute(attr.name, attr.value);
+    //   });
+    //   directive.replaceWith(replacement);
+    // });
 
 
     //
@@ -142,18 +215,41 @@ export default class Operations {
 
     // Tag Rendering
     for (const tag of this.#tags) {
-      this.#template.querySelectorAll(tag).forEach(furled => {
-        const unfurled = document.createElement(`data-${tag}`);
-        [...furled.attributes].forEach(attr => {
-            unfurled.setAttribute(attr.name, attr.value);
+      this.#template.querySelectorAll(tag).forEach(directive => {
+
+        const replacement = document.createElement(`data-${tag}`);
+        const positionalArguments = [];
+        [...directive.attributes].forEach((attr, index) => {
+          const isArgument = attr.value.length == 0;
+          if(isArgument){
+            positionalArguments.push(attr.name)
+          }else{
+            replacement.setAttribute(attr.name, attr.value);
+          }
         });
-        while (furled.firstChild) {
-            unfurled.appendChild(furled.firstChild);
+        if(positionalArguments.length) replacement.setAttribute(`arguments`, positionalArguments.join(' '));
+
+        while (directive.firstChild) {
+            replacement.appendChild(directive.firstChild);
         }
-        furled.replaceWith(unfurled);
+
+        ////console.log('CCC BEFORE', replacement.innerHTML);
+
+        directive.replaceWith(replacement);
+        //console.log('DDD AFTER', replacement.outerHTML);
       });
     }
+
+
+    for (const tag of this.#tags) {
+      this.#template.querySelectorAll(`data-${tag}`).forEach(directive => {
+        const clsId = `clsid-${guid()}`;
+         directive.setAttribute(`clsid`, clsId);
+      })
+    }
+
     return this;
+
   }
   //
   // subscribeAndRender(){
@@ -165,6 +261,15 @@ export default class Operations {
   // }
 
   clearContent(){
+    if(!this.getApplication()) return this;
+
+    let clsid = this.#host.getAttribute('clsid');
+    //console.log('this.getApplication()', this.getApplication());
+    this.getApplication().templates.set(clsid, this.#template);
+
+    //console.debug(`clearContent: DDD ${this.#host.tagName}/${this.#host.getAttribute('name')} Emptied It self`, this.#template?.outerHTML);
+    //console.debug(`clearContent: ORDER ${this.#host.tagName}/${this.#host.getAttribute('name')} running...`);
+
     this.#host.shadowRoot.replaceChildren(); // empty
     return this;
   }
@@ -186,10 +291,10 @@ export default class Operations {
            }
            const isOutermost = !parents.map(o=>o.tagName).find(o=>o.match(/^DATA-/));
           if(!isOutermost) continue; // only interested in outermost
-          console.log(`Tag ${this.#host.tagName} applied #context to ${el.tagName}`, el.context);
+          ////console.log(`Tag ${this.#host.tagName} applied #context to ${el.tagName}`, el.context);
 
           el.context = item;
-          console.log(el.context);
+          ////console.log(el.context);
         }
       }
 
@@ -201,11 +306,11 @@ export default class Operations {
   renderContext(){
 
     if(!this.#context){
-      console.log(`Tag ${this.#host.tagName} has no #context`);
+      //console.log(`Tag ${this.#host.tagName} has no #context`);
       return this;
     }
 
-    console.log(`Tag ${this.#host.tagName}`, 'this.#context', this.#context);
+    console.debug(`renderContext: FROM ${this.#host.tagName.toLowerCase()}/${this.#host.getAttribute('name')}`, this.#context,);
 
     const subscription = this.#context.subscribe(contextObject=>this.renderTemplate(contextObject))
     this.#subscriptions.push( {type:'context', id:'main', subscription} );
@@ -215,7 +320,8 @@ export default class Operations {
 
   renderDebug(){
     const propertyName = this.#host.getAttribute('name');
-    console.log('renderValue', propertyName);
+    ////console.log('renderValue', propertyName);
+
     if(!this.#context) return this;
     if(!this.#context[propertyName]) return this;
     if(!this.#context[propertyName].subscribe) return this;
@@ -225,10 +331,37 @@ export default class Operations {
     this.#subscriptions.push( {type:'debug', id:`${this.#context.key}.${propertyName}`, subscription} );
   }
 
+
+
+
   renderValue(){
-    const propertyName = this.#host.getAttribute('signal');
-    const withFunction = this.#host.getAttribute('with');
-    console.log('renderValue', propertyName);
+
+    const positionalArguments = this.#host.getAttribute('arguments');
+    const withSelector = this.#host.getAttribute('with');
+    const [propertyName] = positionalArguments.split(' ');
+    const matches = upwards(this.#host, withSelector);
+
+    // ////console.log('renderValue', propertyName, withSelector, );
+    if(!this.#context) return this;
+    if(!this.#context[propertyName]) return this;
+    if(!this.#context[propertyName].subscribe) return this;
+
+
+
+    for (const matchingElement of matches) {
+      let applicator1 = (el,v)=>el.innerHTML=v;
+
+      let applicator = (el,v)=>el.value=v;
+      const subscription = this.#context[propertyName].subscribe(attributeValue=>applicator(matchingElement, attributeValue));
+      this.#subscriptions.push( {type:'value', id:`${this.#context.key}.${propertyName}`, subscription} );
+      const updateValue = (e) => {
+        this.#context[propertyName].set(e.target.value);
+      }
+      matchingElement.addEventListener("input", updateValue);
+      this.#subscriptions.push( {type:'value', id:`${this.#context.key}.${propertyName}`, subscription:()=>removeEventListener("input", updateValue)} );
+    }
+
+    return;
     if(!this.#context) return this;
     if(!this.#context[propertyName]) return this;
     if(!this.#context[propertyName].subscribe) return this;
@@ -238,7 +371,7 @@ export default class Operations {
 
     const defaultFunction = (el, value) => el.innerHTML = value;
     const electedFunction = withFunction?new Function('('+ withFunction+')(...arguments)'):defaultFunction;
-    console.log('DDD', electedFunction.toString());
+    ////console.log('DDD', electedFunction.toString());
     const subscription = this.#context[propertyName].subscribe(attributeValue=>electedFunction(this.#host.shadowRoot, attributeValue));
     this.#subscriptions.push( {type:'value', id:`${this.#context.key}.${propertyName}`, subscription} );
   }
@@ -250,7 +383,9 @@ export default class Operations {
 
   // INTERMEDIATE.. continuing to drill down templates
   renderTemplate(signalValue){
-    console.log({signalValue});
+    ////console.log({signalValue});
+
+
 
     const arriving = signalValue.map(o=>[o.key, o])
     const existing = Object.fromEntries([...this.#host.shadowRoot.children].map(o=>[o.dataset.key, o]));
@@ -279,7 +414,22 @@ export default class Operations {
 
   // Rendering a piece of the array, or object with a key.
   renderObject(item){
+
+    if(!this.#template){
+      ////console.log(`${this.#host.tagName} HAS NO TEMPLATE!`, this.#template);
+      this.#host.shadowRoot.appendChild(this.#ui.alert(`key=${item.key}: <${this.#host.tagName.toLowerCase()}> name=${this.#host.getAttribute('name')} does not have a #template`));
+      return;
+    }else{
+      this.#host.shadowRoot.appendChild(this.#ui.alert(`key=${item.key}: <${this.#host.tagName.toLowerCase()}> name=${this.#host.getAttribute('name')} does have a #template: ${this.#template.outerHTML}`));
+
+    }
+
+    let corona = document.createElement('div');
+    corona.classList.add(...'border border-info rounded p-1'.split(' '))
     let templateClone = this.#template.cloneNode(true);
+    corona.appendChild(templateClone);
+
+
     templateClone.dataset.key = item.key;
     const subscription = item.subscribe(c=>{
       for (const tag of this.#tags) {
@@ -292,15 +442,16 @@ export default class Operations {
            }
            const isOutermost = !parents.map(o=>o.tagName).find(o=>o.match(/^DATA-/));
           if(!isOutermost) continue; // only interested in outermost
-          console.log(`Tag ${this.#host.tagName} applied #context to ${el.tagName}`, el.context);
+          ////console.log(`Tag ${this.#host.tagName} applied #context to ${el.tagName}`, el.context);
 
           el.context = c;
-          console.log(el.context);
+          ////console.log(el.context);
         }
       }
     });
+
     this.#subscriptions.push( {type:'item', id:item.key, subscription} );
-    this.#host.shadowRoot.appendChild(templateClone);
+    this.#host.shadowRoot.appendChild(corona);
   };
 
 
@@ -315,4 +466,58 @@ export default class Operations {
     return this;
   };
 
+
+  getApplication(){
+    let response = null;
+    // const application = upwards(this.#host, 'data-application').pop();
+    //
+
+    if(this.#host.tagName.toLowerCase() == 'data-application'){
+      response =  this.#host;
+    }else{
+      response = upwards(this.#host, 'data-application').pop();
+      // response = this.#host.closest('data-application');
+    }
+    //console.debug(`getApplication: FROM ${this.#host.tagName.toLowerCase()}/${this.#host.getAttribute('name')}`, this.#host.application, response);
+
+    return response;
+  }
+
+}
+
+
+
+
+
+
+
+
+function guid() {
+    const arr = new Uint8Array(16); // UUID is 16 bytes
+    crypto.getRandomValues(arr); // Generate random values
+
+    // Conform to UUID version 4 specs
+    arr[6] = (arr[6] & 0x0f) | 0x40; // Version 4 type (bits at 7-4 are 0100)
+    arr[8] = (arr[8] & 0x3f) | 0x80; // Variant bits (10xx, meaning variant 1)
+
+    // Convert to hexadecimal format
+    return Array.from(arr, byte => byte.toString(16).padStart(2, '0'))
+        .join('')
+        .replace(/(.{8})(.{4})(.{4})(.{4})(.{12})/, '$1-$2-$3-$4-$5'); // Insert hyphen as per UUID formatting
+}
+
+function upwards(el, selector) {
+  const response = [];
+  const scanned = [];
+  while ((el = el.parentNode||el.host) && el !== document) {
+    const selectables = [el, ...el.children];
+    for (const el of selectables) {
+      //console.log('MATCH', el);
+      scanned.push(el)
+      if (el.matches && el.matches(selector)) response.push(el);
+    }
+  }
+
+  console.log({scanned});
+  return response;
 }

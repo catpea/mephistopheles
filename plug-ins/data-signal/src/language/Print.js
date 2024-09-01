@@ -16,7 +16,7 @@ export default class Print extends HTMLElement {
 
       .adoptCss()
       .consumeTemplate()
-      .unfurlTemplate()
+      // .unfurlTemplate()
       .clearContent()
       .renderValue()
   }

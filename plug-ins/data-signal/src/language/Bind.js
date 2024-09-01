@@ -11,14 +11,8 @@ export default class Print extends HTMLElement {
   connectedCallback() {
     this.#op
       .setContextFromString()
-
       .attachShadow()
-
-      .adoptCss()
-      .consumeTemplate()
-      // .unfurlTemplate()
-      .clearContent()
-      .renderDebug()
+      .renderValue()
   }
 
   disconnectedCallback() {
@@ -29,7 +23,6 @@ export default class Print extends HTMLElement {
   get context(){
     return this.#op.retrieveContext()
   }
-
   set context(v){
     this.#op.updateContext(v);
   }

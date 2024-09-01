@@ -1,8 +1,11 @@
-<embed bug mode="danger">
+<loop name="outer-loop" >
 
-<loop>
-  <div class="alert" role="alert">
-    <link mode with="(el, value)=>el.host.parentElement.setAttribute('class', `alert alert-${value}`)">
-    <link name>
-  </div>
+  <div>outer-loop</div>
+  <loop name="inner-loop" children>
+    <div>inner-loop</div>
+    <loop name="inner-inner-loop" children>
+      <div>inner-inner-loop</div>
+    </loop>
+  </loop>
+
 </loop>
