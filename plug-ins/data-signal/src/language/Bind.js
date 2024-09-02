@@ -9,15 +9,15 @@ export default class Print extends HTMLElement {
   }
 
   connectedCallback() {
-    this.#op
-      .setContextFromString()
-      .attachShadow()
-      .renderValue()
+    if(this.#op.ready) this.#op
+    .setContextFromString()
+    .attachShadow()
+    .renderValue()
   }
 
   disconnectedCallback() {
-    this.#op
-      .removeSubscription();
+    if(this.#op.ready) this.#op
+    .removeSubscription();
   }
 
   get context(){

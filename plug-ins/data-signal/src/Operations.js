@@ -1,13 +1,22 @@
 class UI {
 
-  alert(message="", title='Danger'){
-    const alert = document.createElement('div');
-    alert.classList.add('alert', 'alert-danger', 'm-2');
-    const icon = document.createElement('i');
-    icon.classList.add('bi', 'bi-exclamation-triangle', 'text-warning', 'p-1');
+  alert(message='', title='', type='primary', icon='info-circle'){ //exclamation-triangle
 
-    alert.append(icon, message);
+    const alert = document.createElement('div');
+    alert.classList.add('alert', `alert-${type}`, 'mb-3');
+
+    const heading = document.createElement('h4');
+    heading.classList.add('alert-heading');
+    heading.append(title)
+
+    const graphic = document.createElement('i');
+    graphic.classList.add('bi', `bi-${icon}`, 'fs-3', `text-${type}`, 'pe-2');
+
+    if(title) alert.append(heading);
+    alert.append(graphic, message);
+
     return alert;
+    
   }
 
 }
@@ -31,6 +40,12 @@ export default class Operations {
     this.#host = host;
   }
 
+  get ready(){
+    return this.isDOM()
+  }
+
+  // --
+
   attachShadow(){
     const shadow = this.#host.attachShadow({ mode: "open" });
     const slot = document.createElement('slot');
@@ -48,7 +63,7 @@ export default class Operations {
 
   setContextFromProperty(){
 
-    ////console.log('setContextFromProperty', this.#context);
+    //////console.log('setContextFromProperty', this.#context);
 
     if(!this.#context) return this;
 
@@ -97,9 +112,9 @@ export default class Operations {
     const templateCandidates = [...div.children].filter(node => node.nodeType === Node.ELEMENT_NODE);
 
     if (templateCandidates.length === 0){
-      // /////////console.warn('No template content found'); //result: template remains undefined
+      // ///////////console.warn('No template content found'); //result: template remains undefined
     } else if (templateCandidates.length > 0){
-      // /////////console.warn('One root per template please due to key/reconciler optimizations, wrapping in div');
+      // ///////////console.warn('One root per template please due to key/reconciler optimizations, wrapping in div');
       template = document.createElement('div');
       template.append(...div.children)
     }else{
@@ -108,41 +123,29 @@ export default class Operations {
 
     this.#template = template;
 
-    ////console.log(html, templateCandidates);
+    //////console.log(html, templateCandidates);
     return this;
 
   }
 
   debugTemplate(){
-    //console.debug(`debugTemplate: BBB ${this.#host.tagName} TEMPLATE!`, this.#template?.outerHTML, this.#host.shadowRoot.querySelector('slot').assignedNodes());
+    ////console.debug(`debugTemplate: BBB ${this.#host.tagName} TEMPLATE!`, this.#template?.outerHTML, this.#host.shadowRoot.querySelector('slot').assignedNodes());
 
     return this;
   }
 
   consumeTemplate(){
-    if(!this.getApplication()) return this;
-
-    let clsid = this.#host.getAttribute('clsid');
-
-    if( this.getApplication().templates.has(clsid) ){
-      this.#template = this.getApplication().templates.get(clsid);
-      return this;
-    }
-
-
-
-
     let template;
     const templateCandidates = this.#host.shadowRoot.querySelector('slot').assignedNodes().filter(node => node.nodeType === Node.ELEMENT_NODE);
 
-    ////console.log(`BBB consumeTemplate ${this.#host.tagName}`, this.#template, this.#host.shadowRoot.querySelector('slot').assignedNodes(), [...this.#host.attributes]);
+    //////console.log(`BBB consumeTemplate ${this.#host.tagName}`, this.#template, this.#host.shadowRoot.querySelector('slot').assignedNodes(), [...this.#host.attributes]);
 
 
     if (templateCandidates.length === 0){
-      ////console.log(`ZZZ ${this.#host.tagName} HAS NO TEMPLATE!`, this.#host.shadowRoot, templateCandidates);
-      ////console.warn('No template content found'); //result: template remains undefined
+      //////console.log(`ZZZ ${this.#host.tagName} HAS NO TEMPLATE!`, this.#host.shadowRoot, templateCandidates);
+      //////console.warn('No template content found'); //result: template remains undefined
     } else if (templateCandidates.length > 0){
-      // /////////console.warn('One root per template please due to key/reconciler optimizations, wrapping in div');
+      // ///////////console.warn('One root per template please due to key/reconciler optimizations, wrapping in div');
       template = document.createElement('div');
       template.append(...this.#host.shadowRoot.querySelector('slot').assignedNodes())
     }else{
@@ -150,10 +153,10 @@ export default class Operations {
     }
     this.#template = template;
 
-    // //console.debug(`consumeTemplate: DDD ${this.#host.tagName}/${this.#host.getAttribute('name')} TEMPLATE!`, this.#template?.outerHTML, this.#host.shadowRoot.querySelector('slot').assignedNodes());
+    // ////console.debug(`consumeTemplate: DDD ${this.#host.tagName}/${this.#host.getAttribute('name')} TEMPLATE!`, this.#template?.outerHTML, this.#host.shadowRoot.querySelector('slot').assignedNodes());
 
-    //console.debug(`consumeTemplate: OOO ${this.#host.tagName}/${this.#host.getAttribute('name')} consumed its template`, this.#template?.outerHTML);
-    //console.debug(`consumeTemplate: ORDER ${this.#host.tagName}/${this.#host.getAttribute('name')} running...`);
+    ////console.debug(`consumeTemplate: OOO ${this.#host.tagName}/${this.#host.getAttribute('name')} consumed its template`, this.#template?.outerHTML);
+    ////console.debug(`consumeTemplate: ORDER ${this.#host.tagName}/${this.#host.getAttribute('name')} running...`);
 
     return this;
   }
@@ -233,20 +236,15 @@ export default class Operations {
             replacement.appendChild(directive.firstChild);
         }
 
-        ////console.log('CCC BEFORE', replacement.innerHTML);
+        //////console.log('CCC BEFORE', replacement.innerHTML);
 
         directive.replaceWith(replacement);
-        //console.log('DDD AFTER', replacement.outerHTML);
+        ////console.log('DDD AFTER', replacement.outerHTML);
       });
     }
 
 
-    for (const tag of this.#tags) {
-      this.#template.querySelectorAll(`data-${tag}`).forEach(directive => {
-        const clsId = `clsid-${guid()}`;
-         directive.setAttribute(`clsid`, clsId);
-      })
-    }
+
 
     return this;
 
@@ -261,15 +259,6 @@ export default class Operations {
   // }
 
   clearContent(){
-    if(!this.getApplication()) return this;
-
-    let clsid = this.#host.getAttribute('clsid');
-    //console.log('this.getApplication()', this.getApplication());
-    this.getApplication().templates.set(clsid, this.#template);
-
-    //console.debug(`clearContent: DDD ${this.#host.tagName}/${this.#host.getAttribute('name')} Emptied It self`, this.#template?.outerHTML);
-    //console.debug(`clearContent: ORDER ${this.#host.tagName}/${this.#host.getAttribute('name')} running...`);
-
     this.#host.shadowRoot.replaceChildren(); // empty
     return this;
   }
@@ -291,10 +280,10 @@ export default class Operations {
            }
            const isOutermost = !parents.map(o=>o.tagName).find(o=>o.match(/^DATA-/));
           if(!isOutermost) continue; // only interested in outermost
-          ////console.log(`Tag ${this.#host.tagName} applied #context to ${el.tagName}`, el.context);
+          //////console.log(`Tag ${this.#host.tagName} applied #context to ${el.tagName}`, el.context);
 
           el.context = item;
-          ////console.log(el.context);
+          //////console.log(el.context);
         }
       }
 
@@ -306,11 +295,11 @@ export default class Operations {
   renderContext(){
 
     if(!this.#context){
-      //console.log(`Tag ${this.#host.tagName} has no #context`);
+      ////console.log(`Tag ${this.#host.tagName} has no #context`);
       return this;
     }
 
-    console.debug(`renderContext: FROM ${this.#host.tagName.toLowerCase()}/${this.#host.getAttribute('name')}`, this.#context,);
+    //console.debug(`renderContext: FROM ${this.#host.tagName.toLowerCase()}/${this.#host.getAttribute('name')}`, this.#context,);
 
     const subscription = this.#context.subscribe(contextObject=>this.renderTemplate(contextObject))
     this.#subscriptions.push( {type:'context', id:'main', subscription} );
@@ -320,7 +309,7 @@ export default class Operations {
 
   renderDebug(){
     const propertyName = this.#host.getAttribute('name');
-    ////console.log('renderValue', propertyName);
+    //////console.log('renderValue', propertyName);
 
     if(!this.#context) return this;
     if(!this.#context[propertyName]) return this;
@@ -341,7 +330,7 @@ export default class Operations {
     const [propertyName] = positionalArguments.split(' ');
     const matches = upwards(this.#host, withSelector);
 
-    // ////console.log('renderValue', propertyName, withSelector, );
+    // //////console.log('renderValue', propertyName, withSelector, );
     if(!this.#context) return this;
     if(!this.#context[propertyName]) return this;
     if(!this.#context[propertyName].subscribe) return this;
@@ -371,7 +360,7 @@ export default class Operations {
 
     const defaultFunction = (el, value) => el.innerHTML = value;
     const electedFunction = withFunction?new Function('('+ withFunction+')(...arguments)'):defaultFunction;
-    ////console.log('DDD', electedFunction.toString());
+    //////console.log('DDD', electedFunction.toString());
     const subscription = this.#context[propertyName].subscribe(attributeValue=>electedFunction(this.#host.shadowRoot, attributeValue));
     this.#subscriptions.push( {type:'value', id:`${this.#context.key}.${propertyName}`, subscription} );
   }
@@ -383,7 +372,7 @@ export default class Operations {
 
   // INTERMEDIATE.. continuing to drill down templates
   renderTemplate(signalValue){
-    ////console.log({signalValue});
+    //////console.log({signalValue});
 
 
 
@@ -415,17 +404,17 @@ export default class Operations {
   // Rendering a piece of the array, or object with a key.
   renderObject(item){
 
-    if(!this.#template){
-      ////console.log(`${this.#host.tagName} HAS NO TEMPLATE!`, this.#template);
-      this.#host.shadowRoot.appendChild(this.#ui.alert(`key=${item.key}: <${this.#host.tagName.toLowerCase()}> name=${this.#host.getAttribute('name')} does not have a #template`));
-      return;
-    }else{
-      this.#host.shadowRoot.appendChild(this.#ui.alert(`key=${item.key}: <${this.#host.tagName.toLowerCase()}> name=${this.#host.getAttribute('name')} does have a #template: ${this.#template.outerHTML}`));
-
-    }
+    // if(!this.#template){
+    //   //////console.log(`${this.#host.tagName} HAS NO TEMPLATE!`, this.#template);
+    //   this.#host.shadowRoot.appendChild(this.#ui.alert(`key=${item.key}: <${this.#host.tagName.toLowerCase()}> name=${this.#host.getAttribute('name')} does not have a #template`));
+    //   return;
+    // }else{
+    //   this.#host.shadowRoot.appendChild(this.#ui.alert(`key=${item.key}: <${this.#host.tagName.toLowerCase()}> name=${this.#host.getAttribute('name')} does have a #template: ${this.#template.outerHTML}`));
+    //
+    // }
 
     let corona = document.createElement('div');
-    corona.classList.add(...'border border-info rounded p-1'.split(' '))
+    corona.classList.add(...'border border-primary rounded p-3 mb-3'.split(' '))
     let templateClone = this.#template.cloneNode(true);
     corona.appendChild(templateClone);
 
@@ -442,10 +431,10 @@ export default class Operations {
            }
            const isOutermost = !parents.map(o=>o.tagName).find(o=>o.match(/^DATA-/));
           if(!isOutermost) continue; // only interested in outermost
-          ////console.log(`Tag ${this.#host.tagName} applied #context to ${el.tagName}`, el.context);
+          //////console.log(`Tag ${this.#host.tagName} applied #context to ${el.tagName}`, el.context);
 
           el.context = c;
-          ////console.log(el.context);
+          //////console.log(el.context);
         }
       }
     });
@@ -459,27 +448,32 @@ export default class Operations {
 
 
   log(message, context='info'){
-    const div = document.createElement('div');
-    div.append(message);
-    div.classList.add('alert', `alert-${context}`);
-    this.#host.shadowRoot.appendChild(div);
+    const alert = this.#ui.alert(message);
+    this.#host.shadowRoot.appendChild(alert);
     return this;
   };
 
 
+
+
+  isDOM(){
+    let current = this.#host;
+    while (current.parentNode||current.host) {
+        current = current.parentNode||current.host;
+        if (current === document) {
+            return true;
+        }
+    }
+    return false;
+  }
+
   getApplication(){
     let response = null;
-    // const application = upwards(this.#host, 'data-application').pop();
-    //
-
     if(this.#host.tagName.toLowerCase() == 'data-application'){
       response =  this.#host;
     }else{
       response = upwards(this.#host, 'data-application').pop();
-      // response = this.#host.closest('data-application');
     }
-    //console.debug(`getApplication: FROM ${this.#host.tagName.toLowerCase()}/${this.#host.getAttribute('name')}`, this.#host.application, response);
-
     return response;
   }
 
@@ -512,12 +506,12 @@ function upwards(el, selector) {
   while ((el = el.parentNode||el.host) && el !== document) {
     const selectables = [el, ...el.children];
     for (const el of selectables) {
-      //console.log('MATCH', el);
+      ////console.log('MATCH', el);
       scanned.push(el)
       if (el.matches && el.matches(selector)) response.push(el);
     }
   }
 
-  console.log({scanned});
+  //console.log({scanned});
   return response;
 }

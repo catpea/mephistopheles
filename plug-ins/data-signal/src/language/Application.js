@@ -12,23 +12,21 @@ export default class Application extends HTMLElement {
   async connectedCallback() {
 
     await this.#op.fetchTemplate();
-    console.debug(`connectedCallback: ORDER ${this.tagName}/${this.getAttribute('name')} running...`);
 
     this.#op
-      .setContextFromString()
-      .attachShadow()
-      .adoptCss()
-      .unfurlTemplate()
-      // .debugTemplate()
-      .clearContent()
-      .renderDelegate() // root subscription in application does not change
-      // .log('Context loaded!')
+    .setContextFromString()
+    .attachShadow()
+    .adoptCss()
+    .unfurlTemplate()
+    .clearContent()
+    .renderDelegate() // root subscription in application does not change
+    .log('Application Ready!')
 
   }
 
   disconnectedCallback() {
     this.#op
-      .removeSubscription();
+    .removeSubscription();
   }
 
 

@@ -10,27 +10,24 @@ export default class Loop extends HTMLElement {
   }
 
   connectedCallback() {
-    console.debug(`connectedCallback: ORDER ${this.tagName}/${this.getAttribute('name')} running...`);
-
-    this.#op
+    if(this.#op.ready) this.#op
     .attachShadow()
+    .adoptCss()
     .consumeTemplate()
-      .setContextFromProperty()
-      .adoptCss()
-      .clearContent()
-      .renderContext()
+    .clearContent()
+    .setContextFromProperty()
+    .renderContext()
   }
 
   disconnectedCallback() {
-    this.#op
-      .removeSubscription();
+    if(this.#op.ready) this.#op
+    .removeSubscription();
   }
 
   get context(){
     return this.#op.retrieveContext()
   }
   set context(v){
-    // console.log('YAH', this.tagName, ' got context ', v);
     this.#op.updateContext(v);
   }
 

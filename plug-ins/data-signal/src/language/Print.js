@@ -9,21 +9,18 @@ export default class Print extends HTMLElement {
   }
 
   connectedCallback() {
-    this.#op
-      .setContextFromString()
-
-      .attachShadow()
-
-      .adoptCss()
-      .consumeTemplate()
-      // .unfurlTemplate()
-      .clearContent()
-      .renderValue()
+    if(this.#op.ready) this.#op
+    .attachShadow()
+    .consumeTemplate()
+    .adoptCss()
+    .clearContent()
+    .setContextFromString()
+    .renderValue()
   }
 
   disconnectedCallback() {
-    this.#op
-      .removeSubscription();
+    if(this.#op.ready) this.#op
+    .removeSubscription();
   }
 
   get context(){
