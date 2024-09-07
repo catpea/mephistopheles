@@ -28,4 +28,24 @@ async function install(prefix='data', css=['./bootstrap.min.css','bootstrap-icon
 export {
   Signal,
   install,
+  signalize,
+}
+
+// TODO: generalize .children into typeof = array
+function signalize(root){
+  for (const branch of root) {
+    // all the children of every branch
+    if(branch.children) branch.children = signalize(branch.children);
+    // all properties of every branch
+    for (const key in branch) {
+      if(key === 'children') continue;
+      console.log(key);
+      branch[key] = new Signal( branch[key] );
+    }
+  }
+  // convert every branch in root
+  root = root.map(o=>new Signal( o ))
+  // convert root
+  root = new Signal( root );
+  return root
 }

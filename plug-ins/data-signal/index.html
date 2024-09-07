@@ -6,67 +6,45 @@
     <title>Data Signal Demo</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧠</text></svg>">
     <style>
-    body {
-      background-color: #212529;
-    }
-    data-loop {
-      border: 1px dotted orange;
-    }
+      body {
+        background-color: #212529;
+      }
+      data-loop {
+        border: 1px dotted orange;
+      }
     </style>
   </head>
-  <style>
-    /* data-signal {display: none;} */
-  </style>
-
   <script type="module">
-    import {Signal, install} from "./src/index.js";
+    import {signalize, Signal, install} from "./src/index.js";
     install();
-
-    function rng(min=0, max=1) {
-      const minCeiled = Math.ceil(min);
-      const maxFloored = Math.floor(max);
-      const response = Math.floor(Math.random() * (maxFloored - minCeiled + 1) + minCeiled); // The maximum is inclusive and the minimum is inclusive
-      console.log(response);
-      return response;
-    };
-
-    globalThis.root = new Signal([
-      new Signal( {key:0, mode:new Signal('primary'), name:new Signal('Alice'), description:new Signal('1Fetch list of song URLs from remote server'),
-
-      children: new Signal([
-        new Signal( {key:0, mode:new Signal('primary'), name:new Signal('Alice+Alice'), description:new Signal('2Fetch list of song URLs from remote server'),
-
-
-        children: new Signal([
-          new Signal( {key:0, mode:new Signal('primary'), name:new Signal('Alice'), description:new Signal('2Fetch list of song URLs from remote server'),
-
-
-
-
-        } ),
-          // new Signal( {key:1, mode:new Signal('primary1'), name:new Signal('Alice'), description:new Signal('Fetch list of song URLs from remote server')} ),
-          // new Signal( {key:1, mode:new Signal('secondary'), name:new Signal('Bobby')} ),
-          // new Signal( {key:2, mode:new Signal('success'), name:new Signal('Carol')} ),
-        ])
-
-      } ),
-        // new Signal( {key:1, mode:new Signal('primary1'), name:new Signal('Alice'), description:new Signal('Fetch list of song URLs from remote server')} ),
-        // new Signal( {key:1, mode:new Signal('secondary'), name:new Signal('Bobby')} ),
-        // new Signal( {key:2, mode:new Signal('success'), name:new Signal('Carol')} ),
-      ])
-
-    }),
-      // new Signal( {key:1, mode:new Signal('secondary'), name:new Signal('Bobby')} ),
-      // new Signal( {key:2, mode:new Signal('success'), name:new Signal('Carol')} ),
-    ]);
-
-    setInterval(()=>{
-      console.log(rng()?'danger':'warning');
-      globalThis.root.get()[1].get().mode.set(rng()?'danger':'warning')
-    },511111111100);
-
+    globalThis.root = signalize([
+      {
+        mode: 'primary',
+        name: 'Grandmother',
+        description: 'Outer Loop Text',
+        children: [
+          {
+            mode: 'seondary',
+            name: 'Mother',
+            description: 'Inner Loop Text',
+            children: [
+              //NOTE: only one daughter is shown in screenshot to keep things simple
+              {
+                mode: 'info',
+                name: 'Daughter #1',
+                description: 'Inner Inner Loop Text for Daughter #1',
+              },
+              {
+                mode: 'info',
+                name: 'Daughter #2',
+                description: 'Inner Inner Loop Text for Daughter #2',
+              }
+            ] // close Mother's children (Daughters)
+          } // close mother
+        ] // close grandmother children
+      } // close grandmother
+    ]); // close root array (Signal Tree Root)
   </script>
-
   <body>
     <div class="container my-5">
       <div class="row">

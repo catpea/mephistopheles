@@ -16,7 +16,7 @@ class UI {
     alert.append(graphic, message);
 
     return alert;
-    
+
   }
 
 }
@@ -300,69 +300,57 @@ export default class Operations {
     }
 
     //console.debug(`renderContext: FROM ${this.#host.tagName.toLowerCase()}/${this.#host.getAttribute('name')}`, this.#context,);
-
+    console.log(this.#context);
     const subscription = this.#context.subscribe(contextObject=>this.renderTemplate(contextObject))
     this.#subscriptions.push( {type:'context', id:'main', subscription} );
     return this;
   }
 
-
-  renderDebug(){
-    const propertyName = this.#host.getAttribute('name');
-    //////console.log('renderValue', propertyName);
-
-    if(!this.#context) return this;
-    if(!this.#context[propertyName]) return this;
-    if(!this.#context[propertyName].subscribe) return this;
-
-    const subscription = this.#context[propertyName].subscribe(attributeValue=>this.#host.shadowRoot.innerHTML='<i class="bi bi-bug"></i>');
-
-    this.#subscriptions.push( {type:'debug', id:`${this.#context.key}.${propertyName}`, subscription} );
-  }
-
-
-
-
   renderValue(){
 
     const positionalArguments = this.#host.getAttribute('arguments');
     const withSelector = this.#host.getAttribute('with');
+    const limitSpecifier = this.#host.getAttribute('limit');
     const [propertyName] = positionalArguments.split(' ');
     const matches = upwards(this.#host, withSelector);
 
-    // //////console.log('renderValue', propertyName, withSelector, );
-    if(!this.#context) return this;
-    if(!this.#context[propertyName]) return this;
-    if(!this.#context[propertyName].subscribe) return this;
-
-
-
-    for (const matchingElement of matches) {
-      let applicator1 = (el,v)=>el.innerHTML=v;
-
-      let applicator = (el,v)=>el.value=v;
-      const subscription = this.#context[propertyName].subscribe(attributeValue=>applicator(matchingElement, attributeValue));
-      this.#subscriptions.push( {type:'value', id:`${this.#context.key}.${propertyName}`, subscription} );
-      const updateValue = (e) => {
-        this.#context[propertyName].set(e.target.value);
+    console.log({limitSpecifier});
+    if(limitSpecifier !== null){
+      if(limitSpecifier=='*'){
+        // noop
+      }else{
+        const size = Math.min(matches.length, parseInt(limitSpecifier));
+        console.log({size});
+        matches.length = size;
       }
-      matchingElement.addEventListener("input", updateValue);
-      this.#subscriptions.push( {type:'value', id:`${this.#context.key}.${propertyName}`, subscription:()=>removeEventListener("input", updateValue)} );
+    }else{
+      matches.length = 1;
     }
 
-    return;
+    console.log(matches);
+
     if(!this.#context) return this;
     if(!this.#context[propertyName]) return this;
     if(!this.#context[propertyName].subscribe) return this;
 
-    // with="(this, value)=>this.innerHTML = value')"
-    // ( new Function(withFunction) )(this.#host, attributeValue)
+    for (const matchingElement of matches) {
 
-    const defaultFunction = (el, value) => el.innerHTML = value;
-    const electedFunction = withFunction?new Function('('+ withFunction+')(...arguments)'):defaultFunction;
-    //////console.log('DDD', electedFunction.toString());
-    const subscription = this.#context[propertyName].subscribe(attributeValue=>electedFunction(this.#host.shadowRoot, attributeValue));
-    this.#subscriptions.push( {type:'value', id:`${this.#context.key}.${propertyName}`, subscription} );
+      if(this.isInputControl(matchingElement)){
+        let applicator = (el,v)=>el.value=v;
+        const subscription = this.#context[propertyName].subscribe(attributeValue=>applicator(matchingElement, attributeValue));
+        this.#subscriptions.push( {type:'value', id:`${this.#context.key}.${propertyName}`, subscription} );
+        const updateValue = (e) => this.#context[propertyName].set(e.target.value);
+        matchingElement.addEventListener("input", updateValue);
+        this.#subscriptions.push( {type:'value', id:`${this.#context.key}.${propertyName}`, subscription:()=>removeEventListener("input", updateValue)} );
+
+      }else{
+        let applicator = (el,v)=>el.innerHTML=v;
+        const subscription = this.#context[propertyName].subscribe(attributeValue=>applicator(matchingElement, attributeValue));
+        this.#subscriptions.push( {type:'value', id:`${this.#context.key}.${propertyName}`, subscription} );
+      }
+
+    }
+
   }
 
 
@@ -418,7 +406,7 @@ export default class Operations {
     let templateClone = this.#template.cloneNode(true);
     corona.appendChild(templateClone);
 
-
+    console.log(item);
     templateClone.dataset.key = item.key;
     const subscription = item.subscribe(c=>{
       for (const tag of this.#tags) {
@@ -477,6 +465,12 @@ export default class Operations {
     return response;
   }
 
+
+  isInputControl(el) {
+    const tagName = el.tagName;  // Gets the tag name in uppercase form
+    return tagName === 'INPUT' || tagName === 'TEXTAREA' || tagName === 'SELECT';
+  }
+
 }
 
 
@@ -504,7 +498,7 @@ function upwards(el, selector) {
   const response = [];
   const scanned = [];
   while ((el = el.parentNode||el.host) && el !== document) {
-    const selectables = [el, ...el.children];
+    const selectables = [el, ...el.children].reverse();
     for (const el of selectables) {
       ////console.log('MATCH', el);
       scanned.push(el)
