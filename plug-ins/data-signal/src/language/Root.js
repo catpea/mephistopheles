@@ -1,19 +1,19 @@
-import Operations from '../Operations.js';
+import System from '../System.js';
 
 export default class Application extends HTMLElement {
-  #op;
+  #system;
   templates = new Map();
 
   constructor() {
     super();
-    this.#op = new Operations(this);
+    this.#system = new System(this);
   }
 
   async connectedCallback() {
 
-    await this.#op.fetchTemplate();
+    await this.#system.fetchTemplate();
 
-    this.#op
+    this.#system
     .setContextFromString()
     .attachShadow()
     .adoptCss()
@@ -25,7 +25,7 @@ export default class Application extends HTMLElement {
   }
 
   disconnectedCallback() {
-    this.#op
+    this.#system
     .removeSubscription();
   }
 

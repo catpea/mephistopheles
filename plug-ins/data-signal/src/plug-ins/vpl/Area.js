@@ -1,6 +1,6 @@
-import System from '../System.js';
+import System from './VplSystem.js';
 
-export default class Print extends HTMLElement {
+export default class Area extends HTMLElement {
   #system;
 
   constructor() {

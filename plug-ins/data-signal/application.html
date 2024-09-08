@@ -1,80 +1,42 @@
-<loop>
-  <code class="d-block text-bg-danger rounded">&lt;loop&gt; (loops over root content)</code>
-  <h4>Outer Loop aka Signal Tree Root (<span></span>)<bind name with="span"></h4>
+<div class="area position-relative overflow-hidden" is="fire" use="pan zoom" style="min-height: 60vh;">
+  <svg class="position-absolute w-100 h-100" xmlns="http://www.w3.org/2000/svg">
+  </svg>
 
-    <div class="alert alert-info" role="alert">
-      <h4 class="alert-heading">Well done!</h4>
-      <p>Aww yeah, you successfully read this important alert message. This example text is going to run a bit longer so that you can see how spacing within an alert works with this kind of content.</p>
-      <bind name with="h4">
-      <bind description with="p">
+  <node id="a" type="fetch">
+  <node id="b" type="bash">
+  <line from="#a/#out" to="#b/#in1">
+  <line from="#a/#out" to="#b/#in2">
+
+</div>
+
+
+
+
+
+<template id="fetch">
+  <div class="card shadow" is="fire" use="drag resize select" style="min-width: 18rem; position: absolute; top: 50px; left: 50px;">
+    <div class="card-header drag-handle">
+      Featured
     </div>
-
-    <code class="d-block">&lt;bind name with="h4"&gt;</code>
-    <code class="d-block">&lt;bind description with="p"&gt;</code>
-    <hr>
-
-  <div class="mb-3">
-    <label for="functionName" class="form-label">Outer Loop Name</label>
-    <input type="text" class="form-control" id="functionName" placeholder="Fetch Remote">
-    <bind name with="input">
-    <code>&lt;bind name with="input"&gt;</code>
+    <ul class="list-group list-group-flush">
+      <li class="list-group-item">An item<span id="out" class="position-absolute p-1 top-50 start-100 translate-middle badge rounded-pill bg-danger shadow-sm"><i class="bi bi-broadcast"></i></span></li>
+      <li class="list-group-item">A second item</li>
+      <li class="list-group-item">A third item</li>
+    </ul>
   </div>
+</template>
 
-  <loop children>
-    <code class="d-block text-bg-danger rounded">&lt;loop children&gt; (loop over children property of every item in root)</code>
-    <h4>Inner Loop (<span></span>)<bind name with="span"></h4>
-
-    <div class="mb-3">
-      <label for="functionName" class="form-label">Inner Loop Name</label>
-      <input type="text" class="form-control" id="functionName" placeholder="Fetch Remote">
-      <bind name with="input">
-      <code>&lt;bind name with="input"&gt;</code>
-
+<template id="bash">
+  <div class="card shadow" is="fire" use="drag resize select" style="min-width: 18rem; position: absolute; top: 100px; left: 500px">
+    <div class="card-header drag-handle">
+      Featured
     </div>
-
-    <div class="text-bg-dark rounded">
-      <loop children>
-        <code class="d-block text-bg-danger rounded">&lt;loop children&gt; (children of children)</code>
-
-        <h4>Inner Inner Loop (<span></span>)<bind name with="span"></h4>
-
-
-        <div class="mb-3">
-          <label for="functionName333" class="form-label">Edit Name Field</label>
-          <input type="text" class="form-control" id="functionName333" placeholder="Fetch Remote">
-          <bind name with="input">
-          <code>&lt;bind name with="input"&gt;</code>
-
-        </div>
-
-        <div>Text below will automatically update!</div>
-        <div>inner-inner-loop</div>
-        <bind name with="div">
-        <code>&lt;bind name with="div"&gt;</code>
-
-        <em class="d-block">It is that easy!</em>
-
-      </loop>
-    </div>
-
-  </loop>
-
-  <div class="mb-3">
-    <label for="functionDescription" class="form-label">Function Description</label>
-    <textarea class="form-control" id="functionDescription" rows="3"></textarea>
-    <textarea class="form-control" id="functionDescription" rows="3"></textarea>
-    <bind description with="textarea" limit=2>
-    <code>&lt;bind description with="textarea" limit=2&gt;</code>
+    <ul class="list-group list-group-flush">
+      <li class="list-group-item">An item</li>
+      <li class="list-group-item">An item<span id="in1" class="position-absolute p-1 top-50 start-0 translate-middle badge rounded-pill bg-success shadow-sm"><i class="bi bi-bug"></i></span></li>
+      <li class="list-group-item">A second item</li>
+      <li class="list-group-item">A third item</li>
+      <li class="list-group-item">An item<span id="in2" class="position-absolute p-1 top-50 start-0 translate-middle badge rounded-pill bg-success shadow-sm"><i class="bi bi-bell"></i></span></li>
+    </ul>
   </div>
-
-  <div class="mb-3">
-    <label for="functionDescription" class="form-label">Function Description</label>
-    <div>the first text area remains unboud due to limit=1 (default)</div>
-    <textarea class="form-control" id="functionDescription" rows="3"></textarea>
-    <textarea class="form-control" id="functionDescription" rows="3"></textarea>
-    <bind name with="textarea" limit=1>
-    <code>&lt;bind name with="textarea" limit=1&gt;</code>
-    <code>or just &lt;bind name with="textarea"&gt;</code>
-  </div>
-
-</loop>
+</template>

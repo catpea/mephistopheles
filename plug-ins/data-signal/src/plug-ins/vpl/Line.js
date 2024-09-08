@@ -1,6 +1,6 @@
-import System from '../System.js';
+import System from './VplSystem.js';
 
-export default class Print extends HTMLElement {
+export default class Line extends HTMLElement {
   #system;
 
   constructor() {
@@ -12,7 +12,11 @@ export default class Print extends HTMLElement {
     if(this.#system.ready) this.#system
     .setContextFromString()
     .attachShadow()
-    .renderValue()
+    .locateSvg()
+    .drawLine()
+    .monitorSourcePosition()
+    .monitorTargetPosition()
+
   }
 
   disconnectedCallback() {

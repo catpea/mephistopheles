@@ -1,6 +1,6 @@
-import System from '../System.js';
+import System from './VplSystem.js';
 
-export default class Print extends HTMLElement {
+export default class Node extends HTMLElement {
   #system;
 
   constructor() {
@@ -10,9 +10,12 @@ export default class Print extends HTMLElement {
 
   connectedCallback() {
     if(this.#system.ready) this.#system
-    .setContextFromString()
     .attachShadow()
-    .renderValue()
+    .adoptCss()
+    .injectTemplate()
+    .unfurlTemplate()
+    .setContextFromString()
+    .renderTemplateDelegate()
   }
 
   disconnectedCallback() {

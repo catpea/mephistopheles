@@ -1,13 +1,13 @@
-import Operations from '../Operations.js';
+import System from '../System.js';
 
 export default class Loop extends HTMLElement {
-  #op;
+  #system;
   constructor() {
     super();
-    this.#op = new Operations(this);
+    this.#system = new System(this);
   }
   connectedCallback() {
-    if(this.#op.ready) this.#op
+    if(this.#system.ready) this.#system
     .attachShadow()
     .adoptCss()
     .consumeTemplate()
@@ -16,13 +16,13 @@ export default class Loop extends HTMLElement {
     .renderContext()
   }
   disconnectedCallback() {
-    if(this.#op.ready) this.#op
+    if(this.#system.ready) this.#system
     .removeSubscription();
   }
   get context(){
-    return this.#op.retrieveContext()
+    return this.#system.retrieveContext()
   }
   set context(v){
-    this.#op.updateContext(v);
+    this.#system.updateContext(v);
   }
 }

@@ -1,8 +1,17 @@
 // For Registration
-import Application from './language/Application.js';
-import Loop        from './language/Loop.js';
-import Print       from './language/Print.js';
-import Bind        from './language/Bind.js';
+import Root from './language/Root.js';
+import Bind from './language/Bind.js';
+import Loop from './language/Loop.js';
+import Echo from './language/Echo.js';
+
+import Port from './plug-ins/vpl/Port.js';
+import Line from './plug-ins/vpl/Line.js';
+import Area from './plug-ins/vpl/Area.js';
+import Node from './plug-ins/vpl/Node.js';
+
+import Fire from './plug-ins/fire/Fire.js';
+
+// import DraggableElement from './plug-ins/mouse/Draggable.js';
 
 // For Export
 import Signal      from './variables/Signal.js';
@@ -17,11 +26,22 @@ async function install(prefix='data', css=['./bootstrap.min.css','bootstrap-icon
     document.adoptedStyleSheets = [...document.adoptedStyleSheets, css];
   }
 
+  customElements.define(`${prefix}-fire`, Fire, { extends: 'div' });
+
   customElements.define(`${prefix}-loop`, Loop);
-  customElements.define(`${prefix}-print`, Print);
+  customElements.define(`${prefix}-echo`, Echo);
   customElements.define(`${prefix}-bind`, Bind);
 
-  customElements.define(`${prefix}-application`, Application);
+  customElements.define(`${prefix}-port`, Port);
+  customElements.define(`${prefix}-line`, Line);
+  customElements.define(`${prefix}-area`, Area);
+  customElements.define(`${prefix}-node`, Node);
+
+
+  customElements.define(`${prefix}-root`, Root);
+
+
+
 
 }
 
@@ -39,7 +59,6 @@ function signalize(root){
     // all properties of every branch
     for (const key in branch) {
       if(key === 'children') continue;
-      console.log(key);
       branch[key] = new Signal( branch[key] );
     }
   }

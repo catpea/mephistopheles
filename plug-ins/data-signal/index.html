@@ -24,20 +24,33 @@
         description: 'Outer Loop Text',
         children: [
           {
+            component: 'stage',
             mode: 'seondary',
-            name: 'Mother',
-            description: 'Inner Loop Text',
+            name: 'Stage',
+            description: 'Visual Programming Language Stage',
             children: [
               //NOTE: only one daughter is shown in screenshot to keep things simple
               {
+                component: 'node',
+                id: 'a',
                 mode: 'info',
-                name: 'Daughter #1',
+                name: 'Node #1',
                 description: 'Inner Inner Loop Text for Daughter #1',
               },
               {
+                component: 'node',
+                idnt: 'a',
                 mode: 'info',
-                name: 'Daughter #2',
+                name: 'Node #2',
                 description: 'Inner Inner Loop Text for Daughter #2',
+              },
+              {
+                component: 'line',
+                mode: 'warning',
+                name: 'Connection #2',
+                description: 'Inner Inner Loop Text for Daughter #2',
+                from: 'a/1',
+                from: 'b/0',
               }
             ] // close Mother's children (Daughters)
           } // close mother
@@ -46,10 +59,6 @@
     ]); // close root array (Signal Tree Root)
   </script>
   <body>
-    <div class="container my-5">
-      <div class="row">
-        <data-application name="hello-world" context="root" url="./application.html"></data-application>
-      </div>
-    </div>
+    <data-root name="hello-world" context="root" url="./application.html"></data-root>
   </body>
 </html>
