@@ -1,4 +1,5 @@
 import System from '../../System.js';
+import EventEmitter from '../event-emitter/EventEmitter.js';
 
 export default class VplSystem extends System {
 
@@ -13,8 +14,17 @@ export default class VplSystem extends System {
   #strokeWidth = 2;
   #line;
 
+  #scripts = [];
+  #pipe;
+
   locateSvg(){
-    this.#svg = this.host.shadowRoot.host.parentNode.querySelector('svg');
+
+    this.#svg = this.host.shadowRoot.host.parentNode.shadowRoot.querySelector('svg');
+
+    // const doc = this.host.shadowRoot.host.parentNode;
+    // const targetElement2 = doc.querySelector('');
+    // const targetElement = targetElement2.shadowRoot.querySelector(secondary);
+
     if(!this.#svg){
       //console(this.host.shadowRoot.host.parentNode);
       throw new TypeError('Unable to locate SVG element');
@@ -39,19 +49,91 @@ export default class VplSystem extends System {
     return this;
   }
 
-  injectTemplate(){
-    //console('XXXXXXXXXXXx', this.getApplication());
-    //console('XXXXXXXXXXXx', this.context);
-    let type = this.host.getAttribute('type');
-    const template = this.getApplication().shadowRoot.querySelector(`#${type}`);
-
+  injectTemplateFromAttribute(attribute='type'){
+    let value = this.host.getAttribute(attribute);
+    const id = `#${value}`;
+    const template = this.getApplication().shadowRoot.querySelector(id);
     this.template = template.content.cloneNode(true);
-    // this.host.shadowRoot.firstChild.appendChild(clone);
-    // //console('clone', this.host.shadowRoot);
+    return this;
+  }
+
+  injectTemplateFromTagName(){
+    const id = `#${this.host.tagName.toLowerCase().split('-')[1]}`;
+    const template = this.getApplication().shadowRoot.querySelector(id);
+    this.template = template.content.cloneNode(true);
+    return this;
+  }
+
+  consumeScript(){
+
+    const scripts = this.template.querySelectorAll('script');
+     scripts.forEach(script => {
+       const scriptContent = script.textContent;
+       // new Function(scriptContent).call(this);
+       this.#scripts.push(scriptContent);
+       script.remove()
+     });
 
     return this;
 
   }
+
+  createElementPipe(){
+      this.#pipe = new EventEmitter();
+      return this;
+      
+  }
+
+  wrapAttributeEvents(){
+    const classContext = {
+      app: this.getApplication().pipe,
+      pipe: this.#pipe,
+    };
+    // theis is the embeded script's class
+    const strContextClass = `${this.#scripts[0]}\n return new Main(this);`;
+    const objContextClass = new Function(strContextClass).call(classContext);
+    const supportedEvents = ['click'];
+    for (const name of supportedEvents) {
+      const attributeQuery = `[on${name}]`
+      const attributeName = `on${name}`
+      const matches = this.host.shadowRoot.querySelectorAll(attributeQuery);
+      matches.forEach(match => {
+        // get attribute code and remove attribute
+        const code = match.getAttribute(attributeName);
+        match.removeAttribute(attributeName);
+        // add a manual listener
+        match.addEventListener(name, ()=>{
+          const codeFunction = new Function(`return ${code}`);
+          // execute attribute code in context of class + retrieve user funcion (if any)
+          const userFuncion = codeFunction.call(objContextClass);
+          // execute user funcion
+          if (userFuncion instanceof Function) userFuncion(match, this);
+        });
+      });
+    } // supportedEvents
+    if('mount' in objContextClass) objContextClass.mount();
+    return this;
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   monitorSourcePosition(){
     this.monitorPosition('from', (x,y)=>{this.#line.setAttribute('x1', x); this.#line.setAttribute('y1', y); });
@@ -131,6 +213,9 @@ export default class VplSystem extends System {
 //     this.subscriptions.push( {type:'ChildObserver', id:'ancestor', subscription:()=>observer.disconnect()} );
 //
 //   }
+
+
+
 
   monitorPosition(attributeName, fun){
 

@@ -34,14 +34,12 @@ export default class System {
 
   subscriptions = []; // {type:'list/item/value', id:'', run}
 
-
-  // #fire = {'div[is]':['fire']};
-  #voids = ['print', 'bind', 'line', 'node'];
-  #tags = ['loop'];
+  // both of these rely on a different installer
+  #voids = ['print', 'bind', 'cable', 'program', 'port'];
+  #tags = ['loop', 'scene'];
 
   constructor(host) {
     this.host = host;
-    // this.#tags = this.#tags.concat(this.#voids);
   }
 
   get ready(){
@@ -50,10 +48,15 @@ export default class System {
 
   // --
 
-  attachShadow(){
+  attachEatingShadow(){
     const shadow = this.host.attachShadow({ mode: "open" });
     const slot = document.createElement('slot');
     this.host.shadowRoot.appendChild(slot);
+    return this;
+  }
+
+  attachShadow(){
+    const shadow = this.host.attachShadow({ mode: "open" });
     return this;
   }
 
@@ -159,7 +162,7 @@ export default class System {
     return this;
   }
 
-  consumeTemplate(){
+  consumeEatingTemplate(){
     let template;
     const templateCandidates = this.host.shadowRoot.querySelector('slot').assignedNodes().filter(node => node.nodeType === Node.ELEMENT_NODE);
 

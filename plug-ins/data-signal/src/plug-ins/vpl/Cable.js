@@ -1,6 +1,6 @@
 import System from './VplSystem.js';
 
-export default class Area extends HTMLElement {
+export default class Cable extends HTMLElement {
   #system;
 
   constructor() {
@@ -12,7 +12,11 @@ export default class Area extends HTMLElement {
     if(this.#system.ready) this.#system
     .setContextFromString()
     .attachShadow()
-    .renderValue()
+    .locateSvg()
+    .drawLine()
+    .monitorSourcePosition()
+    .monitorTargetPosition()
+
   }
 
   disconnectedCallback() {

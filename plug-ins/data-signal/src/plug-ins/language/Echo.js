@@ -1,6 +1,6 @@
-import System from '../System.js';
+import System from '../../System.js';
 
-export default class Print extends HTMLElement {
+export default class Echo extends HTMLElement {
   #system;
 
   constructor() {
@@ -10,8 +10,11 @@ export default class Print extends HTMLElement {
 
   connectedCallback() {
     if(this.#system.ready) this.#system
-    .setContextFromString()
     .attachShadow()
+    .consumeTemplate()
+    .adoptCss()
+    .clearContent()
+    .setContextFromString()
     .renderValue()
   }
 

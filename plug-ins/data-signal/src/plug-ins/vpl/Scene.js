@@ -1,6 +1,6 @@
-import System from '../System.js';
+import System from './VplSystem.js';
 
-export default class Echo extends HTMLElement {
+export default class Scene extends HTMLElement {
   #system;
 
   constructor() {
@@ -11,16 +11,25 @@ export default class Echo extends HTMLElement {
   connectedCallback() {
     if(this.#system.ready) this.#system
     .attachShadow()
-    .consumeTemplate()
-    .adoptCss()
-    .clearContent()
     .setContextFromString()
-    .renderValue()
+    .adoptCss()
+    .injectTemplateFromTagName()
+    .consumeScript()
+    .unfurlTemplate()
+    .setContextFromString()
+    .renderTemplateDelegate()
+    .wrapAttributeEvents()
   }
 
   disconnectedCallback() {
     if(this.#system.ready) this.#system
     .removeSubscription();
+  }
+
+  execute(fun){
+    const customContext = { customName: 'Example' };
+    console.log('Executing <3....', fun.apply(customContext)(this));
+    return this;
   }
 
   get context(){

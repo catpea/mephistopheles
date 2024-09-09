@@ -1,4 +1,4 @@
-import System from '../System.js';
+import System from '../../System.js';
 
 export default class Loop extends HTMLElement {
   #system;
@@ -8,9 +8,9 @@ export default class Loop extends HTMLElement {
   }
   connectedCallback() {
     if(this.#system.ready) this.#system
-    .attachShadow()
     .adoptCss()
-    .consumeTemplate()
+    .attachEatingShadow()
+    .consumeEatingTemplate()
     .clearContent()
     .setContextFromProperty()
     .renderContext()

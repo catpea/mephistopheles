@@ -1,12 +1,17 @@
-import System from '../System.js';
+import System from '../../System.js';
+import EventEmitter from '../event-emitter/EventEmitter.js';
+
 
 export default class Application extends HTMLElement {
   #system;
+  pipe;
   templates = new Map();
 
   constructor() {
     super();
     this.#system = new System(this);
+    this.pipe = new EventEmitter();
+
   }
 
   async connectedCallback() {
@@ -15,7 +20,7 @@ export default class Application extends HTMLElement {
 
     this.#system
     .setContextFromString()
-    .attachShadow()
+    .attachEatingShadow()
     .adoptCss()
     .unfurlTemplate()
     .clearContent()

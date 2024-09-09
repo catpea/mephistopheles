@@ -1,6 +1,6 @@
 import System from './VplSystem.js';
 
-export default class Line extends HTMLElement {
+export default class Program extends HTMLElement {
   #system;
 
   constructor() {
@@ -10,12 +10,15 @@ export default class Line extends HTMLElement {
 
   connectedCallback() {
     if(this.#system.ready) this.#system
-    .setContextFromString()
     .attachShadow()
-    .locateSvg()
-    .drawLine()
-    .monitorSourcePosition()
-    .monitorTargetPosition()
+    .adoptCss()
+    .injectTemplateFromAttribute()
+    .consumeScript()
+    .unfurlTemplate()
+    .setContextFromString()
+    .renderTemplateDelegate()
+    .createElementPipe()
+    .wrapAttributeEvents()
 
   }
 

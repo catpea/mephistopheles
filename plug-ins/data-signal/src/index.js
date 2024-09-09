@@ -1,22 +1,19 @@
 // For Registration
-import Root from './language/Root.js';
-import Bind from './language/Bind.js';
-import Loop from './language/Loop.js';
-import Echo from './language/Echo.js';
+import Root from './plug-ins/language/Root.js';
+import Bind from './plug-ins/language/Bind.js';
+import Loop from './plug-ins/language/Loop.js';
+import Echo from './plug-ins/language/Echo.js';
 
-import Port from './plug-ins/vpl/Port.js';
-import Line from './plug-ins/vpl/Line.js';
-import Area from './plug-ins/vpl/Area.js';
-import Node from './plug-ins/vpl/Node.js';
+import { Scene, Program, Port, Cable } from './plug-ins/vpl/import.js';
 
 import Fire from './plug-ins/fire/Fire.js';
 
 // import DraggableElement from './plug-ins/mouse/Draggable.js';
 
 // For Export
-import Signal      from './variables/Signal.js';
+import Signal      from './plug-ins/variables/Signal.js';
 
-async function install(prefix='data', css=['./bootstrap.min.css','bootstrap-icons.min.css']){
+async function install(prefix='data', css=['style.css', './bootstrap.min.css','bootstrap-icons.min.css']){
 
   for (const url of css) {
     const response = await fetch(url);
@@ -32,16 +29,12 @@ async function install(prefix='data', css=['./bootstrap.min.css','bootstrap-icon
   customElements.define(`${prefix}-echo`, Echo);
   customElements.define(`${prefix}-bind`, Bind);
 
+  customElements.define(`${prefix}-scene`, Scene);
+  customElements.define(`${prefix}-program`, Program);
   customElements.define(`${prefix}-port`, Port);
-  customElements.define(`${prefix}-line`, Line);
-  customElements.define(`${prefix}-area`, Area);
-  customElements.define(`${prefix}-node`, Node);
-
+  customElements.define(`${prefix}-cable`, Cable);
 
   customElements.define(`${prefix}-root`, Root);
-
-
-
 
 }
 
