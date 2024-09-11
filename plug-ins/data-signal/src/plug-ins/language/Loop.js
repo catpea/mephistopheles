@@ -8,9 +8,10 @@ export default class Loop extends HTMLElement {
   }
   connectedCallback() {
     if(this.#system.ready) this.#system
-    .adoptCss()
     .attachEatingShadow()
     .consumeEatingTemplate()
+    .normalizeTemplate()
+    .adoptCss()
     .clearContent()
     .setContextFromProperty()
     .renderContext()

@@ -29,17 +29,29 @@ export default class System {
 
   host;
 
-  context;
+  #context;
+  set context(v){
+    this.#context = v;
+    //console.log(`${this.host.tagName} set context to:`, this.#context);
+  }
+  get context(){
+    //console.log(`${this.host.tagName} read context`, this.#context);
+    return this.#context
+  }
+
   template;
 
   subscriptions = []; // {type:'list/item/value', id:'', run}
 
   // both of these rely on a different installer
-  #voids = ['print', 'bind', 'cable', 'program', 'port'];
-  #tags = ['loop', 'scene'];
+  #voidTags = ['print', 'bind', 'cable', 'program', 'port'];
+  #containerTags = ['loop', 'scene'];
+  #allTags = []
 
   constructor(host) {
     this.host = host;
+    this.#allTags = this.#allTags.concat(this.#voidTags, this.#containerTags);
+    //console.log(this.#allTags);
   }
 
   get ready(){
@@ -124,36 +136,56 @@ export default class System {
     const response = await fetch(url);
     let html = await response.text();
 
-    for (const name of this.#voids) {
+    for (const name of this.#voidTags) {
       const seek = new RegExp(`<${name} `, 'g');
       html = html.replace(seek, `<embed ${name} `);
     }
-
     html = html.replace(/is="fire" /g, 'is="data-fire"');
-
-
-    const div = document.createElement('div');
-    div.innerHTML = html;
-
-    let template;
-
-    const templateCandidates = [...div.children].filter(node => node.nodeType === Node.ELEMENT_NODE);
-
-    if (templateCandidates.length === 0){
-      // ///////////console.warn('No template content found'); //result: template remains undefined
-    } else if (templateCandidates.length > 0){
-      // ///////////console.warn('One root per template please due to key/reconciler optimizations, wrapping in div');
-      template = document.createElement('div');
-      template.append(...div.children)
-    }else{
-      template = templateCandidates[0]; // correct selection
-    }
-
-    this.template = template;
-
-    ////////console(html, templateCandidates);
+    const container = document.createElement('div');
+    container.innerHTML = html.trim();
+    this.template = container.children;
     return this;
 
+  }
+
+  normalizeTemplate(){
+    let templateChildren;
+
+    //console.log('normalizeTemplate', this.template )
+    //console.log('normalizeTemplate typeof this.template:', typeof this.template )
+    //console.log('normalizeTemplate Array.isArray(this.template):', Array.isArray(this.template) )
+    //console.log('normalizeTemplate instanceof DocumentFragment:', this.template instanceof DocumentFragment )
+    //console.log('normalizeTemplate instanceof HTMLCollection:', this.template instanceof HTMLCollection )
+
+    if( Array.isArray(this.template) ){
+      templateChildren = this.template;
+    }else if(this.template instanceof HTMLCollection){
+      templateChildren = [...this.template];
+    }else if(this.template instanceof DocumentFragment){
+      templateChildren = [...this.template.children];
+    }
+
+    let response;
+
+    const noTemplate = templateChildren.length === 0;
+    const oneTempate =  templateChildren.length === 1
+    const manyTemplates = templateChildren.length > 0;
+
+    if (noTemplate){
+      let blankRoot = document.createElement('div');
+      blankRoot.append('no template!')
+      response = blankRoot;
+    } else if (manyTemplates){
+      let singeRoot = document.createElement('div');
+      singeRoot.append(...templateChildren)
+      response = singeRoot;
+    }else if(oneTempate){ // only one
+      response = templateChildren[0]; // correct selection
+    }
+
+    this.template = response;
+
+    return this;
   }
 
   debugTemplate(){
@@ -164,28 +196,8 @@ export default class System {
 
   consumeEatingTemplate(){
     let template;
-    const templateCandidates = this.host.shadowRoot.querySelector('slot').assignedNodes().filter(node => node.nodeType === Node.ELEMENT_NODE);
-
-    ////////console(`BBB consumeTemplate ${this.host.tagName}`, this.template, this.host.shadowRoot.querySelector('slot').assignedNodes(), [...this.host.attributes]);
-
-
-    if (templateCandidates.length === 0){
-      ////////console(`ZZZ ${this.host.tagName} HAS NO TEMPLATE!`, this.host.shadowRoot, templateCandidates);
-      //////console.warn('No template content found'); //result: template remains undefined
-    } else if (templateCandidates.length > 0){
-      // ///////////console.warn('One root per template please due to key/reconciler optimizations, wrapping in div');
-      template = document.createElement('div');
-      template.append(...this.host.shadowRoot.querySelector('slot').assignedNodes())
-    }else{
-      template = templateCandidates[0]; // correct selection
-    }
-    this.template = template;
-
-    // ////console.debug(`consumeTemplate: DDD ${this.host.tagName}/${this.host.getAttribute('name')} TEMPLATE!`, this.template?.outerHTML, this.host.shadowRoot.querySelector('slot').assignedNodes());
-
-    ////console.debug(`consumeTemplate: OOO ${this.host.tagName}/${this.host.getAttribute('name')} consumed its template`, this.template?.outerHTML);
-    ////console.debug(`consumeTemplate: ORDER ${this.host.tagName}/${this.host.getAttribute('name')} running...`);
-
+    const templateCandidates = this.host.shadowRoot.querySelector('slot').assignedNodes();//.filter(node => node.nodeType === Node.ELEMENT_NODE);
+    this.template = templateCandidates;
     return this;
   }
 
@@ -262,7 +274,7 @@ export default class System {
     //   });
     // }
 
-    for (const tag of this.#tags) {
+    for (const tag of this.#containerTags) {
       this.template.querySelectorAll(tag).forEach(directive => {
         //console('TAGS PROCESSING', directive.tagName);
 
@@ -316,52 +328,100 @@ export default class System {
     let templateClone = this.template.cloneNode(true);
     templateClone.dataset.key = item.key;
 
-      for (const tag of this.#tags) {
+    //console.log('allTags', this.#allTags);
+      for (const tag of this.#allTags) {
+        // console.log(`${this.host.tagName} Scanning for data-${tag} and found ${this.host.querySelectorAll(`data-${tag}`).length}`);
+
+
         for (const el of templateClone.querySelectorAll(`data-${tag}`)) {
            const parents = [];
            let parent = el.parentNode;
            while(parent !== templateClone){
-             parents.push(el.parentNode)
+             // parents.push(el.parentNode)
+             parents.push(parent)
              parent = parent.parentNode;
            }
-           const isOutermost = !parents.map(o=>o.tagName).find(o=>o.match(/^DATA-/));
+           // console.log(`Found ${el.tagName} with parents`, parents.map(o=>o.tagName));
+          const isOutermost = !parents.map(o=>o.tagName).find(o=>o.match(/^DATA-/));
           if(!isOutermost) continue; // only interested in outermost
-          ////////console(`Tag ${this.host.tagName} applied context to ${el.tagName}`, el.context);
-
           el.context = item;
-          ////////console(el.context);
+          // console.log(`${this.host.tagName} found ${el.tagName} and set context to`, el.context);
         }
+
+
+        for (const el of this.host.querySelectorAll(`data-${tag}`)) {
+           let parent = el.parentNode;
+           const parents = [];
+           while(parent !== this.host){
+             // console.log(this.host.tagName, parent.tagName, templateClone.tagName, parent == templateClone);
+             // if(parent == templateClone) break;
+             parents.push(parent)
+             parent = parent.parentNode;
+             // if(!parent) break;
+           }
+           console.log(`Found ${el.tagName} with parents`, parents.map(o=>o.tagName));
+
+          const isOutermost = !parents.map(o=>o.tagName).find(o=>o.match(/^DATA-/));
+          if(!isOutermost) continue; // only interested in outermost
+          el.context = item;
+          console.log(`${this.host.tagName} found ${el.tagName} and set context to`, el.context);
+        }
+
+
+
       }
 
     this.host.shadowRoot.appendChild(templateClone);
+
+
     return this;
 
   }
-
-  renderTemplateDelegate(){
+  renderDelegate2(){
+    const item = this.context || {};
     let templateClone = this.template.cloneNode(true);
+    templateClone.dataset.key = item.key;
 
-      for (const tag of this.#tags) {
-        for (const el of templateClone.querySelectorAll(`data-${tag}`)) {
-           const parents = [];
-           let parent = el.parentNode;
-           while(parent !== templateClone){
-             parents.push(el.parentNode)
-             parent = parent.parentNode;
-           }
-           const isOutermost = !parents.map(o=>o.tagName).find(o=>o.match(/^DATA-/));
-          if(!isOutermost) continue; // only interested in outermost
-          ////////console(`Tag ${this.host.tagName} applied context to ${el.tagName}`, el.context);
+    //console.log('allTags', this.#allTags);
+      for (const tag of this.#allTags) {
+        console.log(`${this.host.tagName} Scanning for data-${tag} and found ${this.host.querySelectorAll(`data-${tag}`).length}`);
 
-          el.context = item;
-          ////////console(el.context);
-        }
+
+
+
       }
 
     this.host.shadowRoot.appendChild(templateClone);
+
+
     return this;
 
   }
+
+  // renderTemplateDelegate(){
+  //   let templateClone = this.template.cloneNode(true);
+  //
+  //     for (const tag of this.#containerTags) {
+  //       for (const el of templateClone.querySelectorAll(`data-${tag}`)) {
+  //          const parents = [];
+  //          let parent = el.parentNode;
+  //          while(parent !== templateClone){
+  //            parents.push(el.parentNode)
+  //            parent = parent.parentNode;
+  //          }
+  //          const isOutermost = !parents.map(o=>o.tagName).find(o=>o.match(/^DATA-/));
+  //         if(!isOutermost) continue; // only interested in outermost
+  //         ////////console(`Tag ${this.host.tagName} applied context to ${el.tagName}`, el.context);
+  //
+  //         el.context = item;
+  //         ////////console(el.context);
+  //       }
+  //     }
+  //
+  //   this.host.shadowRoot.appendChild(templateClone);
+  //   return this;
+  //
+  // }
 
   renderContext(){
 
@@ -389,6 +449,8 @@ export default class System {
     const limitSpecifier = this.host.getAttribute('limit');
     const [propertyName] = positionalArguments.split(' ');
     const matches = upwards(this.host, withSelector);
+
+    console.log(`${this.host.tagName} -> ${propertyName} with ${withSelector} ... CONTEXT:`, this.context);
 
     //console({limitSpecifier});
     if(limitSpecifier !== null){
@@ -478,14 +540,14 @@ export default class System {
     // }
 
     let corona = document.createElement('div');
-    corona.classList.add(...'border border-primary rounded p-3 mb-3'.split(' '))
+    corona.classList.add(...'border border-primary rounded'.split(' '))
     let templateClone = this.template.cloneNode(true);
     corona.appendChild(templateClone);
 
     //console(item);
     templateClone.dataset.key = item.key;
     const subscription = item.subscribe(c=>{
-      for (const tag of this.#tags) {
+      for (const tag of this.#allTags) {
         for (const el of templateClone.querySelectorAll(`data-${tag}`)) {
            const parents = [];
            let parent = el.parentNode;

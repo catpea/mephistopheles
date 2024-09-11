@@ -14,11 +14,13 @@ export default class Program extends HTMLElement {
     .adoptCss()
     .injectTemplateFromAttribute()
     .consumeScript()
+    .normalizeTemplate()
     .unfurlTemplate()
     .setContextFromString()
-    .renderTemplateDelegate()
+    .renderDelegate()
     .createElementPipe()
     .wrapAttributeEvents()
+    .bindInputs()
 
   }
 

@@ -73,7 +73,7 @@ export default class VplSystem extends System {
        this.#scripts.push(scriptContent);
        script.remove()
      });
-
+     ////console.log('Consumed scripts', this.#scripts);
     return this;
 
   }
@@ -81,13 +81,14 @@ export default class VplSystem extends System {
   createElementPipe(){
       this.#pipe = new EventEmitter();
       return this;
-      
+
   }
 
   wrapAttributeEvents(){
     const classContext = {
-      app: this.getApplication().pipe,
+      root: this.getApplication().pipe,
       pipe: this.#pipe,
+      data: this.context,
     };
     // theis is the embeded script's class
     const strContextClass = `${this.#scripts[0]}\n return new Main(this);`;
@@ -115,7 +116,24 @@ export default class VplSystem extends System {
     return this;
   }
 
+  bindInputs(){
 
+    console.error('PLEASE ADD GARBAGE COLLECTION TO signal and event listenr in bindInputs');
+
+    const standardInputs = this.host.shadowRoot.querySelectorAll('input[value]');
+    standardInputs.forEach(input => {
+      const key = input.getAttribute('value');
+      if(this.context[key]){
+        this.context[key].subscribe(v=>input.value = v)
+        input.addEventListener("input", (event) => {
+          this.context[key].set(event.target.value);
+        });
+      }
+    });
+
+    console.log({standardInputs});
+    return this;
+  }
 
 
 
@@ -227,7 +245,7 @@ export default class VplSystem extends System {
 
     let [primary, secondary] = this.host.getAttribute(attributeName).split('/');
     // let targetElement = null;
-    console.log({primary, secondary});
+    ////console.log({primary, secondary});
 
     const doc = this.host.shadowRoot.host.parentNode;
     const targetElement2 = doc.querySelector(primary);
@@ -236,10 +254,10 @@ export default class VplSystem extends System {
 
 
     if(!targetElement){
-      console.log(`${this.host.tagName}, Unable to locate targetElement via selector ${selector}`, this.host.shadowRoot.host.parentNode.innerHTML);
+      ////console.log(`${this.host.tagName}, Unable to locate targetElement via selector ${selector}`, this.host.shadowRoot.host.parentNode.innerHTML);
       return this;
     }else{
-      console.log('GOTIT', targetElement);
+      ////console.log('GOTIT', targetElement);
     }
 
     // this.monitoring = true;

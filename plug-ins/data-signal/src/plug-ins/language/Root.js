@@ -19,6 +19,7 @@ export default class Application extends HTMLElement {
     await this.#system.fetchTemplate();
 
     this.#system
+    .normalizeTemplate()
     .setContextFromString()
     .attachEatingShadow()
     .adoptCss()

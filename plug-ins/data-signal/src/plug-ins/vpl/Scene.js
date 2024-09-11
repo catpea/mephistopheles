@@ -15,9 +15,9 @@ export default class Scene extends HTMLElement {
     .adoptCss()
     .injectTemplateFromTagName()
     .consumeScript()
+    .normalizeTemplate()
     .unfurlTemplate()
-    .setContextFromString()
-    .renderTemplateDelegate()
+    .renderDelegate()
     .wrapAttributeEvents()
   }
 
